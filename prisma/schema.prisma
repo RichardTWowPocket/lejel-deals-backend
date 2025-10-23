@@ -1,0 +1,338 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum PricingType {
+  FIXED
+  PERCENTAGE
+}
+
+enum DealStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  EXPIRED
+  SOLD_OUT
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELLED
+  REFUNDED
+}
+
+enum CouponStatus {
+  ACTIVE
+  USED
+  EXPIRED
+  CANCELLED
+}
+
+enum UserRole {
+  CUSTOMER
+  MERCHANT
+  STAFF
+  ADMIN
+}
+
+enum StaffRole {
+  MANAGER
+  CASHIER
+  SUPERVISOR
+  ADMIN
+}
+
+// Models
+model Deal {
+  id          String      @id @default(cuid())
+  title       String
+  description String?
+  dealPrice   Decimal     @db.Decimal(10, 2)  // What customer PAYS to buy the coupon
+  discountPrice Decimal   @db.Decimal(10, 2)  // Face value of the coupon (voucher value)
+  validFrom   DateTime
+  validUntil  DateTime
+  status      DealStatus  @default(DRAFT)
+  maxQuantity Int?
+  soldQuantity Int       @default(0)
+  images      String[]    @default([])
+  terms       String?
+  merchantId  String
+  categoryId  String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relations
+  merchant    Merchant    @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  category    Category?   @relation(fields: [categoryId], references: [id])
+  orders      Order[]
+  coupons     Coupon[]
+
+  // Indexes for performance optimization
+  @@index([status])                                           // Filter by status
+  @@index([merchantId])                                       // Filter by merchant
+  @@index([categoryId])                                       // Filter by category
+  @@index([dealPrice])                                        // Sort by price
+  @@index([soldQuantity])                                     // Sort by popularity
+  @@index([createdAt])                                        // Sort by creation date
+  @@index([validFrom])                                        // Filter by valid from date
+  @@index([validUntil])                                       // Filter by valid until date
+  @@index([status, validFrom, validUntil])                    // Composite for active deals query
+  @@index([status, merchantId])                               // Filter by merchant's active deals
+  @@index([status, categoryId])                               // Filter by category's active deals
+  @@index([status, dealPrice])                                // Sort active deals by price
+  @@index([status, soldQuantity])                             // Sort active deals by popularity
+  @@map("deals")
+}
+
+model Merchant {
+  id          String      @id @default(cuid())
+  name        String
+  description String?
+  email       String      @unique
+  phone       String?
+  address     String?
+  city        String?
+  province    String?
+  postalCode  String?
+  website     String?
+  logo        String?
+  images      String[]    @default([])
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  deals       Deal[]
+  staff       Staff[]
+  users       MerchantUser[]
+
+  @@map("merchants")
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  orderNumber String      @unique
+  customerId  String
+  dealId      String
+  quantity    Int         @default(1)
+  totalAmount Decimal     @db.Decimal(10, 2)
+  status      OrderStatus @default(PENDING)
+  paymentMethod String?
+  paymentReference String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  customer    Customer    @relation(fields: [customerId], references: [id])
+  deal        Deal        @relation(fields: [dealId], references: [id])
+  coupons     Coupon[]
+
+  // Indexes for performance optimization
+  @@index([customerId])                                       // Filter by customer
+  @@index([dealId])                                           // Filter by deal
+  @@index([status])                                           // Filter by status
+  @@index([createdAt])                                        // Sort by creation date
+  @@index([customerId, status])                               // Customer's orders by status
+  @@index([dealId, status])                                   // Deal's orders by status
+  @@map("orders")
+}
+
+model Coupon {
+  id          String      @id @default(cuid())
+  orderId     String
+  dealId      String
+  qrCode      String      @unique
+  status      CouponStatus @default(ACTIVE)
+  usedAt      DateTime?
+  expiresAt   DateTime
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  order       Order       @relation(fields: [orderId], references: [id])
+  deal        Deal        @relation(fields: [dealId], references: [id])
+  redemptions Redemption[]
+
+  // Indexes for performance optimization
+  @@index([orderId])                                          // Filter by order
+  @@index([dealId])                                           // Filter by deal
+  @@index([status])                                           // Filter by status
+  @@index([expiresAt])                                        // Filter by expiration
+  @@index([status, expiresAt])                                // Active non-expired coupons
+  @@map("coupons")
+}
+
+enum RedemptionStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+model Redemption {
+  id          String           @id @default(cuid())
+  couponId    String
+  staffId     String?
+  notes       String?
+  location    String?
+  status      RedemptionStatus @default(COMPLETED)
+  redeemedAt  DateTime         @default(now())
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  metadata    Json?
+
+  // Relations
+  coupon      Coupon           @relation(fields: [couponId], references: [id])
+  staff       Staff?           @relation(fields: [staffId], references: [id])
+
+  // Indexes for performance optimization
+  @@index([couponId])                                         // Filter by coupon
+  @@index([staffId])                                          // Filter by staff
+  @@index([status])                                           // Filter by status
+  @@index([redeemedAt])                                       // Sort by redemption date
+  @@map("redemptions")
+}
+
+model Customer {
+  id          String      @id @default(cuid())
+  userId      String?     @unique
+  email       String      @unique
+  phone       String?
+  firstName   String?
+  lastName    String?
+  dateOfBirth DateTime?
+  preferences Json?
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  user        User?       @relation(fields: [userId], references: [id])
+  orders      Order[]
+
+  @@map("customers")
+}
+
+model User {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  hashedPassword String
+  role           UserRole  @default(CUSTOMER)
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Profiles / relations
+  customer       Customer?
+  merchants      MerchantUser[]
+
+  @@map("users")
+}
+
+model MerchantUser {
+  id         String    @id @default(cuid())
+  userId     String
+  merchantId String
+  isOwner    Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+
+  user       User      @relation(fields: [userId], references: [id])
+  merchant   Merchant  @relation(fields: [merchantId], references: [id])
+
+  @@unique([userId, merchantId])
+  @@map("merchant_users")
+}
+
+model Staff {
+  id          String      @id @default(cuid())
+  firstName   String
+  lastName    String
+  email       String      @unique
+  phone       String?
+  pin         String      // 4-6 digit PIN for authentication
+  role        StaffRole   @default(CASHIER)
+  isActive    Boolean     @default(true)
+  lastLoginAt DateTime?
+  merchantId  String?     // Optional: staff can be assigned to specific merchant
+  permissions Json?       // Flexible permissions object
+  metadata    Json?       // Additional staff data
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  merchant    Merchant?   @relation(fields: [merchantId], references: [id])
+  redemptions Redemption[]
+
+  @@map("staff")
+}
+
+model Category {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  description String?
+  icon        String?
+  color       String?     // For UI theming
+  image       String?     // Category banner image
+  parentId    String?     // Reference to parent category
+  level       Int         @default(0) // 0 = root, 1 = child, etc.
+  path        String?     // "food/beverage/restaurants"
+  sortOrder   Int         @default(0) // Custom ordering within level
+  tags        String[]    @default([]) // Searchable tags
+  metadata    Json?       // Flexible additional data
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  parent      Category?   @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children    Category[]  @relation("CategoryHierarchy")
+  deals       Deal[]
+
+  @@map("categories")
+}
+
+model Media {
+  id          String      @id @default(cuid())
+  filename    String
+  originalName String
+  mimeType    String
+  size        Int
+  url         String
+  uploadedBy  String?
+  createdAt   DateTime    @default(now())
+
+  @@map("media")
+}
+
+model QRCodeActivity {
+  id          String      @id @default(cuid())
+  action      String      // GENERATED, VALIDATED, REDEEMED, EXPIRED, REVOKED, etc.
+  couponId    String?
+  metadata    Json?       // Additional data about the activity
+  timestamp   DateTime    @default(now())
+  createdAt   DateTime    @default(now())
+
+  @@map("qr_code_activities")
+}
+
+model WebhookLog {
+  id          String      @id @default(cuid())
+  source      String      // e.g., 'midtrans', 'whatsapp'
+  event       String
+  payload     Json
+  status      String      // 'success', 'error', 'pending'
+  response    Json?
+  createdAt   DateTime    @default(now())
+
+  @@map("webhook_logs")
+}
