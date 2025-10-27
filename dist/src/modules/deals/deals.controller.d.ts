@@ -5,7 +5,7 @@ import { DealStatus } from '@prisma/client';
 export declare class DealsController {
     private readonly dealsService;
     constructor(dealsService: DealsService);
-    findAll(page: number, limit: number, status?: DealStatus, merchantId?: string, categoryId?: string, search?: string, featured?: boolean, sortBy?: string, sortOrder?: 'asc' | 'desc'): Promise<DealListResponseDto>;
+    findAll(page: number, limit: number, status?: DealStatus, merchantId?: string, categoryId?: string, search?: string, featured?: boolean, city?: string, priceMin?: number, priceMax?: number, sortBy?: string, sortOrder?: 'asc' | 'desc'): Promise<DealListResponseDto>;
     findActive(page: number, limit: number): Promise<DealListResponseDto>;
     findByStatus(status: DealStatus, page: number, limit: number): Promise<DealListResponseDto>;
     findByMerchant(merchantId: string, page: number, limit: number): Promise<DealListResponseDto>;

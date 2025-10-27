@@ -5,11 +5,15 @@ export declare class DealMerchantDto {
     slug: string;
     logoUrl?: string;
     address?: string;
+    city?: string;
+    province?: string;
+    phone?: string;
 }
 export declare class DealCategoryDto {
     id: string;
     name: string;
     slug: string;
+    color?: string;
 }
 export declare class DealResponseDto {
     id: string;

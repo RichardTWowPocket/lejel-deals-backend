@@ -27,7 +27,7 @@ let DealsController = class DealsController {
     constructor(dealsService) {
         this.dealsService = dealsService;
     }
-    async findAll(page, limit, status, merchantId, categoryId, search, featured, sortBy, sortOrder) {
+    async findAll(page, limit, status, merchantId, categoryId, search, featured, city, priceMin, priceMax, sortBy, sortOrder) {
         return this.dealsService.findAll({
             page,
             limit,
@@ -36,6 +36,9 @@ let DealsController = class DealsController {
             categoryId,
             search,
             featured,
+            city,
+            priceMin,
+            priceMax,
             sortBy,
             sortOrder,
         });
@@ -100,6 +103,9 @@ __decorate([
     (0, swagger_1.ApiQuery)({ name: 'categoryId', required: false, type: String, description: 'Filter by category' }),
     (0, swagger_1.ApiQuery)({ name: 'search', required: false, type: String, description: 'Search in title/description' }),
     (0, swagger_1.ApiQuery)({ name: 'featured', required: false, type: Boolean, description: 'Filter featured deals' }),
+    (0, swagger_1.ApiQuery)({ name: 'city', required: false, type: String, description: 'Filter by merchant city' }),
+    (0, swagger_1.ApiQuery)({ name: 'priceMin', required: false, type: Number, description: 'Minimum deal price (IDR)' }),
+    (0, swagger_1.ApiQuery)({ name: 'priceMax', required: false, type: Number, description: 'Maximum deal price (IDR)' }),
     (0, swagger_1.ApiQuery)({ name: 'sortBy', required: false, type: String, description: 'Sort by field' }),
     (0, swagger_1.ApiQuery)({ name: 'sortOrder', required: false, enum: ['asc', 'desc'], description: 'Sort order' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Deals retrieved successfully', type: deal_response_dto_1.DealListResponseDto }),
@@ -110,10 +116,13 @@ __decorate([
     __param(4, (0, common_1.Query)('categoryId')),
     __param(5, (0, common_1.Query)('search')),
     __param(6, (0, common_1.Query)('featured')),
-    __param(7, (0, common_1.Query)('sortBy')),
-    __param(8, (0, common_1.Query)('sortOrder')),
+    __param(7, (0, common_1.Query)('city')),
+    __param(8, (0, common_1.Query)('priceMin')),
+    __param(9, (0, common_1.Query)('priceMax')),
+    __param(10, (0, common_1.Query)('sortBy')),
+    __param(11, (0, common_1.Query)('sortOrder')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Number, String, String, String, String, Boolean, String, String]),
+    __metadata("design:paramtypes", [Number, Number, String, String, String, String, Boolean, String, Number, Number, String, String]),
     __metadata("design:returntype", Promise)
 ], DealsController.prototype, "findAll", null);
 __decorate([

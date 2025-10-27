@@ -178,5 +178,22 @@ export class DealFiltersDto {
   @IsString()
   @IsOptional()
   sortOrder?: 'asc' | 'desc';
+
+  @ApiPropertyOptional({ description: 'Filter by merchant city', example: 'Jakarta' })
+  @IsString()
+  @IsOptional()
+  city?: string;
+
+  @ApiPropertyOptional({ description: 'Minimum deal price in IDR', example: 10000 })
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  priceMin?: number;
+
+  @ApiPropertyOptional({ description: 'Maximum deal price in IDR', example: 100000 })
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  priceMax?: number;
 }
 

@@ -96,6 +96,26 @@ export class DealsService {
       ];
     }
 
+    // Filter by merchant city
+    if (filters.city) {
+      where.merchant = {
+        ...where.merchant,
+        city: { contains: filters.city, mode: 'insensitive' },
+      };
+    }
+
+    // Filter by price range
+    if (filters.priceMin !== undefined) {
+      where.dealPrice = { ...where.dealPrice, gte: filters.priceMin };
+    }
+
+    if (filters.priceMax !== undefined) {
+      where.dealPrice = {
+        ...where.dealPrice,
+        lte: filters.priceMax,
+      };
+    }
+
     // Filter for active deals only when status=active is specified
     if (filters.status === DealStatus.ACTIVE) {
       where.status = DealStatus.ACTIVE;
@@ -147,6 +167,8 @@ export class DealsService {
               logo: true,
               address: true,
               city: true,
+              province: true,
+              phone: true,
             },
           },
           category: {
@@ -155,6 +177,7 @@ export class DealsService {
               name: true,
               description: true,
               icon: true,
+              color: true,
             },
           },
           _count: {
@@ -193,6 +216,8 @@ export class DealsService {
             logo: true,
             address: true,
             city: true,
+            province: true,
+            phone: true,
           },
         },
         category: {
@@ -201,6 +226,7 @@ export class DealsService {
             name: true,
             description: true,
             icon: true,
+            color: true,
           },
         },
         _count: {
@@ -240,6 +266,8 @@ export class DealsService {
             logo: true,
             address: true,
             city: true,
+            province: true,
+            phone: true,
           },
         },
         category: {
@@ -248,6 +276,7 @@ export class DealsService {
             name: true,
             description: true,
             icon: true,
+            color: true,
           },
         },
         _count: {
@@ -584,6 +613,9 @@ export class DealsService {
             slug: this.generateSlug(deal.merchant.name, deal.merchant.id),
             logoUrl: deal.merchant.logo,
             address: deal.merchant.address,
+            city: deal.merchant.city,
+            province: deal.merchant.province,
+            phone: deal.merchant.phone,
           }
         : undefined,
       categoryId: deal.categoryId,
@@ -592,6 +624,7 @@ export class DealsService {
             id: deal.category.id,
             name: deal.category.name,
             slug: this.generateSlug(deal.category.name, deal.category.id),
+            color: deal.category.color,
           }
         : undefined,
       createdAt: deal.createdAt,

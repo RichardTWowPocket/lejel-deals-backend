@@ -16,6 +16,15 @@ export class DealMerchantDto {
 
   @ApiPropertyOptional()
   address?: string;
+
+  @ApiPropertyOptional()
+  city?: string;
+
+  @ApiPropertyOptional()
+  province?: string;
+
+  @ApiPropertyOptional()
+  phone?: string;
 }
 
 export class DealCategoryDto {
@@ -27,6 +36,9 @@ export class DealCategoryDto {
 
   @ApiProperty()
   slug: string;
+
+  @ApiPropertyOptional()
+  color?: string;
 }
 
 export class DealResponseDto {

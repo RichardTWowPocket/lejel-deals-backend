@@ -18,6 +18,9 @@ class DealMerchantDto {
     slug;
     logoUrl;
     address;
+    city;
+    province;
+    phone;
 }
 exports.DealMerchantDto = DealMerchantDto;
 __decorate([
@@ -40,10 +43,23 @@ __decorate([
     (0, swagger_1.ApiPropertyOptional)(),
     __metadata("design:type", String)
 ], DealMerchantDto.prototype, "address", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)(),
+    __metadata("design:type", String)
+], DealMerchantDto.prototype, "city", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)(),
+    __metadata("design:type", String)
+], DealMerchantDto.prototype, "province", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)(),
+    __metadata("design:type", String)
+], DealMerchantDto.prototype, "phone", void 0);
 class DealCategoryDto {
     id;
     name;
     slug;
+    color;
 }
 exports.DealCategoryDto = DealCategoryDto;
 __decorate([
@@ -58,6 +74,10 @@ __decorate([
     (0, swagger_1.ApiProperty)(),
     __metadata("design:type", String)
 ], DealCategoryDto.prototype, "slug", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)(),
+    __metadata("design:type", String)
+], DealCategoryDto.prototype, "color", void 0);
 class DealResponseDto {
     id;
     slug;

@@ -37,6 +37,9 @@ export class DealsController {
   @ApiQuery({ name: 'categoryId', required: false, type: String, description: 'Filter by category' })
   @ApiQuery({ name: 'search', required: false, type: String, description: 'Search in title/description' })
   @ApiQuery({ name: 'featured', required: false, type: Boolean, description: 'Filter featured deals' })
+  @ApiQuery({ name: 'city', required: false, type: String, description: 'Filter by merchant city' })
+  @ApiQuery({ name: 'priceMin', required: false, type: Number, description: 'Minimum deal price (IDR)' })
+  @ApiQuery({ name: 'priceMax', required: false, type: Number, description: 'Maximum deal price (IDR)' })
   @ApiQuery({ name: 'sortBy', required: false, type: String, description: 'Sort by field' })
   @ApiQuery({ name: 'sortOrder', required: false, enum: ['asc', 'desc'], description: 'Sort order' })
   @ApiResponse({ status: 200, description: 'Deals retrieved successfully', type: DealListResponseDto })
@@ -48,6 +51,9 @@ export class DealsController {
     @Query('categoryId') categoryId?: string,
     @Query('search') search?: string,
     @Query('featured') featured?: boolean,
+    @Query('city') city?: string,
+    @Query('priceMin') priceMin?: number,
+    @Query('priceMax') priceMax?: number,
     @Query('sortBy') sortBy?: string,
     @Query('sortOrder') sortOrder?: 'asc' | 'desc',
   ): Promise<DealListResponseDto> {
@@ -59,6 +65,9 @@ export class DealsController {
       categoryId,
       search,
       featured,
+      city,
+      priceMin,
+      priceMax,
       sortBy,
       sortOrder,
     });

@@ -203,6 +203,9 @@ class DealFiltersDto {
     featured;
     sortBy;
     sortOrder;
+    city;
+    priceMin;
+    priceMax;
 }
 exports.DealFiltersDto = DealFiltersDto;
 __decorate([
@@ -261,4 +264,24 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], DealFiltersDto.prototype, "sortOrder", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Filter by merchant city', example: 'Jakarta' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], DealFiltersDto.prototype, "city", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Minimum deal price in IDR', example: 10000 }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.Min)(0),
+    __metadata("design:type", Number)
+], DealFiltersDto.prototype, "priceMin", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Maximum deal price in IDR', example: 100000 }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.Min)(0),
+    __metadata("design:type", Number)
+], DealFiltersDto.prototype, "priceMax", void 0);
 //# sourceMappingURL=create-deal.dto.js.map

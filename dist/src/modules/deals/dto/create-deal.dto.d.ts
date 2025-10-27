@@ -39,4 +39,7 @@ export declare class DealFiltersDto {
     featured?: boolean;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
+    city?: string;
+    priceMin?: number;
+    priceMax?: number;
 }
