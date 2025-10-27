@@ -15,6 +15,7 @@ import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { StaffModule } from './modules/staff/staff.module';
 import { QRCodeSecurityModule } from './modules/qr-security/qr-security.module';
 import { RedemptionsModule } from './modules/redemptions/redemptions.module';
+import { MediaModule } from './modules/media/media.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { RedemptionsModule } from './modules/redemptions/redemptions.module';
     StaffModule,
     QRCodeSecurityModule,
     RedemptionsModule,
+    MediaModule,
   ],
   controllers: [AppController],
   providers: [AppService],

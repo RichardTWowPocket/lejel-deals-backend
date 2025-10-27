@@ -205,6 +205,39 @@ export class MerchantsController {
     return this.merchantsService.getMerchantStats(id);
   }
 
+  // Merchant overview for dashboard
+  @Roles('merchant', 'admin')
+  @Get(':id/overview')
+  @ApiOperation({ summary: 'Get merchant overview - today\'s metrics for dashboard' })
+  @ApiParam({ name: 'id', description: 'Merchant ID' })
+  @ApiBearerAuth('JWT-auth')
+  @ApiResponse({ status: 200, description: 'Returns merchant overview with today\'s KPIs' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden - insufficient permissions' })
+  @ApiResponse({ status: 404, description: 'Merchant not found' })
+  getOverview(@Param('id') id: string, @CurrentUser() user: AuthUser) {
+    return this.merchantsService.getMerchantOverview(id);
+  }
+
+  // Payouts endpoint
+  @Roles('merchant', 'admin')
+  @Get(':id/payouts')
+  @ApiOperation({ summary: 'Get merchant payouts and revenue calculations' })
+  @ApiParam({ name: 'id', description: 'Merchant ID' })
+  @ApiQuery({ name: 'period', required: false, enum: ['day', 'week', 'month', 'year', 'all'], description: 'Time period for payouts' })
+  @ApiBearerAuth('JWT-auth')
+  @ApiResponse({ status: 200, description: 'Returns merchant payouts and revenue data' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden - insufficient permissions' })
+  @ApiResponse({ status: 404, description: 'Merchant not found' })
+  getPayouts(
+    @Param('id') id: string,
+    @Query('period') period?: 'day' | 'week' | 'month' | 'year' | 'all',
+    @CurrentUser() user?: AuthUser,
+  ) {
+    return this.merchantsService.getMerchantPayouts(id, period || 'all');
+  }
+
   // Merchant activation/deactivation
   @Roles('merchant', 'admin')
   @Patch(':id/deactivate')
