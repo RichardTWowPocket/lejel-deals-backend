@@ -454,9 +454,9 @@ export class MerchantsService {
       .map(deal => ({
         id: deal.id,
         title: deal.title,
-        remaining: deal.maxQuantity - deal.soldQuantity,
-        total: deal.maxQuantity,
-        percentageLeft: ((deal.maxQuantity - deal.soldQuantity) / deal.maxQuantity) * 100,
+        remaining: deal.maxQuantity! - deal.soldQuantity,
+        total: deal.maxQuantity!,
+        percentageLeft: ((deal.maxQuantity! - deal.soldQuantity) / deal.maxQuantity!) * 100,
       }));
 
     // Get expiring soon deals (expires in 7 days or less)

@@ -24,6 +24,7 @@ const analytics_module_1 = require("./modules/analytics/analytics.module");
 const staff_module_1 = require("./modules/staff/staff.module");
 const qr_security_module_1 = require("./modules/qr-security/qr-security.module");
 const redemptions_module_1 = require("./modules/redemptions/redemptions.module");
+const media_module_1 = require("./modules/media/media.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -46,6 +47,7 @@ exports.AppModule = AppModule = __decorate([
             staff_module_1.StaffModule,
             qr_security_module_1.QRCodeSecurityModule,
             redemptions_module_1.RedemptionsModule,
+            media_module_1.MediaModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

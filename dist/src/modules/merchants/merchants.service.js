@@ -273,6 +273,189 @@ let MerchantsService = class MerchantsService {
             recentOrders,
         };
     }
+    async getMerchantOverview(id) {
+        const merchant = await this.findOne(id);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const allDeals = await this.prisma.deal.findMany({
+            where: { merchantId: id },
+            select: { id: true },
+        });
+        const dealIds = allDeals.map(d => d.id);
+        const [todayOrders, todayRedemptions, todayRevenue, todayOrdersDetails,] = await Promise.all([
+            this.prisma.order.count({
+                where: {
+                    dealId: { in: dealIds },
+                    createdAt: { gte: today, lt: tomorrow },
+                    status: 'PAID',
+                },
+            }),
+            this.prisma.redemption.count({
+                where: {
+                    coupon: {
+                        dealId: { in: dealIds },
+                    },
+                    redeemedAt: { gte: today, lt: tomorrow },
+                    status: 'COMPLETED',
+                },
+            }),
+            this.prisma.order.aggregate({
+                where: {
+                    dealId: { in: dealIds },
+                    createdAt: { gte: today, lt: tomorrow },
+                    status: 'PAID',
+                },
+                _sum: { totalAmount: true },
+            }),
+            this.prisma.order.findMany({
+                where: {
+                    dealId: { in: dealIds },
+                    createdAt: { gte: today, lt: tomorrow },
+                },
+                take: 10,
+                orderBy: { createdAt: 'desc' },
+                include: {
+                    deal: {
+                        select: {
+                            id: true,
+                            title: true,
+                            discountPrice: true,
+                        },
+                    },
+                    customer: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            email: true,
+                        },
+                    },
+                },
+            }),
+        ]);
+        const activeDeals = await this.prisma.deal.findMany({
+            where: {
+                merchantId: id,
+                status: 'ACTIVE',
+            },
+            select: {
+                id: true,
+                title: true,
+                validUntil: true,
+                soldQuantity: true,
+                maxQuantity: true,
+                dealPrice: true,
+                discountPrice: true,
+            },
+        });
+        const lowInventoryDeals = activeDeals
+            .filter(deal => {
+            if (!deal.maxQuantity)
+                return false;
+            const percentageLeft = ((deal.maxQuantity - deal.soldQuantity) / deal.maxQuantity) * 100;
+            return percentageLeft < 20 && percentageLeft > 0;
+        })
+            .map(deal => ({
+            id: deal.id,
+            title: deal.title,
+            remaining: deal.maxQuantity - deal.soldQuantity,
+            total: deal.maxQuantity,
+            percentageLeft: ((deal.maxQuantity - deal.soldQuantity) / deal.maxQuantity) * 100,
+        }));
+        const sevenDaysFromNow = new Date();
+        sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
+        const expiringSoonDeals = activeDeals
+            .filter(deal => {
+            const expiresAt = new Date(deal.validUntil);
+            return expiresAt <= sevenDaysFromNow && expiresAt > new Date();
+        })
+            .map(deal => ({
+            id: deal.id,
+            title: deal.title,
+            expiresAt: deal.validUntil,
+        }));
+        const todayRedemptionsDetails = await this.prisma.redemption.findMany({
+            where: {
+                coupon: {
+                    dealId: { in: dealIds },
+                },
+                redeemedAt: { gte: today, lt: tomorrow },
+                status: 'COMPLETED',
+            },
+            take: 10,
+            orderBy: { redeemedAt: 'desc' },
+            include: {
+                coupon: {
+                    include: {
+                        deal: {
+                            select: {
+                                id: true,
+                                title: true,
+                                discountPrice: true,
+                            },
+                        },
+                        order: {
+                            select: {
+                                orderNumber: true,
+                            },
+                        },
+                    },
+                },
+                staff: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        role: true,
+                    },
+                },
+            },
+        });
+        const voucherValueRedeemedToday = todayRedemptionsDetails.reduce((sum, redemption) => {
+            return sum + Number(redemption.coupon.deal.discountPrice || 0);
+        }, 0);
+        const totalCoupons = await this.prisma.coupon.count({
+            where: {
+                dealId: { in: dealIds },
+            },
+        });
+        const usedCoupons = await this.prisma.coupon.count({
+            where: {
+                dealId: { in: dealIds },
+                status: 'USED',
+            },
+        });
+        const redemptionRate = totalCoupons > 0
+            ? (usedCoupons / totalCoupons) * 100
+            : 0;
+        return {
+            merchant: {
+                id: merchant.id,
+                name: merchant.name,
+                email: merchant.email,
+            },
+            today: {
+                orders: todayOrders,
+                redemptions: todayRedemptions,
+                revenue: Number(todayRevenue._sum.totalAmount || 0),
+                voucherValueRedeemed: voucherValueRedeemedToday,
+                ordersDetails: todayOrdersDetails,
+                redemptionsDetails: todayRedemptionsDetails,
+            },
+            activeDeals: activeDeals.length,
+            activeDealsList: activeDeals,
+            lowInventoryDeals,
+            expiringSoonDeals,
+            redemptionRate: Math.round(redemptionRate * 100) / 100,
+            alerts: {
+                lowInventory: lowInventoryDeals.length,
+                expiringSoon: expiringSoonDeals.length,
+                hasAlerts: lowInventoryDeals.length > 0 || expiringSoonDeals.length > 0,
+            },
+        };
+    }
     async searchMerchants(query, filters = {}) {
         const where = {
             OR: [
@@ -319,6 +502,111 @@ let MerchantsService = class MerchantsService {
             where: { id },
             data: { isActive: true },
         });
+    }
+    async getMerchantPayouts(id, period) {
+        const merchant = await this.findOne(id);
+        const allDeals = await this.prisma.deal.findMany({
+            where: { merchantId: id },
+            select: { id: true },
+        });
+        const dealIds = allDeals.map(d => d.id);
+        const now = new Date();
+        let startDate = new Date();
+        if (period === 'day') {
+            startDate.setHours(0, 0, 0, 0);
+        }
+        else if (period === 'week') {
+            startDate.setDate(startDate.getDate() - 7);
+        }
+        else if (period === 'month') {
+            startDate.setMonth(startDate.getMonth() - 1);
+        }
+        else if (period === 'year') {
+            startDate.setFullYear(startDate.getFullYear() - 1);
+        }
+        else {
+            startDate = new Date(0);
+        }
+        const orders = await this.prisma.order.findMany({
+            where: {
+                dealId: { in: dealIds },
+                createdAt: { gte: startDate },
+                status: 'PAID',
+            },
+            include: {
+                deal: {
+                    select: {
+                        id: true,
+                        title: true,
+                        dealPrice: true,
+                        discountPrice: true,
+                    },
+                },
+                customer: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        email: true,
+                    },
+                },
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+        const totalRevenue = orders.reduce((sum, order) => sum + Number(order.totalAmount), 0);
+        const totalOrders = orders.length;
+        const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+        const ordersByDate = orders.reduce((acc, order) => {
+            const date = order.createdAt.toISOString().split('T')[0];
+            if (!acc[date]) {
+                acc[date] = { orders: 0, revenue: 0 };
+            }
+            acc[date].orders += 1;
+            acc[date].revenue += Number(order.totalAmount);
+            return acc;
+        }, {});
+        const dailyTrends = Object.entries(ordersByDate).map(([date, data]) => ({
+            date,
+            orders: data.orders,
+            revenue: data.revenue,
+            averageOrderValue: data.revenue / data.orders,
+        }));
+        const dealRevenue = orders.reduce((acc, order) => {
+            const dealId = order.dealId;
+            if (!acc[dealId]) {
+                acc[dealId] = {
+                    dealId,
+                    dealTitle: order.deal.title,
+                    orders: 0,
+                    revenue: 0,
+                };
+            }
+            acc[dealId].orders += 1;
+            acc[dealId].revenue += Number(order.totalAmount);
+            return acc;
+        }, {});
+        const topDeals = Object.values(dealRevenue)
+            .sort((a, b) => b.revenue - a.revenue)
+            .slice(0, 10);
+        const summary = {
+            period,
+            startDate: startDate.toISOString(),
+            endDate: now.toISOString(),
+            totalRevenue,
+            totalOrders,
+            averageOrderValue,
+            topDeals,
+        };
+        return {
+            merchant: {
+                id: merchant.id,
+                name: merchant.name,
+            },
+            summary,
+            orders: orders.slice(0, 50),
+            dailyTrends,
+            totalRecords: orders.length,
+        };
     }
 };
 exports.MerchantsService = MerchantsService;

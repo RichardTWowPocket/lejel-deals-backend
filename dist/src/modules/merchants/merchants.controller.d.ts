@@ -275,6 +275,164 @@ export declare class MerchantsController {
             dealId: string;
         })[];
     }>;
+    getOverview(id: string, user: AuthUser): Promise<{
+        merchant: {
+            id: string;
+            name: string;
+            email: string;
+        };
+        today: {
+            orders: number;
+            redemptions: number;
+            revenue: number;
+            voucherValueRedeemed: number;
+            ordersDetails: ({
+                deal: {
+                    id: string;
+                    title: string;
+                    discountPrice: import("@prisma/client/runtime/library").Decimal;
+                };
+                customer: {
+                    id: string;
+                    email: string;
+                    firstName: string | null;
+                    lastName: string | null;
+                };
+            } & {
+                id: string;
+                createdAt: Date;
+                updatedAt: Date;
+                status: import("@prisma/client").$Enums.OrderStatus;
+                orderNumber: string;
+                quantity: number;
+                totalAmount: import("@prisma/client/runtime/library").Decimal;
+                paymentMethod: string | null;
+                paymentReference: string | null;
+                customerId: string;
+                dealId: string;
+            })[];
+            redemptionsDetails: ({
+                staff: {
+                    id: string;
+                    role: import("@prisma/client").$Enums.StaffRole;
+                    firstName: string;
+                    lastName: string;
+                } | null;
+                coupon: {
+                    deal: {
+                        id: string;
+                        title: string;
+                        discountPrice: import("@prisma/client/runtime/library").Decimal;
+                    };
+                    order: {
+                        orderNumber: string;
+                    };
+                } & {
+                    id: string;
+                    createdAt: Date;
+                    updatedAt: Date;
+                    status: import("@prisma/client").$Enums.CouponStatus;
+                    dealId: string;
+                    qrCode: string;
+                    usedAt: Date | null;
+                    expiresAt: Date;
+                    orderId: string;
+                };
+            } & {
+                id: string;
+                metadata: import("@prisma/client/runtime/library").JsonValue | null;
+                createdAt: Date;
+                updatedAt: Date;
+                status: import("@prisma/client").$Enums.RedemptionStatus;
+                notes: string | null;
+                couponId: string;
+                staffId: string | null;
+                location: string | null;
+                redeemedAt: Date;
+            })[];
+        };
+        activeDeals: number;
+        activeDealsList: {
+            id: string;
+            title: string;
+            dealPrice: import("@prisma/client/runtime/library").Decimal;
+            discountPrice: import("@prisma/client/runtime/library").Decimal;
+            validUntil: Date;
+            maxQuantity: number | null;
+            soldQuantity: number;
+        }[];
+        lowInventoryDeals: {
+            id: string;
+            title: string;
+            remaining: number;
+            total: number;
+            percentageLeft: number;
+        }[];
+        expiringSoonDeals: {
+            id: string;
+            title: string;
+            expiresAt: Date;
+        }[];
+        redemptionRate: number;
+        alerts: {
+            lowInventory: number;
+            expiringSoon: number;
+            hasAlerts: boolean;
+        };
+    }>;
+    getPayouts(id: string, period?: 'day' | 'week' | 'month' | 'year' | 'all', user?: AuthUser): Promise<{
+        merchant: {
+            id: string;
+            name: string;
+        };
+        summary: {
+            period: "day" | "week" | "month" | "year" | "all" | undefined;
+            startDate: string;
+            endDate: string;
+            totalRevenue: number;
+            totalOrders: number;
+            averageOrderValue: number;
+            topDeals: {
+                dealId: string;
+                dealTitle: string;
+                orders: number;
+                revenue: number;
+            }[];
+        };
+        orders: ({
+            deal: {
+                id: string;
+                title: string;
+                dealPrice: import("@prisma/client/runtime/library").Decimal;
+                discountPrice: import("@prisma/client/runtime/library").Decimal;
+            };
+            customer: {
+                id: string;
+                email: string;
+                firstName: string | null;
+                lastName: string | null;
+            };
+        } & {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            status: import("@prisma/client").$Enums.OrderStatus;
+            orderNumber: string;
+            quantity: number;
+            totalAmount: import("@prisma/client/runtime/library").Decimal;
+            paymentMethod: string | null;
+            paymentReference: string | null;
+            customerId: string;
+            dealId: string;
+        })[];
+        dailyTrends: {
+            date: string;
+            orders: number;
+            revenue: number;
+            averageOrderValue: number;
+        }[];
+        totalRecords: number;
+    }>;
     deactivate(id: string, user: AuthUser): Promise<{
         id: string;
         name: string;

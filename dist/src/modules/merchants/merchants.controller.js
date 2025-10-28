@@ -65,6 +65,12 @@ let MerchantsController = class MerchantsController {
     getStats(id, user) {
         return this.merchantsService.getMerchantStats(id);
     }
+    getOverview(id, user) {
+        return this.merchantsService.getMerchantOverview(id);
+    }
+    getPayouts(id, period, user) {
+        return this.merchantsService.getMerchantPayouts(id, period || 'all');
+    }
     deactivate(id, user) {
         return this.merchantsService.deactivate(id, user.id);
     }
@@ -255,6 +261,40 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
 ], MerchantsController.prototype, "getStats", null);
+__decorate([
+    (0, auth_decorators_1.Roles)('merchant', 'admin'),
+    (0, common_1.Get)(':id/overview'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get merchant overview - today\'s metrics for dashboard' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'Merchant ID' }),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Returns merchant overview with today\'s KPIs' }),
+    (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
+    (0, swagger_1.ApiResponse)({ status: 403, description: 'Forbidden - insufficient permissions' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Merchant not found' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, auth_decorators_1.CurrentUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", void 0)
+], MerchantsController.prototype, "getOverview", null);
+__decorate([
+    (0, auth_decorators_1.Roles)('merchant', 'admin'),
+    (0, common_1.Get)(':id/payouts'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get merchant payouts and revenue calculations' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'Merchant ID' }),
+    (0, swagger_1.ApiQuery)({ name: 'period', required: false, enum: ['day', 'week', 'month', 'year', 'all'], description: 'Time period for payouts' }),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Returns merchant payouts and revenue data' }),
+    (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
+    (0, swagger_1.ApiResponse)({ status: 403, description: 'Forbidden - insufficient permissions' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Merchant not found' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Query)('period')),
+    __param(2, (0, auth_decorators_1.CurrentUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, Object]),
+    __metadata("design:returntype", void 0)
+], MerchantsController.prototype, "getPayouts", null);
 __decorate([
     (0, auth_decorators_1.Roles)('merchant', 'admin'),
     (0, common_1.Patch)(':id/deactivate'),
