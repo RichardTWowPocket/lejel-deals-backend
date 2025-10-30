@@ -258,11 +258,7 @@ let OrdersService = class OrdersService {
         return this.mapToOrderResponseDto(order);
     }
     async findByCustomer(customerId, page = 1, limit = 10) {
-        console.warn('[findByCustomer] Customer ID', customerId);
-        console.warn('[findByCustomer] Page', page);
-        console.warn('[findByCustomer] Limit', limit);
         const result = await this.findAll(page, limit, undefined, customerId);
-        console.warn('[findByCustomer] Result', result);
         return result;
     }
     async findByMerchant(merchantId, page = 1, limit = 10) {

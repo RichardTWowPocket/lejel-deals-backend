@@ -407,6 +407,114 @@ export class MerchantsService {
       data: { isActive: true },
     });
   }
+
+  // Overview for dashboard (focus on today's metrics)
+  async getMerchantOverview(id: string) {
+    // Ensure merchant exists
+    await this.findOne(id);
+
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const [
+      todayOrders,
+      todayRevenueAgg,
+      totalRevenueAgg,
+      activeDealsCount,
+    ] = await Promise.all([
+      this.prisma.order.count({
+        where: {
+          deal: { merchantId: id },
+          createdAt: { gte: startOfDay, lte: endOfDay },
+          status: 'PAID',
+        },
+      }),
+      this.prisma.order.aggregate({
+        where: {
+          deal: { merchantId: id },
+          createdAt: { gte: startOfDay, lte: endOfDay },
+          status: 'PAID',
+        },
+        _sum: { totalAmount: true },
+      }),
+      this.prisma.order.aggregate({
+        where: { deal: { merchantId: id }, status: 'PAID' },
+        _sum: { totalAmount: true },
+      }),
+      this.prisma.deal.count({ where: { merchantId: id, status: 'ACTIVE' } }),
+    ]);
+
+    return {
+      merchantId: id,
+      todayOrders,
+      todayRevenue: todayRevenueAgg._sum.totalAmount || 0,
+      totalRevenue: totalRevenueAgg._sum.totalAmount || 0,
+      activeDeals: activeDealsCount,
+    };
+  }
+
+  // Payouts and revenue over a given period
+  async getMerchantPayouts(
+    id: string,
+    period: 'day' | 'week' | 'month' | 'year' | 'all' = 'all',
+  ) {
+    // Ensure merchant exists
+    await this.findOne(id);
+
+    let gte: Date | undefined;
+    const now = new Date();
+    switch (period) {
+      case 'day': {
+        gte = new Date();
+        gte.setHours(0, 0, 0, 0);
+        break;
+      }
+      case 'week': {
+        gte = new Date(now);
+        const day = gte.getDay();
+        const diff = (day + 6) % 7; // make Monday start
+        gte.setDate(gte.getDate() - diff);
+        gte.setHours(0, 0, 0, 0);
+        break;
+      }
+      case 'month': {
+        gte = new Date(now.getFullYear(), now.getMonth(), 1);
+        break;
+      }
+      case 'year': {
+        gte = new Date(now.getFullYear(), 0, 1);
+        break;
+      }
+      case 'all':
+      default:
+        gte = undefined;
+    }
+
+    const whereBase: any = { deal: { merchantId: id }, status: 'PAID' };
+    if (gte) whereBase.createdAt = { gte };
+
+    const [ordersCount, revenueAgg] = await Promise.all([
+      this.prisma.order.count({ where: whereBase }),
+      this.prisma.order.aggregate({ where: whereBase, _sum: { totalAmount: true } }),
+    ]);
+
+    // Simple payout model: merchant gets 90% of revenue
+    const grossRevenueRaw = revenueAgg._sum.totalAmount ?? 0;
+    const grossRevenue = Number(grossRevenueRaw);
+    const payoutAmount = Math.round(grossRevenue * 0.9);
+    const platformFees = grossRevenue - payoutAmount;
+
+    return {
+      merchantId: id,
+      period,
+      orders: ordersCount,
+      grossRevenue,
+      payoutAmount,
+      platformFees,
+    };
+  }
 }
 
 

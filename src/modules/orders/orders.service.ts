@@ -282,11 +282,7 @@ export class OrdersService {
   }
 
   async findByCustomer(customerId: string, page: number = 1, limit: number = 10): Promise<{ orders: OrderResponseDto[]; pagination: any }> {
-    console.warn('[findByCustomer] Customer ID', customerId)
-    console.warn('[findByCustomer] Page', page)
-    console.warn('[findByCustomer] Limit', limit)
     const result = await this.findAll(page, limit, undefined, customerId);
-    console.warn('[findByCustomer] Result', result)
     return result;
   }
 
