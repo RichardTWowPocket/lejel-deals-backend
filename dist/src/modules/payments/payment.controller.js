@@ -18,6 +18,7 @@ const payment_service_1 = require("./payment.service");
 const payment_dto_1 = require("./dto/payment.dto");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const roles_guard_1 = require("../auth/guards/roles.guard");
+const merchant_role_guard_1 = require("../auth/guards/merchant-role.guard");
 const auth_decorators_1 = require("../auth/decorators/auth.decorators");
 const client_1 = require("@prisma/client");
 const swagger_1 = require("@nestjs/swagger");
@@ -62,8 +63,9 @@ __decorate([
 ], PaymentController.prototype, "createPayment", null);
 __decorate([
     (0, common_1.Get)(':orderId/status'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get payment status for an order' }),
     (0, swagger_1.ApiResponse)({
@@ -79,8 +81,9 @@ __decorate([
 ], PaymentController.prototype, "getPaymentStatus", null);
 __decorate([
     (0, common_1.Post)(':orderId/cancel'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Cancel payment for an order' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Payment cancelled successfully' }),

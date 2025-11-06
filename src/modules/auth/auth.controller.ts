@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Post, Body } from '@nestjs/common';
+import { Controller, Get, UseGuards, Post, Body, Patch } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -55,6 +55,21 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getProfile(@CurrentUser() user: AuthUser) {
     return this.authService.getProfile(user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('change-password')
+  @ApiOperation({ summary: 'Change user password' })
+  @ApiBearerAuth('JWT-auth')
+  @ApiResponse({ status: 200, description: 'Password changed successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid password or current password incorrect' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @Throttle({ short: { limit: 5, ttl: 60 } })
+  async changePassword(
+    @CurrentUser() user: AuthUser,
+    @Body() body: { currentPassword: string; newPassword: string },
+  ) {
+    return this.authService.changePassword(user.id, body.currentPassword, body.newPassword);
   }
 
   @Public()

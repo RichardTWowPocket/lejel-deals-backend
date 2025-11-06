@@ -18,8 +18,9 @@ import {
 } from './dto/payment.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/auth.decorators';
-import { UserRole } from '@prisma/client';
+import { MerchantRoleGuard } from '../auth/guards/merchant-role.guard';
+import { Roles, MerchantRoles } from '../auth/decorators/auth.decorators';
+import { UserRole, MerchantRole } from '@prisma/client';
 import {
   ApiTags,
   ApiOperation,
@@ -52,8 +53,9 @@ export class PaymentController {
   }
 
   @Get(':orderId/status')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.SUPER_ADMIN, UserRole.MERCHANT)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get payment status for an order' })
   @ApiResponse({
@@ -69,8 +71,9 @@ export class PaymentController {
   }
 
   @Post(':orderId/cancel')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.SUPER_ADMIN, UserRole.MERCHANT)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Cancel payment for an order' })
   @ApiResponse({ status: 200, description: 'Payment cancelled successfully' })

@@ -168,6 +168,30 @@ let AuthService = class AuthService {
         }
         return this.formatUser(userRecord);
     }
+    async changePassword(userId, currentPassword, newPassword) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+        });
+        if (!user || !user.hashedPassword) {
+            throw new common_1.UnauthorizedException('User not found');
+        }
+        const passwordMatches = await bcrypt.compare(currentPassword, user.hashedPassword);
+        if (!passwordMatches) {
+            throw new common_1.BadRequestException('Current password is incorrect');
+        }
+        if (newPassword.length < 8) {
+            throw new common_1.BadRequestException('New password must be at least 8 characters');
+        }
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        await this.prisma.user.update({
+            where: { id: userId },
+            data: { hashedPassword },
+        });
+        return {
+            success: true,
+            message: 'Password changed successfully',
+        };
+    }
     async findOrCreateOAuthUser(dto) {
         let userRecord = await this.prisma.user.findFirst({
             where: {

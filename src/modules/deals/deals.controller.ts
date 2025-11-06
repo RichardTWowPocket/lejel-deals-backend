@@ -30,8 +30,14 @@ import {
 import { DealResponseDto, DealListResponseDto } from './dto/deal-response.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles, CurrentUser, Public } from '../auth/decorators/auth.decorators';
-import { UserRole, DealStatus } from '@prisma/client';
+import { MerchantRoleGuard } from '../auth/guards/merchant-role.guard';
+import {
+  Roles,
+  CurrentUser,
+  Public,
+  MerchantRoles,
+} from '../auth/decorators/auth.decorators';
+import { UserRole, DealStatus, MerchantRole } from '@prisma/client';
 
 @ApiTags('Deals')
 @Controller('deals')
@@ -242,8 +248,9 @@ export class DealsController {
     }
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.MERCHANT, UserRole.SUPER_ADMIN)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @Post()
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Create a new deal' })
@@ -261,8 +268,9 @@ export class DealsController {
     return this.dealsService.create(createDealDto, user.id);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.MERCHANT, UserRole.SUPER_ADMIN)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @Patch(':id')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Update deal' })
@@ -281,8 +289,9 @@ export class DealsController {
     return this.dealsService.update(id, updateDealDto, user.id);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.MERCHANT, UserRole.SUPER_ADMIN)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @Patch(':id/status')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Update deal status' })
@@ -297,8 +306,9 @@ export class DealsController {
     return this.dealsService.updateStatus(id, updateStatusDto, user.id);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.MERCHANT, UserRole.SUPER_ADMIN)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @Post(':id/publish')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Publish deal (DRAFT -> ACTIVE)' })
@@ -312,8 +322,9 @@ export class DealsController {
     return this.dealsService.publish(id, user.id);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.MERCHANT, UserRole.SUPER_ADMIN)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @Post(':id/pause')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Pause deal (ACTIVE -> PAUSED)' })

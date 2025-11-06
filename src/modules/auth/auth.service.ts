@@ -161,6 +161,50 @@ export class AuthService {
     return this.formatUser(userRecord as UserWithRelations);
   }
 
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+  ) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user || !user.hashedPassword) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    // Verify current password
+    const passwordMatches = await bcrypt.compare(
+      currentPassword,
+      user.hashedPassword,
+    );
+    if (!passwordMatches) {
+      throw new BadRequestException('Current password is incorrect');
+    }
+
+    // Validate new password strength
+    if (newPassword.length < 8) {
+      throw new BadRequestException(
+        'New password must be at least 8 characters',
+      );
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update password
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { hashedPassword },
+    });
+
+    return {
+      success: true,
+      message: 'Password changed successfully',
+    };
+  }
+
   /**
    * Find or create user from OAuth provider (Google, etc.)
    * Auto-links accounts if email already exists

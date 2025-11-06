@@ -21,8 +21,9 @@ import {
 } from './dto/redemption.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/auth.decorators';
-import { UserRole, RedemptionStatus } from '@prisma/client';
+import { MerchantRoleGuard } from '../auth/guards/merchant-role.guard';
+import { Roles, MerchantRoles } from '../auth/decorators/auth.decorators';
+import { UserRole, RedemptionStatus, MerchantRole } from '@prisma/client';
 import {
   ApiTags,
   ApiOperation,
@@ -37,8 +38,15 @@ export class RedemptionController {
   constructor(private readonly redemptionService: RedemptionService) {}
 
   @Post('process')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.SUPER_ADMIN, UserRole.MERCHANT)
+  @MerchantRoles(
+    MerchantRole.OWNER,
+    MerchantRole.ADMIN,
+    MerchantRole.MANAGER,
+    MerchantRole.SUPERVISOR,
+    MerchantRole.CASHIER,
+  )
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Process a redemption with QR code validation' })
   @ApiResponse({
@@ -58,8 +66,15 @@ export class RedemptionController {
   }
 
   @Post('validate')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.SUPER_ADMIN, UserRole.MERCHANT)
+  @MerchantRoles(
+    MerchantRole.OWNER,
+    MerchantRole.ADMIN,
+    MerchantRole.MANAGER,
+    MerchantRole.SUPERVISOR,
+    MerchantRole.CASHIER,
+  )
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Validate redemption before processing' })
   @ApiResponse({
@@ -77,8 +92,13 @@ export class RedemptionController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.SUPER_ADMIN, UserRole.MERCHANT)
+  @MerchantRoles(
+    MerchantRole.OWNER,
+    MerchantRole.ADMIN,
+    MerchantRole.MANAGER,
+  )
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get paginated list of redemptions with filtering' })
   @ApiResponse({
@@ -148,8 +168,9 @@ export class RedemptionController {
   }
 
   @Get('stats')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.MERCHANT)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get redemption statistics' })
   @ApiResponse({
@@ -170,8 +191,9 @@ export class RedemptionController {
   }
 
   @Get('analytics')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.MERCHANT)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get redemption analytics and insights' })
   @ApiResponse({
@@ -210,8 +232,15 @@ export class RedemptionController {
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.SUPER_ADMIN, UserRole.MERCHANT)
+  @MerchantRoles(
+    MerchantRole.OWNER,
+    MerchantRole.ADMIN,
+    MerchantRole.MANAGER,
+    MerchantRole.SUPERVISOR,
+    MerchantRole.CASHIER,
+  )
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get redemption by ID' })
   @ApiResponse({
@@ -224,8 +253,9 @@ export class RedemptionController {
   }
 
   @Patch(':id/status')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.MERCHANT)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update redemption status' })
   @ApiResponse({
@@ -241,8 +271,15 @@ export class RedemptionController {
   }
 
   @Get('user/:userId')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.SUPER_ADMIN, UserRole.MERCHANT)
+  @MerchantRoles(
+    MerchantRole.OWNER,
+    MerchantRole.ADMIN,
+    MerchantRole.MANAGER,
+    MerchantRole.SUPERVISOR,
+    MerchantRole.CASHIER,
+  )
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get redemptions by user' })
   @ApiResponse({
@@ -283,8 +320,15 @@ export class RedemptionController {
   }
 
   @Get('merchant/:merchantId')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.MERCHANT)
+  @MerchantRoles(
+    MerchantRole.OWNER,
+    MerchantRole.ADMIN,
+    MerchantRole.MANAGER,
+    MerchantRole.SUPERVISOR,
+    MerchantRole.CASHIER,
+  )
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get redemptions by merchant' })
   @ApiResponse({

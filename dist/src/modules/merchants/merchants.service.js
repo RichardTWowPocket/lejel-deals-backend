@@ -13,6 +13,7 @@ exports.MerchantsService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../prisma/prisma.service");
 const merchant_verification_dto_1 = require("./dto/merchant-verification.dto");
+const client_1 = require("@prisma/client");
 let MerchantsService = class MerchantsService {
     prisma;
     constructor(prisma) {
@@ -157,6 +158,21 @@ let MerchantsService = class MerchantsService {
         });
         if (!membership) {
             throw new common_1.ForbiddenException('You do not have access to update this merchant profile');
+        }
+        const isOwnerOrAdmin = membership.isOwner ||
+            membership.merchantRole === client_1.MerchantRole.OWNER ||
+            membership.merchantRole === client_1.MerchantRole.ADMIN;
+        if (!isOwnerOrAdmin && (updateMerchantDto.name !== undefined ||
+            updateMerchantDto.email !== undefined ||
+            updateMerchantDto.logo !== undefined ||
+            updateMerchantDto.description !== undefined ||
+            updateMerchantDto.address !== undefined ||
+            updateMerchantDto.city !== undefined ||
+            updateMerchantDto.province !== undefined ||
+            updateMerchantDto.postalCode !== undefined ||
+            updateMerchantDto.website !== undefined ||
+            updateMerchantDto.phone !== undefined)) {
+            throw new common_1.ForbiddenException('Only OWNER and ADMIN can update merchant business profile information');
         }
         if (updateMerchantDto.email && updateMerchantDto.email !== merchant.email) {
             const existingMerchant = await this.prisma.merchant.findUnique({
@@ -359,38 +375,57 @@ let MerchantsService = class MerchantsService {
         });
     }
     async getMerchantOverview(id) {
-        await this.findOne(id);
+        const merchantExists = await this.prisma.merchant.findUnique({
+            where: { id },
+            select: { id: true },
+        });
+        if (!merchantExists) {
+            throw new common_1.NotFoundException('Merchant not found');
+        }
         const startOfDay = new Date();
         startOfDay.setHours(0, 0, 0, 0);
         const endOfDay = new Date();
         endOfDay.setHours(23, 59, 59, 999);
-        const [todayOrders, todayRevenueAgg, totalRevenueAgg, activeDealsCount] = await Promise.all([
-            this.prisma.order.count({
+        const dealIds = await this.prisma.deal.findMany({
+            where: { merchantId: id },
+            select: { id: true },
+        });
+        const dealIdArray = dealIds.map(d => d.id);
+        if (dealIdArray.length === 0) {
+            return {
+                merchantId: id,
+                todayOrders: 0,
+                todayRevenue: 0,
+                totalRevenue: 0,
+                activeDeals: 0,
+            };
+        }
+        const [todayOrdersData, totalRevenueData, activeDealsCount] = await Promise.all([
+            this.prisma.order.aggregate({
                 where: {
-                    deal: { merchantId: id },
+                    dealId: { in: dealIdArray },
                     createdAt: { gte: startOfDay, lte: endOfDay },
                     status: 'PAID',
                 },
+                _count: { id: true },
+                _sum: { totalAmount: true },
             }),
             this.prisma.order.aggregate({
                 where: {
-                    deal: { merchantId: id },
-                    createdAt: { gte: startOfDay, lte: endOfDay },
+                    dealId: { in: dealIdArray },
                     status: 'PAID',
                 },
                 _sum: { totalAmount: true },
             }),
-            this.prisma.order.aggregate({
-                where: { deal: { merchantId: id }, status: 'PAID' },
-                _sum: { totalAmount: true },
+            this.prisma.deal.count({
+                where: { merchantId: id, status: 'ACTIVE' },
             }),
-            this.prisma.deal.count({ where: { merchantId: id, status: 'ACTIVE' } }),
         ]);
         return {
             merchantId: id,
-            todayOrders,
-            todayRevenue: todayRevenueAgg._sum.totalAmount || 0,
-            totalRevenue: totalRevenueAgg._sum.totalAmount || 0,
+            todayOrders: todayOrdersData._count.id || 0,
+            todayRevenue: todayOrdersData._sum.totalAmount || 0,
+            totalRevenue: totalRevenueData._sum.totalAmount || 0,
             activeDeals: activeDealsCount,
         };
     }

@@ -21,6 +21,7 @@ const update_merchant_dto_1 = require("./dto/update-merchant.dto");
 const merchant_verification_dto_1 = require("./dto/merchant-verification.dto");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const roles_guard_1 = require("../auth/guards/roles.guard");
+const merchant_role_guard_1 = require("../auth/guards/merchant-role.guard");
 const auth_decorators_1 = require("../auth/decorators/auth.decorators");
 const client_1 = require("@prisma/client");
 const prisma_service_1 = require("../../prisma/prisma.service");
@@ -91,6 +92,7 @@ let MerchantsController = class MerchantsController {
                     userId: user.id,
                     merchantId: merchantId,
                 },
+                select: { merchantId: true },
             });
             if (!membership) {
                 throw new common_2.ForbiddenException('You do not have access to this merchant');
@@ -233,6 +235,8 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], MerchantsController.prototype, "findByEmail", null);
 __decorate([
+    (0, common_1.UseGuards)(merchant_role_guard_1.MerchantRoleGuard),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER, client_1.MerchantRole.SUPERVISOR, client_1.MerchantRole.CASHIER),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT, client_1.UserRole.SUPER_ADMIN),
     (0, common_1.Patch)(':id'),
     (0, swagger_1.ApiOperation)({ summary: 'Update a merchant' }),
@@ -312,6 +316,8 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], MerchantsController.prototype, "getVerificationStatus", null);
 __decorate([
+    (0, common_1.UseGuards)(merchant_role_guard_1.MerchantRoleGuard),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT, client_1.UserRole.SUPER_ADMIN),
     (0, common_1.Patch)(':id/operating-hours'),
     (0, swagger_1.ApiOperation)({ summary: 'Update merchant operating hours' }),
@@ -347,6 +353,8 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], MerchantsController.prototype, "getOperatingHours", null);
 __decorate([
+    (0, common_1.UseGuards)(merchant_role_guard_1.MerchantRoleGuard),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT, client_1.UserRole.SUPER_ADMIN),
     (0, common_1.Get)(':id/stats'),
     (0, swagger_1.ApiOperation)({ summary: 'Get merchant statistics' }),
@@ -366,6 +374,8 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], MerchantsController.prototype, "getStats", null);
 __decorate([
+    (0, common_1.UseGuards)(merchant_role_guard_1.MerchantRoleGuard),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER, client_1.MerchantRole.SUPERVISOR, client_1.MerchantRole.CASHIER),
     (0, common_1.Get)('me/overview'),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiOperation)({
@@ -393,6 +403,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], MerchantsController.prototype, "getMyOverview", null);
 __decorate([
+    (0, common_1.UseGuards)(merchant_role_guard_1.MerchantRoleGuard),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER, client_1.MerchantRole.SUPERVISOR, client_1.MerchantRole.CASHIER),
     (0, common_1.Get)('me/payouts'),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiOperation)({
@@ -427,6 +439,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], MerchantsController.prototype, "getMyPayouts", null);
 __decorate([
+    (0, common_1.UseGuards)(merchant_role_guard_1.MerchantRoleGuard),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT, client_1.UserRole.SUPER_ADMIN),
     (0, common_1.Get)(':id/overview'),
     (0, swagger_1.ApiOperation)({
@@ -451,6 +465,8 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], MerchantsController.prototype, "getOverview", null);
 __decorate([
+    (0, common_1.UseGuards)(merchant_role_guard_1.MerchantRoleGuard),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT, client_1.UserRole.SUPER_ADMIN),
     (0, common_1.Get)(':id/payouts'),
     (0, swagger_1.ApiOperation)({ summary: 'Get merchant payouts and revenue calculations' }),

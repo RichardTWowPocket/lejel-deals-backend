@@ -18,6 +18,7 @@ const redemptions_service_1 = require("./redemptions.service");
 const redemption_dto_1 = require("./dto/redemption.dto");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const roles_guard_1 = require("../auth/guards/roles.guard");
+const merchant_role_guard_1 = require("../auth/guards/merchant-role.guard");
 const auth_decorators_1 = require("../auth/decorators/auth.decorators");
 const client_1 = require("@prisma/client");
 const swagger_1 = require("@nestjs/swagger");
@@ -67,8 +68,9 @@ let RedemptionController = class RedemptionController {
 exports.RedemptionController = RedemptionController;
 __decorate([
     (0, common_1.Post)('process'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER, client_1.MerchantRole.SUPERVISOR, client_1.MerchantRole.CASHIER),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Process a redemption with QR code validation' }),
     (0, swagger_1.ApiResponse)({
@@ -83,8 +85,9 @@ __decorate([
 ], RedemptionController.prototype, "processRedemption", null);
 __decorate([
     (0, common_1.Post)('validate'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER, client_1.MerchantRole.SUPERVISOR, client_1.MerchantRole.CASHIER),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Validate redemption before processing' }),
     (0, swagger_1.ApiResponse)({
@@ -99,8 +102,9 @@ __decorate([
 ], RedemptionController.prototype, "validateRedemption", null);
 __decorate([
     (0, common_1.Get)(),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get paginated list of redemptions with filtering' }),
     (0, swagger_1.ApiResponse)({
@@ -163,8 +167,9 @@ __decorate([
 ], RedemptionController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)('stats'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get redemption statistics' }),
     (0, swagger_1.ApiResponse)({
@@ -185,8 +190,9 @@ __decorate([
 ], RedemptionController.prototype, "getRedemptionStats", null);
 __decorate([
     (0, common_1.Get)('analytics'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get redemption analytics and insights' }),
     (0, swagger_1.ApiResponse)({
@@ -222,8 +228,9 @@ __decorate([
 ], RedemptionController.prototype, "getRedemptionAnalytics", null);
 __decorate([
     (0, common_1.Get)(':id'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER, client_1.MerchantRole.SUPERVISOR, client_1.MerchantRole.CASHIER),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get redemption by ID' }),
     (0, swagger_1.ApiResponse)({
@@ -238,8 +245,9 @@ __decorate([
 ], RedemptionController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Patch)(':id/status'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Update redemption status' }),
     (0, swagger_1.ApiResponse)({
@@ -255,8 +263,9 @@ __decorate([
 ], RedemptionController.prototype, "updateStatus", null);
 __decorate([
     (0, common_1.Get)('user/:userId'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER, client_1.MerchantRole.SUPERVISOR, client_1.MerchantRole.CASHIER),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get redemptions by user' }),
     (0, swagger_1.ApiResponse)({
@@ -291,8 +300,9 @@ __decorate([
 ], RedemptionController.prototype, "getStaffRedemptions", null);
 __decorate([
     (0, common_1.Get)('merchant/:merchantId'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER, client_1.MerchantRole.SUPERVISOR, client_1.MerchantRole.CASHIER),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get redemptions by merchant' }),
     (0, swagger_1.ApiResponse)({

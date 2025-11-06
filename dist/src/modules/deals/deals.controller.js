@@ -20,6 +20,7 @@ const create_deal_dto_1 = require("./dto/create-deal.dto");
 const deal_response_dto_1 = require("./dto/deal-response.dto");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const roles_guard_1 = require("../auth/guards/roles.guard");
+const merchant_role_guard_1 = require("../auth/guards/merchant-role.guard");
 const auth_decorators_1 = require("../auth/decorators/auth.decorators");
 const client_1 = require("@prisma/client");
 let DealsController = class DealsController {
@@ -281,8 +282,9 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], DealsController.prototype, "findOne", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT, client_1.UserRole.SUPER_ADMIN),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, common_1.Post)(),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiOperation)({ summary: 'Create a new deal' }),
@@ -300,8 +302,9 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], DealsController.prototype, "create", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT, client_1.UserRole.SUPER_ADMIN),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, common_1.Patch)(':id'),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiOperation)({ summary: 'Update deal' }),
@@ -320,8 +323,9 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], DealsController.prototype, "update", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT, client_1.UserRole.SUPER_ADMIN),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, common_1.Patch)(':id/status'),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiOperation)({ summary: 'Update deal status' }),
@@ -336,8 +340,9 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], DealsController.prototype, "updateStatus", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT, client_1.UserRole.SUPER_ADMIN),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, common_1.Post)(':id/publish'),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiOperation)({ summary: 'Publish deal (DRAFT -> ACTIVE)' }),
@@ -351,8 +356,9 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], DealsController.prototype, "publish", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT, client_1.UserRole.SUPER_ADMIN),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, common_1.Post)(':id/pause'),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiOperation)({ summary: 'Pause deal (ACTIVE -> PAUSED)' }),

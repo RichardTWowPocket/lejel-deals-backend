@@ -118,6 +118,13 @@ export declare class AuthController {
             isActive: boolean;
         } | null;
     }>;
+    changePassword(user: AuthUser, body: {
+        currentPassword: string;
+        newPassword: string;
+    }): Promise<{
+        success: boolean;
+        message: string;
+    }>;
     oauthGoogle(body: OAuthGoogleDto): Promise<{
         success: boolean;
         message: string;

@@ -19,8 +19,13 @@ import {
 } from './dto/create-order.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles, CurrentUser } from '../auth/decorators/auth.decorators';
-import { UserRole, OrderStatus } from '@prisma/client';
+import { MerchantRoleGuard } from '../auth/guards/merchant-role.guard';
+import {
+  Roles,
+  CurrentUser,
+  MerchantRoles,
+} from '../auth/decorators/auth.decorators';
+import { UserRole, OrderStatus, MerchantRole } from '@prisma/client';
 import {
   ApiTags,
   ApiOperation,
@@ -46,6 +51,13 @@ export class OrdersController {
     return this.ordersService.create(createOrderDto);
   }
 
+  @UseGuards(MerchantRoleGuard)
+  @MerchantRoles(
+    MerchantRole.OWNER,
+    MerchantRole.ADMIN,
+    MerchantRole.MANAGER,
+    MerchantRole.SUPERVISOR,
+  )
   @Get()
   @Roles(UserRole.SUPER_ADMIN, UserRole.MERCHANT)
   @ApiOperation({ summary: 'Get all orders with pagination and filtering' })
@@ -104,6 +116,8 @@ export class OrdersController {
     );
   }
 
+  @UseGuards(MerchantRoleGuard)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @Get('stats')
   @Roles(UserRole.SUPER_ADMIN, UserRole.MERCHANT)
   @ApiOperation({ summary: 'Get order statistics' })
@@ -115,6 +129,8 @@ export class OrdersController {
     return this.ordersService.getStats();
   }
 
+  @UseGuards(MerchantRoleGuard)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @Get('analytics')
   @Roles(UserRole.SUPER_ADMIN, UserRole.MERCHANT)
   @ApiOperation({ summary: 'Get order analytics' })
@@ -132,6 +148,13 @@ export class OrdersController {
     return this.ordersService.getAnalytics(period);
   }
 
+  @UseGuards(MerchantRoleGuard)
+  @MerchantRoles(
+    MerchantRole.OWNER,
+    MerchantRole.ADMIN,
+    MerchantRole.MANAGER,
+    MerchantRole.SUPERVISOR,
+  )
   @Get('customer/:customerId')
   @Roles(UserRole.SUPER_ADMIN, UserRole.MERCHANT)
   @ApiOperation({ summary: 'Get orders for a specific customer' })
@@ -186,6 +209,13 @@ export class OrdersController {
     return this.ordersService.findMine(user.id, page, limit);
   }
 
+  @UseGuards(MerchantRoleGuard)
+  @MerchantRoles(
+    MerchantRole.OWNER,
+    MerchantRole.ADMIN,
+    MerchantRole.MANAGER,
+    MerchantRole.SUPERVISOR,
+  )
   @Get('merchant/:merchantId')
   @Roles(UserRole.SUPER_ADMIN, UserRole.MERCHANT)
   @ApiOperation({ summary: 'Get orders for a specific merchant' })
@@ -213,6 +243,13 @@ export class OrdersController {
     return this.ordersService.findByMerchant(merchantId, page, limit);
   }
 
+  @UseGuards(MerchantRoleGuard)
+  @MerchantRoles(
+    MerchantRole.OWNER,
+    MerchantRole.ADMIN,
+    MerchantRole.MANAGER,
+    MerchantRole.SUPERVISOR,
+  )
   @Get('number/:orderNumber')
   @Roles(UserRole.SUPER_ADMIN, UserRole.MERCHANT)
   @ApiOperation({ summary: 'Get order by order number' })
@@ -222,6 +259,13 @@ export class OrdersController {
     return this.ordersService.findByOrderNumber(orderNumber);
   }
 
+  @UseGuards(MerchantRoleGuard)
+  @MerchantRoles(
+    MerchantRole.OWNER,
+    MerchantRole.ADMIN,
+    MerchantRole.MANAGER,
+    MerchantRole.SUPERVISOR,
+  )
   @Get(':id')
   @Roles(UserRole.SUPER_ADMIN, UserRole.MERCHANT)
   @ApiOperation({ summary: 'Get order by ID' })
@@ -231,6 +275,8 @@ export class OrdersController {
     return this.ordersService.findOne(id);
   }
 
+  @UseGuards(MerchantRoleGuard)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @Patch(':id')
   @Roles(UserRole.SUPER_ADMIN, UserRole.MERCHANT)
   @ApiOperation({ summary: 'Update order' })
@@ -244,6 +290,8 @@ export class OrdersController {
     return this.ordersService.update(id, updateOrderDto);
   }
 
+  @UseGuards(MerchantRoleGuard)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @Patch(':id/status')
   @Roles(UserRole.SUPER_ADMIN, UserRole.MERCHANT)
   @ApiOperation({ summary: 'Update order status' })
@@ -260,6 +308,8 @@ export class OrdersController {
     return this.ordersService.updateStatus(id, updateStatusDto);
   }
 
+  @UseGuards(MerchantRoleGuard)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @Patch(':id/cancel')
   @Roles(UserRole.SUPER_ADMIN, UserRole.MERCHANT)
   @ApiOperation({ summary: 'Cancel order' })
@@ -270,6 +320,8 @@ export class OrdersController {
     return this.ordersService.cancel(id, reason);
   }
 
+  @UseGuards(MerchantRoleGuard)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @Patch(':id/refund')
   @Roles(UserRole.SUPER_ADMIN, UserRole.MERCHANT)
   @ApiOperation({ summary: 'Refund order' })

@@ -11,6 +11,7 @@ import {
   MerchantVerificationDto,
   VerificationStatus,
 } from './dto/merchant-verification.dto';
+import { MerchantRole } from '@prisma/client';
 
 @Injectable()
 export class MerchantsService {
@@ -200,6 +201,30 @@ export class MerchantsService {
     if (!membership) {
       throw new ForbiddenException(
         'You do not have access to update this merchant profile',
+      );
+    }
+
+    // Restrict merchant business profile updates to OWNER and ADMIN only
+    // MANAGER, SUPERVISOR, CASHIER should only update their personal settings (password, notifications)
+    const isOwnerOrAdmin = membership.isOwner || 
+      membership.merchantRole === MerchantRole.OWNER || 
+      membership.merchantRole === MerchantRole.ADMIN;
+
+    // If trying to update merchant business info (name, email, logo, etc.) without permission
+    if (!isOwnerOrAdmin && (
+      updateMerchantDto.name !== undefined ||
+      updateMerchantDto.email !== undefined ||
+      updateMerchantDto.logo !== undefined ||
+      updateMerchantDto.description !== undefined ||
+      updateMerchantDto.address !== undefined ||
+      updateMerchantDto.city !== undefined ||
+      updateMerchantDto.province !== undefined ||
+      updateMerchantDto.postalCode !== undefined ||
+      updateMerchantDto.website !== undefined ||
+      updateMerchantDto.phone !== undefined
+    )) {
+      throw new ForbiddenException(
+        'Only OWNER and ADMIN can update merchant business profile information',
       );
     }
 
@@ -485,44 +510,74 @@ export class MerchantsService {
   }
 
   // Overview for dashboard (focus on today's metrics)
+  // Optimized: Uses direct dealId lookups instead of JOINs, combines queries where possible
   async getMerchantOverview(id: string) {
-    // Ensure merchant exists
-    await this.findOne(id);
+    // Lightweight existence check (only select ID)
+    const merchantExists = await this.prisma.merchant.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+
+    if (!merchantExists) {
+      throw new NotFoundException('Merchant not found');
+    }
 
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
     const endOfDay = new Date();
     endOfDay.setHours(23, 59, 59, 999);
 
-    const [todayOrders, todayRevenueAgg, totalRevenueAgg, activeDealsCount] =
+    // Get all deal IDs for this merchant first (single query, uses index)
+    const dealIds = await this.prisma.deal.findMany({
+      where: { merchantId: id },
+      select: { id: true },
+    });
+    const dealIdArray = dealIds.map(d => d.id);
+
+    // Early exit if no deals exist
+    if (dealIdArray.length === 0) {
+      return {
+        merchantId: id,
+        todayOrders: 0,
+        todayRevenue: 0,
+        totalRevenue: 0,
+        activeDeals: 0,
+      };
+    }
+
+    // Optimized: Use dealId directly instead of deal.merchantId (avoids JOIN)
+    // Combined today's orders count and revenue in separate queries but both use dealId index
+    const [todayOrdersData, totalRevenueData, activeDealsCount] =
       await Promise.all([
-        this.prisma.order.count({
+        // Combined today's orders count and revenue
+        this.prisma.order.aggregate({
           where: {
-            deal: { merchantId: id },
+            dealId: { in: dealIdArray }, // Direct index lookup instead of JOIN
             createdAt: { gte: startOfDay, lte: endOfDay },
             status: 'PAID',
           },
+          _count: { id: true },
+          _sum: { totalAmount: true },
         }),
+        // Total revenue (all time)
         this.prisma.order.aggregate({
           where: {
-            deal: { merchantId: id },
-            createdAt: { gte: startOfDay, lte: endOfDay },
+            dealId: { in: dealIdArray }, // Direct index lookup instead of JOIN
             status: 'PAID',
           },
           _sum: { totalAmount: true },
         }),
-        this.prisma.order.aggregate({
-          where: { deal: { merchantId: id }, status: 'PAID' },
-          _sum: { totalAmount: true },
+        // Active deals count
+        this.prisma.deal.count({
+          where: { merchantId: id, status: 'ACTIVE' },
         }),
-        this.prisma.deal.count({ where: { merchantId: id, status: 'ACTIVE' } }),
       ]);
 
     return {
       merchantId: id,
-      todayOrders,
-      todayRevenue: todayRevenueAgg._sum.totalAmount || 0,
-      totalRevenue: totalRevenueAgg._sum.totalAmount || 0,
+      todayOrders: todayOrdersData._count.id || 0,
+      todayRevenue: todayOrdersData._sum.totalAmount || 0,
+      totalRevenue: totalRevenueData._sum.totalAmount || 0,
       activeDeals: activeDealsCount,
     };
   }

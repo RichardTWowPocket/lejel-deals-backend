@@ -18,6 +18,7 @@ const staff_service_1 = require("./staff.service");
 const staff_dto_1 = require("./dto/staff.dto");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const roles_guard_1 = require("../auth/guards/roles.guard");
+const merchant_role_guard_1 = require("../auth/guards/merchant-role.guard");
 const auth_decorators_1 = require("../auth/decorators/auth.decorators");
 const client_1 = require("@prisma/client");
 const swagger_1 = require("@nestjs/swagger");
@@ -29,20 +30,23 @@ let StaffController = class StaffController {
     async create(createStaffDto) {
         return this.staffService.create(createStaffDto);
     }
-    async findAll(page, limit, merchantId, role, isActive) {
-        return this.staffService.findAll(page, limit, merchantId, role, isActive);
+    async findAll(req, page, limit, merchantId, role, isActive) {
+        const currentUserRole = req.merchantMembership?.merchantRole;
+        return this.staffService.findAll(page, limit, merchantId, role, isActive, currentUserRole);
     }
     async getStats() {
         return this.staffService.getStats();
     }
-    async findOne(id) {
-        return this.staffService.findOne(id);
+    async findOne(req, id) {
+        const currentUserRole = req.merchantMembership?.merchantRole;
+        return this.staffService.findOne(id, currentUserRole);
     }
     async findByEmail(email) {
         return this.staffService.findByEmail(email);
     }
-    async update(id, updateStaffDto) {
-        return this.staffService.update(id, updateStaffDto);
+    async update(req, id, updateStaffDto) {
+        const currentUserRole = req.merchantMembership?.merchantRole;
+        return this.staffService.update(id, updateStaffDto, currentUserRole);
     }
     async remove(id) {
         return this.staffService.remove(id);
@@ -50,14 +54,17 @@ let StaffController = class StaffController {
     async login(loginDto) {
         return this.staffService.login(loginDto);
     }
-    async changePin(id, changePinDto) {
-        return this.staffService.changePin(id, changePinDto);
+    async changePin(req, id, changePinDto) {
+        const currentUserRole = req.merchantMembership?.merchantRole;
+        return this.staffService.changePin(id, changePinDto, currentUserRole);
     }
-    async deactivate(id) {
-        return this.staffService.deactivate(id);
+    async deactivate(req, id) {
+        const currentUserRole = req.merchantMembership?.merchantRole;
+        return this.staffService.deactivate(id, currentUserRole);
     }
-    async activate(id) {
-        return this.staffService.activate(id);
+    async activate(req, id) {
+        const currentUserRole = req.merchantMembership?.merchantRole;
+        return this.staffService.activate(id, currentUserRole);
     }
     async getActivity(id, limit) {
         return this.staffService.getStaffActivity(id, limit);
@@ -78,8 +85,9 @@ let StaffController = class StaffController {
 exports.StaffController = StaffController;
 __decorate([
     (0, common_1.Post)(),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Create new staff member' }),
     (0, swagger_1.ApiResponse)({ status: 201, description: 'Staff created successfully', type: staff_dto_1.StaffResponseDto }),
@@ -90,8 +98,9 @@ __decorate([
 ], StaffController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get paginated list of staff members' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Staff list retrieved successfully' }),
@@ -100,13 +109,14 @@ __decorate([
     (0, swagger_1.ApiQuery)({ name: 'merchantId', required: false, type: String, description: 'Filter by merchant ID' }),
     (0, swagger_1.ApiQuery)({ name: 'role', required: false, enum: staff_dto_1.StaffRole, description: 'Filter by staff role' }),
     (0, swagger_1.ApiQuery)({ name: 'isActive', required: false, type: Boolean, description: 'Filter by active status' }),
-    __param(0, (0, common_1.Query)('page')),
-    __param(1, (0, common_1.Query)('limit')),
-    __param(2, (0, common_1.Query)('merchantId')),
-    __param(3, (0, common_1.Query)('role')),
-    __param(4, (0, common_1.Query)('isActive')),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Query)('page')),
+    __param(2, (0, common_1.Query)('limit')),
+    __param(3, (0, common_1.Query)('merchantId')),
+    __param(4, (0, common_1.Query)('role')),
+    __param(5, (0, common_1.Query)('isActive')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Number, String, String, Boolean]),
+    __metadata("design:paramtypes", [Object, Number, Number, String, String, Boolean]),
     __metadata("design:returntype", Promise)
 ], StaffController.prototype, "findAll", null);
 __decorate([
@@ -122,20 +132,23 @@ __decorate([
 ], StaffController.prototype, "getStats", null);
 __decorate([
     (0, common_1.Get)(':id'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get staff member by ID' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Staff retrieved successfully', type: staff_dto_1.StaffResponseDto }),
-    __param(0, (0, common_1.Param)('id')),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", Promise)
 ], StaffController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Get)('email/:email'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get staff member by email' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Staff retrieved successfully', type: staff_dto_1.StaffResponseDto }),
@@ -146,21 +159,24 @@ __decorate([
 ], StaffController.prototype, "findByEmail", null);
 __decorate([
     (0, common_1.Patch)(':id'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Update staff member' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Staff updated successfully', type: staff_dto_1.StaffResponseDto }),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, staff_dto_1.UpdateStaffDto]),
+    __metadata("design:paramtypes", [Object, String, staff_dto_1.UpdateStaffDto]),
     __metadata("design:returntype", Promise)
 ], StaffController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Delete staff member' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Staff deleted successfully' }),
@@ -180,45 +196,52 @@ __decorate([
 ], StaffController.prototype, "login", null);
 __decorate([
     (0, common_1.Post)(':id/change-pin'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Change staff PIN' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'PIN changed successfully' }),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, staff_dto_1.ChangePinDto]),
+    __metadata("design:paramtypes", [Object, String, staff_dto_1.ChangePinDto]),
     __metadata("design:returntype", Promise)
 ], StaffController.prototype, "changePin", null);
 __decorate([
     (0, common_1.Patch)(':id/deactivate'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Deactivate staff member' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Staff deactivated successfully', type: staff_dto_1.StaffResponseDto }),
-    __param(0, (0, common_1.Param)('id')),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", Promise)
 ], StaffController.prototype, "deactivate", null);
 __decorate([
     (0, common_1.Patch)(':id/activate'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Activate staff member' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Staff activated successfully', type: staff_dto_1.StaffResponseDto }),
-    __param(0, (0, common_1.Param)('id')),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", Promise)
 ], StaffController.prototype, "activate", null);
 __decorate([
     (0, common_1.Get)(':id/activity'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get staff activity history' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Staff activity retrieved successfully', type: [staff_dto_1.StaffActivityDto] }),

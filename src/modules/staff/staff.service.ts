@@ -23,7 +23,43 @@ export class StaffService {
   private readonly jwtSecret = process.env.JWT_SECRET || 'your-secret-key';
   private readonly jwtExpiresIn = '8h'; // Staff tokens expire in 8 hours
 
+  // Role hierarchy: OWNER > ADMIN > MANAGER > SUPERVISOR > CASHIER
+  private readonly roleHierarchy: Record<MerchantRole, number> = {
+    [MerchantRole.OWNER]: 5,
+    [MerchantRole.ADMIN]: 4,
+    [MerchantRole.MANAGER]: 3,
+    [MerchantRole.SUPERVISOR]: 2,
+    [MerchantRole.CASHIER]: 1,
+  };
+
   constructor(private prisma: PrismaService) {}
+
+  /**
+   * Check if current user role can access staff with target role
+   * Users can only see/manage staff with roles below their own
+   */
+  private canAccessStaffRole(currentUserRole: MerchantRole | undefined, targetStaffRole: MerchantRole): boolean {
+    // If no current user role (shouldn't happen with guard, but safety check)
+    if (!currentUserRole) {
+      return false;
+    }
+
+    // OWNER and ADMIN can see all staff
+    if (currentUserRole === MerchantRole.OWNER || currentUserRole === MerchantRole.ADMIN) {
+      return true;
+    }
+
+    // MANAGER can only see SUPERVISOR and CASHIER
+    if (currentUserRole === MerchantRole.MANAGER) {
+      return (
+        targetStaffRole === MerchantRole.SUPERVISOR ||
+        targetStaffRole === MerchantRole.CASHIER
+      );
+    }
+
+    // SUPERVISOR and CASHIER cannot manage other staff
+    return false;
+  }
 
   async create(createStaffDto: CreateStaffDto): Promise<StaffResponseDto> {
     try {
@@ -111,7 +147,14 @@ export class StaffService {
     }
   }
 
-  async findAll(page: number = 1, limit: number = 10, merchantId?: string, role?: StaffRole, isActive?: boolean): Promise<{ staff: StaffResponseDto[]; pagination: any }> {
+  async findAll(
+    page: number = 1,
+    limit: number = 10,
+    merchantId?: string,
+    role?: StaffRole,
+    isActive?: boolean,
+    currentUserRole?: MerchantRole,
+  ): Promise<{ staff: StaffResponseDto[]; pagination: any }> {
     try {
       const skip = (page - 1) * limit;
       const where: any = {};
@@ -120,8 +163,32 @@ export class StaffService {
         where.merchantId = merchantId;
       }
 
+      // If current user is MANAGER, filter to only show SUPERVISOR and CASHIER
+      if (currentUserRole === MerchantRole.MANAGER) {
+        // If role filter is specified, check if it's allowed for MANAGER
       if (role) {
-        // Map StaffRole to MerchantRole for filtering
+          const merchantRole = mapStaffRoleToMerchantRole(role);
+          if (merchantRole !== MerchantRole.SUPERVISOR && merchantRole !== MerchantRole.CASHIER) {
+            // MANAGER cannot see this role, return empty result
+            return {
+              staff: [],
+              pagination: {
+                page,
+                limit,
+                total: 0,
+                totalPages: 0,
+              },
+            };
+          }
+          where.merchantRole = merchantRole;
+        } else {
+          // No role filter, show only SUPERVISOR and CASHIER
+          where.merchantRole = {
+            in: [MerchantRole.SUPERVISOR, MerchantRole.CASHIER],
+          };
+        }
+      } else if (role) {
+        // For OWNER/ADMIN, apply role filter normally
         const merchantRole = mapStaffRoleToMerchantRole(role);
         where.merchantRole = merchantRole;
       }
@@ -154,6 +221,13 @@ export class StaffService {
         filteredMemberships = memberships.filter(m => m.user.isActive === isActive);
       }
 
+      // Additional role hierarchy filter (safety check)
+      if (currentUserRole) {
+        filteredMemberships = filteredMemberships.filter(m =>
+          this.canAccessStaffRole(currentUserRole, m.merchantRole),
+        );
+      }
+
       const staffResponse = filteredMemberships.map(m => this.mapToResponseDto(m, m.user));
 
       return {
@@ -161,8 +235,8 @@ export class StaffService {
         pagination: {
           page,
           limit,
-          total,
-          totalPages: Math.ceil(total / limit),
+          total: filteredMemberships.length,
+          totalPages: Math.ceil(filteredMemberships.length / limit),
         },
       };
     } catch (error) {
@@ -171,7 +245,7 @@ export class StaffService {
     }
   }
 
-  async findOne(id: string): Promise<StaffResponseDto> {
+  async findOne(id: string, currentUserRole?: MerchantRole): Promise<StaffResponseDto> {
     try {
       const membership = await this.prisma.merchantMembership.findUnique({
         where: { id },
@@ -189,6 +263,11 @@ export class StaffService {
 
       if (!membership) {
         throw new NotFoundException('Staff not found');
+      }
+
+      // Check role hierarchy access
+      if (currentUserRole && !this.canAccessStaffRole(currentUserRole, membership.merchantRole)) {
+        throw new UnauthorizedException('You do not have permission to view this staff member');
       }
 
       return this.mapToResponseDto(membership, membership.user);
@@ -230,7 +309,7 @@ export class StaffService {
     }
   }
 
-  async update(id: string, updateStaffDto: UpdateStaffDto): Promise<StaffResponseDto> {
+  async update(id: string, updateStaffDto: UpdateStaffDto, currentUserRole?: MerchantRole): Promise<StaffResponseDto> {
     try {
       const membership = await this.prisma.merchantMembership.findUnique({
         where: { id },
@@ -239,6 +318,19 @@ export class StaffService {
 
       if (!membership) {
         throw new NotFoundException('Staff not found');
+      }
+
+      // Check role hierarchy access
+      if (currentUserRole && !this.canAccessStaffRole(currentUserRole, membership.merchantRole)) {
+        throw new UnauthorizedException('You do not have permission to update this staff member');
+      }
+
+      // If updating role, check if new role is accessible
+      if (updateStaffDto.role && currentUserRole) {
+        const newMerchantRole = mapStaffRoleToMerchantRole(updateStaffDto.role);
+        if (!this.canAccessStaffRole(currentUserRole, newMerchantRole)) {
+          throw new UnauthorizedException('You do not have permission to assign this role');
+        }
       }
 
       // Check if email is being changed and if it already exists
@@ -420,7 +512,7 @@ export class StaffService {
     }
   }
 
-  async changePin(id: string, changePinDto: ChangePinDto): Promise<void> {
+  async changePin(id: string, changePinDto: ChangePinDto, currentUserRole?: MerchantRole): Promise<void> {
     try {
       const membership = await this.prisma.merchantMembership.findUnique({
         where: { id },
@@ -428,6 +520,11 @@ export class StaffService {
 
       if (!membership) {
         throw new NotFoundException('Staff not found');
+      }
+
+      // Check role hierarchy access
+      if (currentUserRole && !this.canAccessStaffRole(currentUserRole, membership.merchantRole)) {
+        throw new UnauthorizedException('You do not have permission to change PIN for this staff member');
       }
 
       const metadata = (membership.metadata as any) || {};
@@ -461,7 +558,7 @@ export class StaffService {
     }
   }
 
-  async deactivate(id: string): Promise<StaffResponseDto> {
+  async deactivate(id: string, currentUserRole?: MerchantRole): Promise<StaffResponseDto> {
     try {
       const membership = await this.prisma.merchantMembership.findUnique({
         where: { id },
@@ -479,6 +576,11 @@ export class StaffService {
 
       if (!membership) {
         throw new NotFoundException('Staff not found');
+      }
+
+      // Check role hierarchy access
+      if (currentUserRole && !this.canAccessStaffRole(currentUserRole, membership.merchantRole)) {
+        throw new UnauthorizedException('You do not have permission to deactivate this staff member');
       }
 
       // Deactivate the user
@@ -515,7 +617,7 @@ export class StaffService {
     }
   }
 
-  async activate(id: string): Promise<StaffResponseDto> {
+  async activate(id: string, currentUserRole?: MerchantRole): Promise<StaffResponseDto> {
     try {
       const membership = await this.prisma.merchantMembership.findUnique({
         where: { id },
@@ -533,6 +635,11 @@ export class StaffService {
 
       if (!membership) {
         throw new NotFoundException('Staff not found');
+      }
+
+      // Check role hierarchy access
+      if (currentUserRole && !this.canAccessStaffRole(currentUserRole, membership.merchantRole)) {
+        throw new UnauthorizedException('You do not have permission to activate this staff member');
       }
 
       // Activate the user

@@ -18,6 +18,7 @@ const analytics_service_1 = require("./analytics.service");
 const analytics_dto_1 = require("./dto/analytics.dto");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const roles_guard_1 = require("../auth/guards/roles.guard");
+const merchant_role_guard_1 = require("../auth/guards/merchant-role.guard");
 const auth_decorators_1 = require("../auth/decorators/auth.decorators");
 const client_1 = require("@prisma/client");
 const swagger_1 = require("@nestjs/swagger");
@@ -112,8 +113,9 @@ let AnalyticsController = class AnalyticsController {
 exports.AnalyticsController = AnalyticsController;
 __decorate([
     (0, common_1.Get)('dashboard'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get comprehensive dashboard analytics' }),
     (0, swagger_1.ApiResponse)({
@@ -129,8 +131,9 @@ __decorate([
 ], AnalyticsController.prototype, "getDashboardAnalytics", null);
 __decorate([
     (0, common_1.Get)('revenue'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get revenue analytics' }),
     (0, swagger_1.ApiResponse)({
@@ -180,8 +183,9 @@ __decorate([
 ], AnalyticsController.prototype, "getMerchantAnalytics", null);
 __decorate([
     (0, common_1.Get)('deals'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get deal analytics' }),
     (0, swagger_1.ApiResponse)({
@@ -197,8 +201,9 @@ __decorate([
 ], AnalyticsController.prototype, "getDealAnalytics", null);
 __decorate([
     (0, common_1.Get)('orders'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get order analytics' }),
     (0, swagger_1.ApiResponse)({
@@ -214,8 +219,9 @@ __decorate([
 ], AnalyticsController.prototype, "getOrderAnalytics", null);
 __decorate([
     (0, common_1.Get)('overview'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get overview metrics' }),
     (0, swagger_1.ApiResponse)({
@@ -230,8 +236,9 @@ __decorate([
 ], AnalyticsController.prototype, "getOverviewMetrics", null);
 __decorate([
     (0, common_1.Get)('trends'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get business trends' }),
     (0, swagger_1.ApiResponse)({
@@ -246,8 +253,9 @@ __decorate([
 ], AnalyticsController.prototype, "getBusinessTrends", null);
 __decorate([
     (0, common_1.Get)('performance'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, merchant_role_guard_1.MerchantRoleGuard),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get performance metrics' }),
     (0, swagger_1.ApiResponse)({

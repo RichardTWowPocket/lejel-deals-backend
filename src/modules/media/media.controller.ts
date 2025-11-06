@@ -26,9 +26,10 @@ import {
 import { MediaService } from './media.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles, CurrentUser } from '../auth/decorators/auth.decorators';
+import { MerchantRoleGuard } from '../auth/guards/merchant-role.guard';
+import { Roles, CurrentUser, MerchantRoles } from '../auth/decorators/auth.decorators';
 import type { AuthUser } from '../auth/types';
-import { UserRole } from '@prisma/client';
+import { UserRole, MerchantRole } from '@prisma/client';
 
 @ApiTags('Media')
 @Controller('media')
@@ -39,6 +40,8 @@ export class MediaController {
   /**
    * Generate upload URL for media file
    */
+  @UseGuards(MerchantRoleGuard)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @Roles(UserRole.MERCHANT, UserRole.SUPER_ADMIN)
   @Post('upload/request')
   @ApiOperation({ summary: 'Request upload URL for media file' })
@@ -57,6 +60,8 @@ export class MediaController {
   /**
    * Direct upload endpoint (for small files)
    */
+  @UseGuards(MerchantRoleGuard)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @Roles(UserRole.MERCHANT, UserRole.SUPER_ADMIN)
   @Post('upload/direct')
   @UseInterceptors(FileInterceptor('file'))
@@ -101,6 +106,8 @@ export class MediaController {
   /**
    * List media with pagination
    */
+  @UseGuards(MerchantRoleGuard)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @Roles(UserRole.MERCHANT, UserRole.SUPER_ADMIN)
   @Get()
   @ApiOperation({ summary: 'List media with pagination' })
@@ -120,6 +127,8 @@ export class MediaController {
   /**
    * Delete media
    */
+  @UseGuards(MerchantRoleGuard)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @Roles(UserRole.MERCHANT, UserRole.SUPER_ADMIN)
   @Delete(':id')
   @ApiOperation({ summary: 'Delete media' })

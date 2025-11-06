@@ -24,8 +24,9 @@ import {
 } from './dto/staff.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/auth.decorators';
-import { UserRole } from '@prisma/client';
+import { MerchantRoleGuard } from '../auth/guards/merchant-role.guard';
+import { Roles, MerchantRoles } from '../auth/decorators/auth.decorators';
+import { UserRole, MerchantRole } from '@prisma/client';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 
 @ApiTags('Staff Management')
@@ -34,8 +35,9 @@ export class StaffController {
   constructor(private readonly staffService: StaffService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.SUPER_ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.MERCHANT)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create new staff member' })
   @ApiResponse({ status: 201, description: 'Staff created successfully', type: StaffResponseDto })
@@ -44,8 +46,9 @@ export class StaffController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.MERCHANT)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get paginated list of staff members' })
   @ApiResponse({ status: 200, description: 'Staff list retrieved successfully' })
@@ -55,13 +58,15 @@ export class StaffController {
   @ApiQuery({ name: 'role', required: false, enum: StaffRole, description: 'Filter by staff role' })
   @ApiQuery({ name: 'isActive', required: false, type: Boolean, description: 'Filter by active status' })
   async findAll(
+    @Request() req: any,
     @Query('page') page?: number,
     @Query('limit') limit?: number,
     @Query('merchantId') merchantId?: string,
     @Query('role') role?: StaffRole,
     @Query('isActive') isActive?: boolean,
   ): Promise<{ staff: StaffResponseDto[]; pagination: any }> {
-    return this.staffService.findAll(page, limit, merchantId, role, isActive);
+    const currentUserRole = req.merchantMembership?.merchantRole;
+    return this.staffService.findAll(page, limit, merchantId, role, isActive, currentUserRole);
   }
 
   @Get('stats')
@@ -75,18 +80,21 @@ export class StaffController {
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.MERCHANT)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get staff member by ID' })
   @ApiResponse({ status: 200, description: 'Staff retrieved successfully', type: StaffResponseDto })
-  async findOne(@Param('id') id: string): Promise<StaffResponseDto> {
-    return this.staffService.findOne(id);
+  async findOne(@Request() req: any, @Param('id') id: string): Promise<StaffResponseDto> {
+    const currentUserRole = req.merchantMembership?.merchantRole;
+    return this.staffService.findOne(id, currentUserRole);
   }
 
   @Get('email/:email')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.MERCHANT)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get staff member by email' })
   @ApiResponse({ status: 200, description: 'Staff retrieved successfully', type: StaffResponseDto })
@@ -95,18 +103,21 @@ export class StaffController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.MERCHANT)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update staff member' })
   @ApiResponse({ status: 200, description: 'Staff updated successfully', type: StaffResponseDto })
-  async update(@Param('id') id: string, @Body() updateStaffDto: UpdateStaffDto): Promise<StaffResponseDto> {
-    return this.staffService.update(id, updateStaffDto);
+  async update(@Request() req: any, @Param('id') id: string, @Body() updateStaffDto: UpdateStaffDto): Promise<StaffResponseDto> {
+    const currentUserRole = req.merchantMembership?.merchantRole;
+    return this.staffService.update(id, updateStaffDto, currentUserRole);
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.SUPER_ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.MERCHANT)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete staff member' })
   @ApiResponse({ status: 200, description: 'Staff deleted successfully' })
@@ -122,38 +133,45 @@ export class StaffController {
   }
 
   @Post(':id/change-pin')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.MERCHANT)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Change staff PIN' })
   @ApiResponse({ status: 200, description: 'PIN changed successfully' })
-  async changePin(@Param('id') id: string, @Body() changePinDto: ChangePinDto): Promise<void> {
-    return this.staffService.changePin(id, changePinDto);
+  async changePin(@Request() req: any, @Param('id') id: string, @Body() changePinDto: ChangePinDto): Promise<void> {
+    const currentUserRole = req.merchantMembership?.merchantRole;
+    return this.staffService.changePin(id, changePinDto, currentUserRole);
   }
 
   @Patch(':id/deactivate')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.MERCHANT)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Deactivate staff member' })
   @ApiResponse({ status: 200, description: 'Staff deactivated successfully', type: StaffResponseDto })
-  async deactivate(@Param('id') id: string): Promise<StaffResponseDto> {
-    return this.staffService.deactivate(id);
+  async deactivate(@Request() req: any, @Param('id') id: string): Promise<StaffResponseDto> {
+    const currentUserRole = req.merchantMembership?.merchantRole;
+    return this.staffService.deactivate(id, currentUserRole);
   }
 
   @Patch(':id/activate')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.MERCHANT)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Activate staff member' })
   @ApiResponse({ status: 200, description: 'Staff activated successfully', type: StaffResponseDto })
-  async activate(@Param('id') id: string): Promise<StaffResponseDto> {
-    return this.staffService.activate(id);
+  async activate(@Request() req: any, @Param('id') id: string): Promise<StaffResponseDto> {
+    const currentUserRole = req.merchantMembership?.merchantRole;
+    return this.staffService.activate(id, currentUserRole);
   }
 
   @Get(':id/activity')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.MERCHANT)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get staff activity history' })
   @ApiResponse({ status: 200, description: 'Staff activity retrieved successfully', type: [StaffActivityDto] })
@@ -195,6 +213,5 @@ export class StaffController {
     return this.staffService.changePin(staffId, changePinDto);
   }
 }
-
 
 

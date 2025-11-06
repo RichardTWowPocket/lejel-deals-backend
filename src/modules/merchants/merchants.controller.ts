@@ -26,9 +26,15 @@ import { UpdateMerchantDto } from './dto/update-merchant.dto';
 import { MerchantVerificationDto } from './dto/merchant-verification.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { Public, Roles, CurrentUser } from '../auth/decorators/auth.decorators';
+import { MerchantRoleGuard } from '../auth/guards/merchant-role.guard';
+import {
+  Public,
+  Roles,
+  CurrentUser,
+  MerchantRoles,
+} from '../auth/decorators/auth.decorators';
 import type { AuthUser } from '../auth/types';
-import { UserRole } from '@prisma/client';
+import { UserRole, MerchantRole } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ForbiddenException } from '@nestjs/common';
 
@@ -164,6 +170,14 @@ export class MerchantsController {
     return this.merchantsService.findByEmail(email);
   }
 
+  @UseGuards(MerchantRoleGuard)
+  @MerchantRoles(
+    MerchantRole.OWNER,
+    MerchantRole.ADMIN,
+    MerchantRole.MANAGER,
+    MerchantRole.SUPERVISOR,
+    MerchantRole.CASHIER,
+  )
   @Roles(UserRole.MERCHANT, UserRole.SUPER_ADMIN)
   @Patch(':id')
   @ApiOperation({ summary: 'Update a merchant' })
@@ -244,6 +258,8 @@ export class MerchantsController {
   }
 
   // Operating hours management
+  @UseGuards(MerchantRoleGuard)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN)
   @Roles(UserRole.MERCHANT, UserRole.SUPER_ADMIN)
   @Patch(':id/operating-hours')
   @ApiOperation({ summary: 'Update merchant operating hours' })
@@ -282,6 +298,8 @@ export class MerchantsController {
   }
 
   // Statistics and analytics
+  @UseGuards(MerchantRoleGuard)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @Roles(UserRole.MERCHANT, UserRole.SUPER_ADMIN)
   @Get(':id/stats')
   @ApiOperation({ summary: 'Get merchant statistics' })
@@ -299,6 +317,14 @@ export class MerchantsController {
   }
 
   // "Me" endpoints for merchants (auto-detect merchant ID from session)
+  @UseGuards(MerchantRoleGuard)
+  @MerchantRoles(
+    MerchantRole.OWNER,
+    MerchantRole.ADMIN,
+    MerchantRole.MANAGER,
+    MerchantRole.SUPERVISOR,
+    MerchantRole.CASHIER,
+  )
   @Get('me/overview')
   @Roles(UserRole.MERCHANT)
   @ApiOperation({
@@ -326,12 +352,13 @@ export class MerchantsController {
     let finalMerchantId: string;
 
     if (merchantId) {
-      // Validate user has access to this merchant
+      // Validate user has access to this merchant (optimized: only select needed field)
       const membership = await this.prisma.merchantMembership.findFirst({
         where: {
           userId: user.id,
           merchantId: merchantId,
         },
+        select: { merchantId: true }, // Only select what we need
       });
 
       if (!membership) {
@@ -349,6 +376,14 @@ export class MerchantsController {
     return this.merchantsService.getMerchantOverview(finalMerchantId);
   }
 
+  @UseGuards(MerchantRoleGuard)
+  @MerchantRoles(
+    MerchantRole.OWNER,
+    MerchantRole.ADMIN,
+    MerchantRole.MANAGER,
+    MerchantRole.SUPERVISOR,
+    MerchantRole.CASHIER,
+  )
   @Get('me/payouts')
   @Roles(UserRole.MERCHANT)
   @ApiOperation({
@@ -410,6 +445,8 @@ export class MerchantsController {
   }
 
   // Merchant overview for dashboard (by ID - for admin or when merchant ID is known)
+  @UseGuards(MerchantRoleGuard)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @Roles(UserRole.MERCHANT, UserRole.SUPER_ADMIN)
   @Get(':id/overview')
   @ApiOperation({
@@ -432,6 +469,8 @@ export class MerchantsController {
   }
 
   // Payouts endpoint (by ID - for admin or when merchant ID is known)
+  @UseGuards(MerchantRoleGuard)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @Roles(UserRole.MERCHANT, UserRole.SUPER_ADMIN)
   @Get(':id/payouts')
   @ApiOperation({ summary: 'Get merchant payouts and revenue calculations' })

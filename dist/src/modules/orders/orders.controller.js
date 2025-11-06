@@ -18,6 +18,7 @@ const orders_service_1 = require("./orders.service");
 const create_order_dto_1 = require("./dto/create-order.dto");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const roles_guard_1 = require("../auth/guards/roles.guard");
+const merchant_role_guard_1 = require("../auth/guards/merchant-role.guard");
 const auth_decorators_1 = require("../auth/decorators/auth.decorators");
 const client_1 = require("@prisma/client");
 const swagger_1 = require("@nestjs/swagger");
@@ -84,6 +85,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "create", null);
 __decorate([
+    (0, common_1.UseGuards)(merchant_role_guard_1.MerchantRoleGuard),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER, client_1.MerchantRole.SUPERVISOR),
     (0, common_1.Get)(),
     (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiOperation)({ summary: 'Get all orders with pagination and filtering' }),
@@ -135,6 +138,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "findAll", null);
 __decorate([
+    (0, common_1.UseGuards)(merchant_role_guard_1.MerchantRoleGuard),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, common_1.Get)('stats'),
     (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiOperation)({ summary: 'Get order statistics' }),
@@ -147,6 +152,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "getStats", null);
 __decorate([
+    (0, common_1.UseGuards)(merchant_role_guard_1.MerchantRoleGuard),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, common_1.Get)('analytics'),
     (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiOperation)({ summary: 'Get order analytics' }),
@@ -166,6 +173,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "getAnalytics", null);
 __decorate([
+    (0, common_1.UseGuards)(merchant_role_guard_1.MerchantRoleGuard),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER, client_1.MerchantRole.SUPERVISOR),
     (0, common_1.Get)('customer/:customerId'),
     (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiOperation)({ summary: 'Get orders for a specific customer' }),
@@ -220,6 +229,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "findMine", null);
 __decorate([
+    (0, common_1.UseGuards)(merchant_role_guard_1.MerchantRoleGuard),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER, client_1.MerchantRole.SUPERVISOR),
     (0, common_1.Get)('merchant/:merchantId'),
     (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiOperation)({ summary: 'Get orders for a specific merchant' }),
@@ -247,6 +258,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "findByMerchant", null);
 __decorate([
+    (0, common_1.UseGuards)(merchant_role_guard_1.MerchantRoleGuard),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER, client_1.MerchantRole.SUPERVISOR),
     (0, common_1.Get)('number/:orderNumber'),
     (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiOperation)({ summary: 'Get order by order number' }),
@@ -258,6 +271,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "findByOrderNumber", null);
 __decorate([
+    (0, common_1.UseGuards)(merchant_role_guard_1.MerchantRoleGuard),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER, client_1.MerchantRole.SUPERVISOR),
     (0, common_1.Get)(':id'),
     (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiOperation)({ summary: 'Get order by ID' }),
@@ -269,6 +284,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "findOne", null);
 __decorate([
+    (0, common_1.UseGuards)(merchant_role_guard_1.MerchantRoleGuard),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, common_1.Patch)(':id'),
     (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiOperation)({ summary: 'Update order' }),
@@ -282,6 +299,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "update", null);
 __decorate([
+    (0, common_1.UseGuards)(merchant_role_guard_1.MerchantRoleGuard),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, common_1.Patch)(':id/status'),
     (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiOperation)({ summary: 'Update order status' }),
@@ -298,6 +317,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "updateStatus", null);
 __decorate([
+    (0, common_1.UseGuards)(merchant_role_guard_1.MerchantRoleGuard),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, common_1.Patch)(':id/cancel'),
     (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiOperation)({ summary: 'Cancel order' }),
@@ -311,6 +332,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "cancel", null);
 __decorate([
+    (0, common_1.UseGuards)(merchant_role_guard_1.MerchantRoleGuard),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, common_1.Patch)(':id/refund'),
     (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiOperation)({ summary: 'Refund order' }),

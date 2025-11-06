@@ -11,8 +11,9 @@ import {
 } from './dto/analytics.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/auth.decorators';
-import { UserRole } from '@prisma/client';
+import { MerchantRoleGuard } from '../auth/guards/merchant-role.guard';
+import { Roles, MerchantRoles } from '../auth/decorators/auth.decorators';
+import { UserRole, MerchantRole } from '@prisma/client';
 import {
   ApiTags,
   ApiOperation,
@@ -27,8 +28,9 @@ export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}
 
   @Get('dashboard')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.MERCHANT)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get comprehensive dashboard analytics' })
   @ApiResponse({
@@ -46,8 +48,9 @@ export class AnalyticsController {
   }
 
   @Get('revenue')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.MERCHANT)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get revenue analytics' })
   @ApiResponse({
@@ -103,8 +106,9 @@ export class AnalyticsController {
   }
 
   @Get('deals')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.MERCHANT)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get deal analytics' })
   @ApiResponse({
@@ -122,8 +126,9 @@ export class AnalyticsController {
   }
 
   @Get('orders')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.MERCHANT)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get order analytics' })
   @ApiResponse({
@@ -141,8 +146,9 @@ export class AnalyticsController {
   }
 
   @Get('overview')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.MERCHANT)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get overview metrics' })
   @ApiResponse({
@@ -163,8 +169,9 @@ export class AnalyticsController {
   }
 
   @Get('trends')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.MERCHANT)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get business trends' })
   @ApiResponse({
@@ -192,8 +199,9 @@ export class AnalyticsController {
   }
 
   @Get('performance')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, MerchantRoleGuard)
   @Roles(UserRole.MERCHANT)
+  @MerchantRoles(MerchantRole.OWNER, MerchantRole.ADMIN, MerchantRole.MANAGER)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get performance metrics' })
   @ApiResponse({

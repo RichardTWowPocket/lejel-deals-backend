@@ -19,6 +19,7 @@ const swagger_1 = require("@nestjs/swagger");
 const media_service_1 = require("./media.service");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const roles_guard_1 = require("../auth/guards/roles.guard");
+const merchant_role_guard_1 = require("../auth/guards/merchant-role.guard");
 const auth_decorators_1 = require("../auth/decorators/auth.decorators");
 const client_1 = require("@prisma/client");
 let MediaController = class MediaController {
@@ -49,6 +50,8 @@ let MediaController = class MediaController {
 };
 exports.MediaController = MediaController;
 __decorate([
+    (0, common_1.UseGuards)(merchant_role_guard_1.MerchantRoleGuard),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT, client_1.UserRole.SUPER_ADMIN),
     (0, common_1.Post)('upload/request'),
     (0, swagger_1.ApiOperation)({ summary: 'Request upload URL for media file' }),
@@ -64,6 +67,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], MediaController.prototype, "requestUploadUrl", null);
 __decorate([
+    (0, common_1.UseGuards)(merchant_role_guard_1.MerchantRoleGuard),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT, client_1.UserRole.SUPER_ADMIN),
     (0, common_1.Post)('upload/direct'),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
@@ -91,6 +96,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], MediaController.prototype, "getMedia", null);
 __decorate([
+    (0, common_1.UseGuards)(merchant_role_guard_1.MerchantRoleGuard),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT, client_1.UserRole.SUPER_ADMIN),
     (0, common_1.Get)(),
     (0, swagger_1.ApiOperation)({ summary: 'List media with pagination' }),
@@ -107,6 +114,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], MediaController.prototype, "listMedia", null);
 __decorate([
+    (0, common_1.UseGuards)(merchant_role_guard_1.MerchantRoleGuard),
+    (0, auth_decorators_1.MerchantRoles)(client_1.MerchantRole.OWNER, client_1.MerchantRole.ADMIN, client_1.MerchantRole.MANAGER),
     (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT, client_1.UserRole.SUPER_ADMIN),
     (0, common_1.Delete)(':id'),
     (0, swagger_1.ApiOperation)({ summary: 'Delete media' }),

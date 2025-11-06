@@ -37,6 +37,9 @@ let AuthController = class AuthController {
     async getProfile(user) {
         return this.authService.getProfile(user.id);
     }
+    async changePassword(user, body) {
+        return this.authService.changePassword(user.id, body.currentPassword, body.newPassword);
+    }
     async oauthGoogle(body) {
         return this.authService.findOrCreateOAuthUser(body);
     }
@@ -89,6 +92,21 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "getProfile", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Patch)('change-password'),
+    (0, swagger_1.ApiOperation)({ summary: 'Change user password' }),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Password changed successfully' }),
+    (0, swagger_1.ApiResponse)({ status: 400, description: 'Invalid password or current password incorrect' }),
+    (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
+    (0, throttler_1.Throttle)({ short: { limit: 5, ttl: 60 } }),
+    __param(0, (0, auth_decorators_1.CurrentUser)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "changePassword", null);
 __decorate([
     (0, auth_decorators_1.Public)(),
     (0, common_1.Post)('oauth/google'),

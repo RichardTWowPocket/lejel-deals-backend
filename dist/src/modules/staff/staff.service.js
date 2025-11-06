@@ -55,8 +55,28 @@ let StaffService = StaffService_1 = class StaffService {
     logger = new common_1.Logger(StaffService_1.name);
     jwtSecret = process.env.JWT_SECRET || 'your-secret-key';
     jwtExpiresIn = '8h';
+    roleHierarchy = {
+        [client_1.MerchantRole.OWNER]: 5,
+        [client_1.MerchantRole.ADMIN]: 4,
+        [client_1.MerchantRole.MANAGER]: 3,
+        [client_1.MerchantRole.SUPERVISOR]: 2,
+        [client_1.MerchantRole.CASHIER]: 1,
+    };
     constructor(prisma) {
         this.prisma = prisma;
+    }
+    canAccessStaffRole(currentUserRole, targetStaffRole) {
+        if (!currentUserRole) {
+            return false;
+        }
+        if (currentUserRole === client_1.MerchantRole.OWNER || currentUserRole === client_1.MerchantRole.ADMIN) {
+            return true;
+        }
+        if (currentUserRole === client_1.MerchantRole.MANAGER) {
+            return (targetStaffRole === client_1.MerchantRole.SUPERVISOR ||
+                targetStaffRole === client_1.MerchantRole.CASHIER);
+        }
+        return false;
     }
     async create(createStaffDto) {
         try {
@@ -129,14 +149,36 @@ let StaffService = StaffService_1 = class StaffService {
             throw error;
         }
     }
-    async findAll(page = 1, limit = 10, merchantId, role, isActive) {
+    async findAll(page = 1, limit = 10, merchantId, role, isActive, currentUserRole) {
         try {
             const skip = (page - 1) * limit;
             const where = {};
             if (merchantId) {
                 where.merchantId = merchantId;
             }
-            if (role) {
+            if (currentUserRole === client_1.MerchantRole.MANAGER) {
+                if (role) {
+                    const merchantRole = (0, staff_dto_1.mapStaffRoleToMerchantRole)(role);
+                    if (merchantRole !== client_1.MerchantRole.SUPERVISOR && merchantRole !== client_1.MerchantRole.CASHIER) {
+                        return {
+                            staff: [],
+                            pagination: {
+                                page,
+                                limit,
+                                total: 0,
+                                totalPages: 0,
+                            },
+                        };
+                    }
+                    where.merchantRole = merchantRole;
+                }
+                else {
+                    where.merchantRole = {
+                        in: [client_1.MerchantRole.SUPERVISOR, client_1.MerchantRole.CASHIER],
+                    };
+                }
+            }
+            else if (role) {
                 const merchantRole = (0, staff_dto_1.mapStaffRoleToMerchantRole)(role);
                 where.merchantRole = merchantRole;
             }
@@ -165,14 +207,17 @@ let StaffService = StaffService_1 = class StaffService {
             if (isActive !== undefined) {
                 filteredMemberships = memberships.filter(m => m.user.isActive === isActive);
             }
+            if (currentUserRole) {
+                filteredMemberships = filteredMemberships.filter(m => this.canAccessStaffRole(currentUserRole, m.merchantRole));
+            }
             const staffResponse = filteredMemberships.map(m => this.mapToResponseDto(m, m.user));
             return {
                 staff: staffResponse,
                 pagination: {
                     page,
                     limit,
-                    total,
-                    totalPages: Math.ceil(total / limit),
+                    total: filteredMemberships.length,
+                    totalPages: Math.ceil(filteredMemberships.length / limit),
                 },
             };
         }
@@ -181,7 +226,7 @@ let StaffService = StaffService_1 = class StaffService {
             throw error;
         }
     }
-    async findOne(id) {
+    async findOne(id, currentUserRole) {
         try {
             const membership = await this.prisma.merchantMembership.findUnique({
                 where: { id },
@@ -198,6 +243,9 @@ let StaffService = StaffService_1 = class StaffService {
             });
             if (!membership) {
                 throw new common_1.NotFoundException('Staff not found');
+            }
+            if (currentUserRole && !this.canAccessStaffRole(currentUserRole, membership.merchantRole)) {
+                throw new common_1.UnauthorizedException('You do not have permission to view this staff member');
             }
             return this.mapToResponseDto(membership, membership.user);
         }
@@ -235,7 +283,7 @@ let StaffService = StaffService_1 = class StaffService {
             throw error;
         }
     }
-    async update(id, updateStaffDto) {
+    async update(id, updateStaffDto, currentUserRole) {
         try {
             const membership = await this.prisma.merchantMembership.findUnique({
                 where: { id },
@@ -243,6 +291,15 @@ let StaffService = StaffService_1 = class StaffService {
             });
             if (!membership) {
                 throw new common_1.NotFoundException('Staff not found');
+            }
+            if (currentUserRole && !this.canAccessStaffRole(currentUserRole, membership.merchantRole)) {
+                throw new common_1.UnauthorizedException('You do not have permission to update this staff member');
+            }
+            if (updateStaffDto.role && currentUserRole) {
+                const newMerchantRole = (0, staff_dto_1.mapStaffRoleToMerchantRole)(updateStaffDto.role);
+                if (!this.canAccessStaffRole(currentUserRole, newMerchantRole)) {
+                    throw new common_1.UnauthorizedException('You do not have permission to assign this role');
+                }
             }
             if (updateStaffDto.email && updateStaffDto.email !== membership.user.email) {
                 const emailExists = await this.prisma.user.findUnique({
@@ -389,13 +446,16 @@ let StaffService = StaffService_1 = class StaffService {
             throw error;
         }
     }
-    async changePin(id, changePinDto) {
+    async changePin(id, changePinDto, currentUserRole) {
         try {
             const membership = await this.prisma.merchantMembership.findUnique({
                 where: { id },
             });
             if (!membership) {
                 throw new common_1.NotFoundException('Staff not found');
+            }
+            if (currentUserRole && !this.canAccessStaffRole(currentUserRole, membership.merchantRole)) {
+                throw new common_1.UnauthorizedException('You do not have permission to change PIN for this staff member');
             }
             const metadata = membership.metadata || {};
             const currentPin = metadata.pin;
@@ -419,7 +479,7 @@ let StaffService = StaffService_1 = class StaffService {
             throw error;
         }
     }
-    async deactivate(id) {
+    async deactivate(id, currentUserRole) {
         try {
             const membership = await this.prisma.merchantMembership.findUnique({
                 where: { id },
@@ -436,6 +496,9 @@ let StaffService = StaffService_1 = class StaffService {
             });
             if (!membership) {
                 throw new common_1.NotFoundException('Staff not found');
+            }
+            if (currentUserRole && !this.canAccessStaffRole(currentUserRole, membership.merchantRole)) {
+                throw new common_1.UnauthorizedException('You do not have permission to deactivate this staff member');
             }
             await this.prisma.user.update({
                 where: { id: membership.userId },
@@ -465,7 +528,7 @@ let StaffService = StaffService_1 = class StaffService {
             throw error;
         }
     }
-    async activate(id) {
+    async activate(id, currentUserRole) {
         try {
             const membership = await this.prisma.merchantMembership.findUnique({
                 where: { id },
@@ -482,6 +545,9 @@ let StaffService = StaffService_1 = class StaffService {
             });
             if (!membership) {
                 throw new common_1.NotFoundException('Staff not found');
+            }
+            if (currentUserRole && !this.canAccessStaffRole(currentUserRole, membership.merchantRole)) {
+                throw new common_1.UnauthorizedException('You do not have permission to activate this staff member');
             }
             await this.prisma.user.update({
                 where: { id: membership.userId },

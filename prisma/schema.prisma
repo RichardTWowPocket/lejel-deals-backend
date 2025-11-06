@@ -54,51 +54,52 @@ enum MerchantRole {
 
 // Models
 model Deal {
-  id          String      @id @default(cuid())
-  title       String
-  description String?
-  dealPrice   Decimal     @db.Decimal(10, 2)  // What customer PAYS to buy the coupon
-  discountPrice Decimal   @db.Decimal(10, 2)  // Face value of the coupon (voucher value)
-  validFrom   DateTime
-  validUntil  DateTime
-  status      DealStatus  @default(DRAFT)
-  maxQuantity Int?
-  soldQuantity Int       @default(0)
-  images      String[]    @default([])
-  terms       String?
-  merchantId  String
-  categoryId  String?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id            String     @id @default(cuid())
+  title         String
+  description   String?
+  dealPrice     Decimal    @db.Decimal(10, 2) // What customer PAYS to buy the coupon
+  discountPrice Decimal    @db.Decimal(10, 2) // Face value of the coupon (voucher value)
+  validFrom     DateTime
+  validUntil    DateTime
+  status        DealStatus @default(DRAFT)
+  maxQuantity   Int?
+  soldQuantity  Int        @default(0)
+  images        String[]   @default([])
+  terms         String?
+  merchantId    String
+  categoryId    String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 
   // Relations
-  merchant    Merchant    @relation(fields: [merchantId], references: [id], onDelete: Cascade)
-  category    Category?   @relation(fields: [categoryId], references: [id])
-  orders      Order[]
-  coupons     Coupon[]
+  merchant Merchant  @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  category Category? @relation(fields: [categoryId], references: [id])
+  orders   Order[]
+  coupons  Coupon[]
 
   // Indexes for performance optimization
-  @@index([status])                                           // Filter by status
-  @@index([merchantId])                                       // Filter by merchant
-  @@index([categoryId])                                       // Filter by category
-  @@index([dealPrice])                                        // Sort by price
-  @@index([soldQuantity])                                     // Sort by popularity
-  @@index([createdAt])                                        // Sort by creation date
-  @@index([validFrom])                                        // Filter by valid from date
-  @@index([validUntil])                                       // Filter by valid until date
-  @@index([status, validFrom, validUntil])                    // Composite for active deals query
-  @@index([status, merchantId])                               // Filter by merchant's active deals
-  @@index([status, categoryId])                               // Filter by category's active deals
-  @@index([status, dealPrice])                                // Sort active deals by price
-  @@index([status, soldQuantity])                             // Sort active deals by popularity
+  @@index([status]) // Filter by status
+  @@index([merchantId]) // Filter by merchant
+  @@index([categoryId]) // Filter by category
+  @@index([dealPrice]) // Sort by price
+  @@index([soldQuantity]) // Sort by popularity
+  @@index([createdAt]) // Sort by creation date
+  @@index([validFrom]) // Filter by valid from date
+  @@index([validUntil]) // Filter by valid until date
+  @@index([status, validFrom, validUntil]) // Composite for active deals query
+  @@index([status, merchantId]) // Filter by merchant's active deals
+  @@index([status, categoryId]) // Filter by category's active deals
+  @@index([status, dealPrice]) // Sort active deals by price
+  @@index([status, soldQuantity]) // Sort active deals by popularity
+  @@index([merchantId, createdAt]) // Merchant's deals sorted by creation
   @@map("deals")
 }
 
 model Merchant {
-  id          String      @id @default(cuid())
+  id          String   @id @default(cuid())
   name        String
   description String?
-  email       String      @unique
+  email       String   @unique
   phone       String?
   address     String?
   city        String?
@@ -106,68 +107,78 @@ model Merchant {
   postalCode  String?
   website     String?
   logo        String?
-  images      String[]    @default([])
-  isActive    Boolean     @default(true)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  images      String[] @default([])
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Relations
   deals       Deal[]
   memberships MerchantMembership[]
 
+  // Indexes for performance optimization
+  @@index([city]) // Filter by city
+  @@index([isActive]) // Filter active/inactive merchants
+  @@index([isActive, createdAt]) // Active merchants sorted by creation
   @@map("merchants")
 }
 
 model Order {
-  id          String      @id @default(cuid())
-  orderNumber String      @unique
-  customerId  String
-  dealId      String
-  quantity    Int         @default(1)
-  totalAmount Decimal     @db.Decimal(10, 2)
-  status      OrderStatus @default(PENDING)
-  paymentMethod String?
+  id               String      @id @default(cuid())
+  orderNumber      String      @unique
+  customerId       String
+  dealId           String
+  quantity         Int         @default(1)
+  totalAmount      Decimal     @db.Decimal(10, 2)
+  status           OrderStatus @default(PENDING)
+  paymentMethod    String?
   paymentReference String?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
 
   // Relations
-  customer    Customer    @relation(fields: [customerId], references: [id])
-  deal        Deal        @relation(fields: [dealId], references: [id])
-  coupons     Coupon[]
+  customer Customer @relation(fields: [customerId], references: [id])
+  deal     Deal     @relation(fields: [dealId], references: [id])
+  coupons  Coupon[]
 
   // Indexes for performance optimization
-  @@index([customerId])                                       // Filter by customer
-  @@index([dealId])                                           // Filter by deal
-  @@index([status])                                           // Filter by status
-  @@index([createdAt])                                        // Sort by creation date
-  @@index([customerId, status])                               // Customer's orders by status
-  @@index([dealId, status])                                   // Deal's orders by status
+  @@index([customerId]) // Filter by customer
+  @@index([dealId]) // Filter by deal
+  @@index([status]) // Filter by status
+  @@index([createdAt]) // Sort by creation date
+  @@index([customerId, status]) // Customer's orders by status
+  @@index([dealId, status]) // Deal's orders by status
+  @@index([dealId, status, createdAt]) // Merchant overview queries (dealId + status + date range)
+  @@index([status, createdAt]) // Date range queries with status filter
+  @@index([customerId, createdAt]) // Customer order history sorting
   @@map("orders")
 }
 
 model Coupon {
-  id          String      @id @default(cuid())
-  orderId     String
-  dealId      String
-  qrCode      String      @unique
-  status      CouponStatus @default(ACTIVE)
-  usedAt      DateTime?
-  expiresAt   DateTime
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id        String       @id @default(cuid())
+  orderId   String
+  dealId    String
+  qrCode    String       @unique
+  status    CouponStatus @default(ACTIVE)
+  usedAt    DateTime?
+  expiresAt DateTime
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 
   // Relations
-  order       Order       @relation(fields: [orderId], references: [id])
-  deal        Deal        @relation(fields: [dealId], references: [id])
+  order       Order        @relation(fields: [orderId], references: [id])
+  deal        Deal         @relation(fields: [dealId], references: [id])
   redemptions Redemption[]
 
   // Indexes for performance optimization
-  @@index([orderId])                                          // Filter by order
-  @@index([dealId])                                           // Filter by deal
-  @@index([status])                                           // Filter by status
-  @@index([expiresAt])                                        // Filter by expiration
-  @@index([status, expiresAt])                                // Active non-expired coupons
+  @@index([orderId]) // Filter by order
+  @@index([dealId]) // Filter by deal
+  @@index([status]) // Filter by status
+  @@index([expiresAt]) // Filter by expiration
+  @@index([status, expiresAt]) // Active non-expired coupons
+  @@index([orderId, status]) // Order's coupons by status
+  @@index([dealId, status]) // Deal's coupons by status
+  @@index([createdAt]) // Sort by creation date
   @@map("coupons")
 }
 
@@ -179,66 +190,72 @@ enum RedemptionStatus {
 }
 
 model Redemption {
-  id          String           @id @default(cuid())
-  couponId    String
+  id               String           @id @default(cuid())
+  couponId         String
   redeemedByUserId String?
-  notes       String?
-  location    String?
-  status      RedemptionStatus @default(COMPLETED)
-  redeemedAt  DateTime         @default(now())
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  metadata    Json?
+  notes            String?
+  location         String?
+  status           RedemptionStatus @default(COMPLETED)
+  redeemedAt       DateTime         @default(now())
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  metadata         Json?
 
   // Relations
-  coupon      Coupon           @relation(fields: [couponId], references: [id])
-  redeemedByUser User?         @relation("RedemptionsByUser", fields: [redeemedByUserId], references: [id])
+  coupon         Coupon @relation(fields: [couponId], references: [id])
+  redeemedByUser User?  @relation("RedemptionsByUser", fields: [redeemedByUserId], references: [id])
 
   // Indexes for performance optimization
-  @@index([couponId])                                         // Filter by coupon
-  @@index([redeemedByUserId])                                 // Filter by redeeming user
-  @@index([status])                                           // Filter by status
-  @@index([redeemedAt])                                       // Sort by redemption date
+  @@index([couponId]) // Filter by coupon
+  @@index([redeemedByUserId]) // Filter by redeeming user
+  @@index([status]) // Filter by status
+  @@index([redeemedAt]) // Sort by redemption date
+  @@index([couponId, status]) // Check if coupon already redeemed
+  @@index([redeemedByUserId, redeemedAt]) // Staff activity queries
+  @@index([status, redeemedAt]) // Status-based date range queries
   @@map("redemptions")
 }
 
 model Customer {
-  id          String      @id @default(cuid())
-  userId      String?     @unique
-  email       String      @unique
+  id          String    @id @default(cuid())
+  userId      String?   @unique
+  email       String    @unique
   phone       String?
   firstName   String?
   lastName    String?
   dateOfBirth DateTime?
   preferences Json?
-  isActive    Boolean     @default(true)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   // Relations
-  user        User?       @relation(fields: [userId], references: [id])
-  orders      Order[]
+  user   User?   @relation(fields: [userId], references: [id])
+  orders Order[]
 
+  // Indexes for performance optimization
+  @@index([isActive]) // Filter active/inactive customers
+  @@index([isActive, createdAt]) // Active customers sorted by creation
   @@map("customers")
 }
 
 model User {
-  id             String    @id @default(cuid())
-  email          String    @unique
-  hashedPassword String?   // Nullable for OAuth users (Google, etc.)
-  role           UserRole  @default(CUSTOMER)
-  isActive       Boolean   @default(true)
+  id             String   @id @default(cuid())
+  email          String   @unique
+  hashedPassword String? // Nullable for OAuth users (Google, etc.)
+  role           UserRole @default(CUSTOMER)
+  isActive       Boolean  @default(true)
   // OAuth fields
-  providerId     String?   // Google user ID or other OAuth provider ID
-  provider       String?   // 'google', 'facebook', etc.
-  avatar         String?   // Profile picture URL from OAuth provider
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  providerId     String? // Google user ID or other OAuth provider ID
+  provider       String? // 'google', 'facebook', etc.
+  avatar         String? // Profile picture URL from OAuth provider
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   // Profiles / relations
-  customer       Customer?
-  merchants      MerchantMembership[]
-  redemptions    Redemption[] @relation("RedemptionsByUser")
+  customer    Customer?
+  merchants   MerchantMembership[]
+  redemptions Redemption[]         @relation("RedemptionsByUser")
 
   @@index([providerId]) // Index for OAuth provider lookups
   @@map("users")
@@ -254,70 +271,88 @@ model MerchantMembership {
   metadata     Json?
   createdAt    DateTime     @default(now())
 
-  user         User         @relation(fields: [userId], references: [id])
-  merchant     Merchant     @relation(fields: [merchantId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
+  merchant Merchant @relation(fields: [merchantId], references: [id])
 
   @@unique([userId, merchantId])
+  // Indexes for performance optimization
+  @@index([userId]) // Get user's memberships
+  @@index([merchantId]) // Get merchant's staff list
+  @@index([merchantRole]) // Filter by role
+  @@index([merchantId, merchantRole]) // Staff by role
+  @@index([userId, createdAt]) // User's memberships sorted
+  @@index([merchantId, createdAt]) // Merchant's staff sorted
   @@map("merchant_users")
 }
 
 model Category {
-  id          String      @id @default(cuid())
-  name        String      @unique
+  id          String   @id @default(cuid())
+  name        String   @unique
   description String?
   icon        String?
-  color       String?     // For UI theming
-  image       String?     // Category banner image
-  parentId    String?     // Reference to parent category
-  level       Int         @default(0) // 0 = root, 1 = child, etc.
-  path        String?     // "food/beverage/restaurants"
-  sortOrder   Int         @default(0) // Custom ordering within level
-  tags        String[]    @default([]) // Searchable tags
-  metadata    Json?       // Flexible additional data
-  isActive    Boolean     @default(true)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  color       String? // For UI theming
+  image       String? // Category banner image
+  parentId    String? // Reference to parent category
+  level       Int      @default(0) // 0 = root, 1 = child, etc.
+  path        String? // "food/beverage/restaurants"
+  sortOrder   Int      @default(0) // Custom ordering within level
+  tags        String[] @default([]) // Searchable tags
+  metadata    Json? // Flexible additional data
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Relations
-  parent      Category?   @relation("CategoryHierarchy", fields: [parentId], references: [id])
-  children    Category[]  @relation("CategoryHierarchy")
-  deals       Deal[]
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryHierarchy")
+  deals    Deal[]
 
+  // Indexes for performance optimization
+  @@index([parentId]) // Get children categories
+  @@index([isActive]) // Filter active categories
+  @@index([parentId, sortOrder]) // Sort children within parent
+  @@index([level]) // Filter by hierarchy level
+  @@index([isActive, parentId]) // Active children categories
   @@map("categories")
 }
 
 model Media {
-  id          String      @id @default(cuid())
-  filename    String
+  id           String   @id @default(cuid())
+  filename     String
   originalName String
-  mimeType    String
-  size        Int
-  url         String
-  uploadedBy  String?
-  createdAt   DateTime    @default(now())
+  mimeType     String
+  size         Int
+  url          String
+  uploadedBy   String?
+  createdAt    DateTime @default(now())
 
+  // Indexes for performance optimization
+  @@index([uploadedBy]) // Filter by uploader
+  @@index([mimeType]) // Filter by file type
+  @@index([createdAt]) // Sort by upload date
+  @@index([uploadedBy, createdAt]) // User's uploads sorted
   @@map("media")
 }
 
 model QRCodeActivity {
-  id          String      @id @default(cuid())
-  action      String      // GENERATED, VALIDATED, REDEEMED, EXPIRED, REVOKED, etc.
-  couponId    String?
-  metadata    Json?       // Additional data about the activity
-  timestamp   DateTime    @default(now())
-  createdAt   DateTime    @default(now())
+  id        String   @id @default(cuid())
+  action    String // GENERATED, VALIDATED, REDEEMED, EXPIRED, REVOKED, etc.
+  couponId  String?
+  metadata  Json? // Additional data about the activity
+  timestamp DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@map("qr_code_activities")
 }
 
 model WebhookLog {
-  id          String      @id @default(cuid())
-  source      String      // e.g., 'midtrans', 'whatsapp'
-  event       String
-  payload     Json
-  status      String      // 'success', 'error', 'pending'
-  response    Json?
-  createdAt   DateTime    @default(now())
+  id        String   @id @default(cuid())
+  source    String // e.g., 'midtrans', 'whatsapp'
+  event     String
+  payload   Json
+  status    String // 'success', 'error', 'pending'
+  response  Json?
+  createdAt DateTime @default(now())
 
   @@map("webhook_logs")
 }

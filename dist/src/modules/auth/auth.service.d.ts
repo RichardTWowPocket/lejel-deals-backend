@@ -112,6 +112,10 @@ export declare class AuthService {
             isActive: boolean;
         } | null;
     }>;
+    changePassword(userId: string, currentPassword: string, newPassword: string): Promise<{
+        success: boolean;
+        message: string;
+    }>;
     findOrCreateOAuthUser(dto: OAuthGoogleDto): Promise<{
         success: boolean;
         message: string;
