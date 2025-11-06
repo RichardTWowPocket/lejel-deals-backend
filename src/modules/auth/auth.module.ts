@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { PrismaModule } from '../../prisma/prisma.module';
@@ -13,6 +15,12 @@ import { RolesGuard } from './guards/roles.guard';
     ConfigModule,
     PassportModule,
     PrismaModule,
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60,
+        limit: 20,
+      },
+    ]),
   ],
   controllers: [AuthController],
   providers: [
@@ -20,11 +28,11 @@ import { RolesGuard } from './guards/roles.guard';
     JwtStrategy,
     JwtAuthGuard,
     RolesGuard,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
-  exports: [
-    AuthService,
-    JwtAuthGuard,
-    RolesGuard,
-  ],
+  exports: [AuthService, JwtAuthGuard, RolesGuard],
 })
 export class AuthModule {}

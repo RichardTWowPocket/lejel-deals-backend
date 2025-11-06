@@ -1,39 +1,67 @@
-import { IsString, IsOptional, IsEnum, IsObject, IsDateString, IsUUID } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsEnum,
+  IsObject,
+  IsDateString,
+  IsUUID,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { RedemptionStatus } from '@prisma/client';
 
 export class CreateRedemptionDto {
-  @ApiProperty({ description: 'QR code token to redeem', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' })
+  @ApiProperty({
+    description: 'QR code token to redeem',
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+  })
   @IsString()
   qrToken: string;
 
-  @ApiProperty({ description: 'Staff ID performing the redemption', example: 'staff-123' })
+  @ApiProperty({
+    description: 'User ID performing the redemption',
+    example: 'user-123',
+  })
   @IsString()
-  staffId: string;
+  redeemedByUserId: string;
 
-  @ApiPropertyOptional({ description: 'Redemption notes', example: 'Redeemed at counter' })
+  @ApiPropertyOptional({
+    description: 'Redemption notes',
+    example: 'Redeemed at counter',
+  })
   @IsOptional()
   @IsString()
   notes?: string;
 
-  @ApiPropertyOptional({ description: 'Redemption location', example: 'Main Counter' })
+  @ApiPropertyOptional({
+    description: 'Redemption location',
+    example: 'Main Counter',
+  })
   @IsOptional()
   @IsString()
   location?: string;
 }
 
 export class UpdateRedemptionDto {
-  @ApiPropertyOptional({ description: 'Redemption status', enum: RedemptionStatus })
+  @ApiPropertyOptional({
+    description: 'Redemption status',
+    enum: RedemptionStatus,
+  })
   @IsOptional()
   @IsEnum(RedemptionStatus)
   status?: RedemptionStatus;
 
-  @ApiPropertyOptional({ description: 'Redemption notes', example: 'Updated notes' })
+  @ApiPropertyOptional({
+    description: 'Redemption notes',
+    example: 'Updated notes',
+  })
   @IsOptional()
   @IsString()
   notes?: string;
 
-  @ApiPropertyOptional({ description: 'Redemption location', example: 'Main Counter' })
+  @ApiPropertyOptional({
+    description: 'Redemption location',
+    example: 'Main Counter',
+  })
   @IsOptional()
   @IsString()
   location?: string;
@@ -46,8 +74,8 @@ export class RedemptionResponseDto {
   @ApiProperty({ description: 'Coupon ID' })
   couponId: string;
 
-  @ApiProperty({ description: 'Staff ID' })
-  staffId: string;
+  @ApiProperty({ description: 'Redeemed by user ID' })
+  redeemedByUserId: string;
 
   @ApiPropertyOptional({ description: 'Redemption notes' })
   notes?: string;
@@ -113,14 +141,7 @@ export class RedemptionResponseDto {
     email: string;
   };
 
-  @ApiProperty({ description: 'Staff information' })
-  staff: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    role: string;
-  };
+  // Staff model removed; see merchant memberships for per-merchant roles
 }
 
 export class RedemptionStatsDto {
@@ -139,10 +160,10 @@ export class RedemptionStatsDto {
   @ApiProperty({ description: 'Completion rate percentage' })
   completionRate: number;
 
-  @ApiProperty({ description: 'Redemptions by staff member' })
+  @ApiProperty({ description: 'Redemptions by user' })
   redemptionsByStaff: Array<{
-    staffId: string;
-    staffName: string;
+    userId: string;
+    userEmail: string;
     redemptionCount: number;
   }>;
 
@@ -173,10 +194,10 @@ export class RedemptionAnalyticsDto {
     count: number;
   }>;
 
-  @ApiProperty({ description: 'Top performing staff members' })
+  @ApiProperty({ description: 'Top performing users' })
   topPerformingStaff: Array<{
-    staffId: string;
-    staffName: string;
+    userId: string;
+    userEmail: string;
     redemptionCount: number;
   }>;
 
@@ -202,8 +223,8 @@ export class RedemptionAnalyticsDto {
       count: number;
     };
     topStaff?: {
-      staffId: string;
-      staffName: string;
+      userId: string;
+      userEmail: string;
       redemptionCount: number;
     };
   };
@@ -216,7 +237,7 @@ export class RedemptionValidationDto {
   @ApiPropertyOptional({ description: 'Error message if invalid' })
   error?: string;
 
-  @ApiProperty({ description: 'Whether the staff can redeem this coupon' })
+  @ApiProperty({ description: 'Whether the user can redeem this coupon' })
   canRedeem: boolean;
 
   @ApiPropertyOptional({ description: 'Coupon information' })
@@ -261,14 +282,7 @@ export class RedemptionValidationDto {
     email: string;
   };
 
-  @ApiPropertyOptional({ description: 'Staff information' })
-  staff?: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    role: string;
-  };
+  // Staff information removed
 
   @ApiPropertyOptional({ description: 'Validation timestamp' })
   validationTimestamp?: Date;
@@ -284,18 +298,24 @@ export class RedemptionFiltersDto {
   @ApiPropertyOptional({ description: 'Filter by merchant ID' })
   merchantId?: string;
 
-  @ApiPropertyOptional({ description: 'Filter by staff ID' })
-  staffId?: string;
+  @ApiPropertyOptional({ description: 'Filter by user ID who redeemed' })
+  redeemedByUserId?: string;
 
-  @ApiPropertyOptional({ description: 'Filter by redemption status', enum: RedemptionStatus })
+  @ApiPropertyOptional({
+    description: 'Filter by redemption status',
+    enum: RedemptionStatus,
+  })
   status?: RedemptionStatus;
 
-  @ApiPropertyOptional({ description: 'Filter by start date', example: '2024-01-01' })
+  @ApiPropertyOptional({
+    description: 'Filter by start date',
+    example: '2024-01-01',
+  })
   startDate?: Date;
 
-  @ApiPropertyOptional({ description: 'Filter by end date', example: '2024-12-31' })
+  @ApiPropertyOptional({
+    description: 'Filter by end date',
+    example: '2024-12-31',
+  })
   endDate?: Date;
 }
-
-
-

@@ -2,19 +2,12 @@ import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthUser } from '../types';
 
-export enum UserRole {
-  CUSTOMER = 'customer',
-  MERCHANT = 'merchant',
-  STAFF = 'staff',
-  ADMIN = 'admin',
-}
-
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredRoles = this.reflector.getAllAndOverride<UserRole[] | string[]>('roles', [
+    const requiredRoles = this.reflector.getAllAndOverride<string[]>('roles', [
       context.getHandler(),
       context.getClass(),
     ]);
@@ -30,9 +23,13 @@ export class RolesGuard implements CanActivate {
       return false;
     }
 
-    const needed = (requiredRoles as any[]).map((r) => String(r).toLowerCase());
-    const have = String(user.role || '').toLowerCase();
-    if (have === 'admin') return true; // global admin bypass
+    // Normalize role comparison (convert to uppercase to match Prisma enum)
+    const needed = requiredRoles.map((r) => String(r).toUpperCase());
+    const have = String(user.role || '').toUpperCase();
+
+    // SUPER_ADMIN has global access
+    if (have === 'SUPER_ADMIN') return true;
+
     return needed.includes(have);
   }
 }

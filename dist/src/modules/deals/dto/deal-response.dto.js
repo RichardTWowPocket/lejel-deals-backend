@@ -141,11 +141,15 @@ __decorate([
     __metadata("design:type", Number)
 ], DealResponseDto.prototype, "discountPrice", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'For frontend compatibility - same as discountPrice' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'For frontend compatibility - same as discountPrice',
+    }),
     __metadata("design:type", Number)
 ], DealResponseDto.prototype, "discountedPrice", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'For frontend compatibility - same as discountPrice' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'For frontend compatibility - same as discountPrice',
+    }),
     __metadata("design:type", Number)
 ], DealResponseDto.prototype, "originalPrice", void 0);
 __decorate([
@@ -197,7 +201,9 @@ __decorate([
     __metadata("design:type", Number)
 ], DealResponseDto.prototype, "quantity", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Available quantity (maxQuantity - soldQuantity)' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Available quantity (maxQuantity - soldQuantity)',
+    }),
     __metadata("design:type", Number)
 ], DealResponseDto.prototype, "quantityAvailable", void 0);
 __decorate([

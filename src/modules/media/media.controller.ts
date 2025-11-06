@@ -14,12 +14,21 @@ import {
   DefaultValuePipe,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes, ApiQuery, ApiParam } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiQuery,
+  ApiParam,
+} from '@nestjs/swagger';
 import { MediaService } from './media.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles, CurrentUser } from '../auth/decorators/auth.decorators';
 import type { AuthUser } from '../auth/types';
+import { UserRole } from '@prisma/client';
 
 @ApiTags('Media')
 @Controller('media')
@@ -30,7 +39,7 @@ export class MediaController {
   /**
    * Generate upload URL for media file
    */
-  @Roles('merchant', 'admin')
+  @Roles(UserRole.MERCHANT, UserRole.SUPER_ADMIN)
   @Post('upload/request')
   @ApiOperation({ summary: 'Request upload URL for media file' })
   @ApiBearerAuth('JWT-auth')
@@ -48,7 +57,7 @@ export class MediaController {
   /**
    * Direct upload endpoint (for small files)
    */
-  @Roles('merchant', 'admin')
+  @Roles(UserRole.MERCHANT, UserRole.SUPER_ADMIN)
   @Post('upload/direct')
   @UseInterceptors(FileInterceptor('file'))
   @ApiOperation({ summary: 'Upload media file directly' })
@@ -57,10 +66,7 @@ export class MediaController {
   @ApiResponse({ status: 201, description: 'Media uploaded successfully' })
   @ApiResponse({ status: 400, description: 'Invalid file or missing data' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async uploadFile(
-    @UploadedFile() file: any,
-    @CurrentUser() user: AuthUser,
-  ) {
+  async uploadFile(@UploadedFile() file: any, @CurrentUser() user: AuthUser) {
     if (!file) {
       throw new Error('No file uploaded');
     }
@@ -95,7 +101,7 @@ export class MediaController {
   /**
    * List media with pagination
    */
-  @Roles('merchant', 'admin')
+  @Roles(UserRole.MERCHANT, UserRole.SUPER_ADMIN)
   @Get()
   @ApiOperation({ summary: 'List media with pagination' })
   @ApiQuery({ name: 'page', required: false, type: Number })
@@ -114,7 +120,7 @@ export class MediaController {
   /**
    * Delete media
    */
-  @Roles('merchant', 'admin')
+  @Roles(UserRole.MERCHANT, UserRole.SUPER_ADMIN)
   @Delete(':id')
   @ApiOperation({ summary: 'Delete media' })
   @ApiParam({ name: 'id', description: 'Media ID' })
@@ -126,4 +132,3 @@ export class MediaController {
     return this.mediaService.deleteMedia(id);
   }
 }
-

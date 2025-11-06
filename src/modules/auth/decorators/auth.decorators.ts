@@ -1,4 +1,8 @@
-import { createParamDecorator, ExecutionContext, SetMetadata } from '@nestjs/common';
+import {
+  createParamDecorator,
+  ExecutionContext,
+  SetMetadata,
+} from '@nestjs/common';
 import { AuthUser } from '../types';
 
 export const CurrentUser = createParamDecorator(
@@ -11,6 +15,3 @@ export const CurrentUser = createParamDecorator(
 export const Public = () => SetMetadata('isPublic', true);
 
 export const Roles = (...roles: string[]) => SetMetadata('roles', roles);
-
-
-

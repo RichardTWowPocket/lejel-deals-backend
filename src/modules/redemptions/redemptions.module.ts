@@ -11,6 +11,3 @@ import { QRCodeSecurityModule } from '../qr-security/qr-security.module';
   exports: [RedemptionService],
 })
 export class RedemptionsModule {}
-
-
-

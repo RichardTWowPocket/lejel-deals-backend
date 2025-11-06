@@ -3,9 +3,12 @@ import { CreateMerchantDto } from './dto/create-merchant.dto';
 import { UpdateMerchantDto } from './dto/update-merchant.dto';
 import { MerchantVerificationDto } from './dto/merchant-verification.dto';
 import type { AuthUser } from '../auth/types';
+import { PrismaService } from '../../prisma/prisma.service';
 export declare class MerchantsController {
     private readonly merchantsService;
-    constructor(merchantsService: MerchantsService);
+    private readonly prisma;
+    constructor(merchantsService: MerchantsService, prisma: PrismaService);
+    private getMerchantIdForUser;
     create(createMerchantDto: CreateMerchantDto, user: AuthUser): Promise<{
         totalDeals: number;
         activeDeals: number;
@@ -274,6 +277,21 @@ export declare class MerchantsController {
             customerId: string;
             dealId: string;
         })[];
+    }>;
+    getMyOverview(user: AuthUser, merchantId?: string): Promise<{
+        merchantId: string;
+        todayOrders: number;
+        todayRevenue: number | import("@prisma/client/runtime/library").Decimal;
+        totalRevenue: number | import("@prisma/client/runtime/library").Decimal;
+        activeDeals: number;
+    }>;
+    getMyPayouts(user: AuthUser, period?: 'day' | 'week' | 'month' | 'year' | 'all', merchantId?: string): Promise<{
+        merchantId: string;
+        period: "day" | "week" | "month" | "year" | "all";
+        orders: number;
+        grossRevenue: number;
+        payoutAmount: number;
+        platformFees: number;
     }>;
     getOverview(id: string, user: AuthUser): Promise<{
         merchantId: string;

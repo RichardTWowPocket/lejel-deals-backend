@@ -293,8 +293,12 @@ let DealsService = class DealsService {
             }
         }
         if (updateDealDto.validFrom || updateDealDto.validUntil) {
-            const validFrom = updateDealDto.validFrom ? new Date(updateDealDto.validFrom) : existingDeal.validFrom;
-            const validUntil = updateDealDto.validUntil ? new Date(updateDealDto.validUntil) : existingDeal.validUntil;
+            const validFrom = updateDealDto.validFrom
+                ? new Date(updateDealDto.validFrom)
+                : existingDeal.validFrom;
+            const validUntil = updateDealDto.validUntil
+                ? new Date(updateDealDto.validUntil)
+                : existingDeal.validUntil;
             if (validFrom >= validUntil) {
                 throw new common_1.BadRequestException('validFrom must be before validUntil');
             }
@@ -303,16 +307,30 @@ let DealsService = class DealsService {
             where: { id },
             data: {
                 ...(updateDealDto.title && { title: updateDealDto.title }),
-                ...(updateDealDto.description !== undefined && { description: updateDealDto.description }),
+                ...(updateDealDto.description !== undefined && {
+                    description: updateDealDto.description,
+                }),
                 ...(updateDealDto.dealPrice && { dealPrice: updateDealDto.dealPrice }),
-                ...(updateDealDto.discountPrice && { discountPrice: updateDealDto.discountPrice }),
-                ...(updateDealDto.validFrom && { validFrom: new Date(updateDealDto.validFrom) }),
-                ...(updateDealDto.validUntil && { validUntil: new Date(updateDealDto.validUntil) }),
+                ...(updateDealDto.discountPrice && {
+                    discountPrice: updateDealDto.discountPrice,
+                }),
+                ...(updateDealDto.validFrom && {
+                    validFrom: new Date(updateDealDto.validFrom),
+                }),
+                ...(updateDealDto.validUntil && {
+                    validUntil: new Date(updateDealDto.validUntil),
+                }),
                 ...(updateDealDto.status && { status: updateDealDto.status }),
-                ...(updateDealDto.maxQuantity !== undefined && { maxQuantity: updateDealDto.maxQuantity }),
+                ...(updateDealDto.maxQuantity !== undefined && {
+                    maxQuantity: updateDealDto.maxQuantity,
+                }),
                 ...(updateDealDto.images && { images: updateDealDto.images }),
-                ...(updateDealDto.terms !== undefined && { terms: updateDealDto.terms }),
-                ...(updateDealDto.categoryId !== undefined && { categoryId: updateDealDto.categoryId }),
+                ...(updateDealDto.terms !== undefined && {
+                    terms: updateDealDto.terms,
+                }),
+                ...(updateDealDto.categoryId !== undefined && {
+                    categoryId: updateDealDto.categoryId,
+                }),
             },
             include: {
                 merchant: true,
@@ -415,7 +433,11 @@ let DealsService = class DealsService {
     validateStatusTransition(currentStatus, newStatus) {
         const allowedTransitions = {
             [client_1.DealStatus.DRAFT]: [client_1.DealStatus.ACTIVE],
-            [client_1.DealStatus.ACTIVE]: [client_1.DealStatus.PAUSED, client_1.DealStatus.EXPIRED, client_1.DealStatus.SOLD_OUT],
+            [client_1.DealStatus.ACTIVE]: [
+                client_1.DealStatus.PAUSED,
+                client_1.DealStatus.EXPIRED,
+                client_1.DealStatus.SOLD_OUT,
+            ],
             [client_1.DealStatus.PAUSED]: [client_1.DealStatus.ACTIVE, client_1.DealStatus.EXPIRED],
             [client_1.DealStatus.EXPIRED]: [],
             [client_1.DealStatus.SOLD_OUT]: [],
@@ -425,7 +447,9 @@ let DealsService = class DealsService {
         }
     }
     mapDealToResponse(deal) {
-        const quantityAvailable = deal.maxQuantity ? deal.maxQuantity - deal.soldQuantity : 999999;
+        const quantityAvailable = deal.maxQuantity
+            ? deal.maxQuantity - deal.soldQuantity
+            : 999999;
         const dealPriceValue = Number(deal.dealPrice);
         const discountPriceValue = Number(deal.discountPrice);
         const realDiscountPercentage = discountPriceValue > 0
@@ -434,12 +458,15 @@ let DealsService = class DealsService {
         const slug = this.generateSlug(deal.title, deal.id);
         const firstImage = deal.images && deal.images.length > 0 ? deal.images[0] : '';
         const shortDescription = deal.description
-            ? deal.description.substring(0, 150) + (deal.description.length > 150 ? '...' : '')
+            ? deal.description.substring(0, 150) +
+                (deal.description.length > 150 ? '...' : '')
             : null;
         const highlights = [];
         if (deal.terms) {
-            const termLines = deal.terms.split('.').filter(t => t.trim().length > 0);
-            termLines.forEach(line => {
+            const termLines = deal.terms
+                .split('.')
+                .filter((t) => t.trim().length > 0);
+            termLines.forEach((line) => {
                 if (line.trim().length > 10 && line.trim().length < 100) {
                     highlights.push(line.trim());
                 }

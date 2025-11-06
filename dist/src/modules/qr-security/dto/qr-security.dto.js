@@ -17,7 +17,10 @@ class GenerateQRCodeDto {
 }
 exports.GenerateQRCodeDto = GenerateQRCodeDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Coupon ID to generate QR code for', example: 'coupon-123' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Coupon ID to generate QR code for',
+        example: 'coupon-123',
+    }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], GenerateQRCodeDto.prototype, "couponId", void 0);
@@ -27,12 +30,18 @@ class ValidateQRCodeDto {
 }
 exports.ValidateQRCodeDto = ValidateQRCodeDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'QR code token to validate', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'QR code token to validate',
+        example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+    }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], ValidateQRCodeDto.prototype, "qrToken", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Staff ID performing the validation', example: 'staff-123' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Staff ID performing the validation',
+        example: 'staff-123',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -44,17 +53,26 @@ class RedeemQRCodeDto {
 }
 exports.RedeemQRCodeDto = RedeemQRCodeDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'QR code token to redeem', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'QR code token to redeem',
+        example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+    }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], RedeemQRCodeDto.prototype, "qrToken", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Staff ID performing the redemption', example: 'staff-123' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Staff ID performing the redemption',
+        example: 'staff-123',
+    }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], RedeemQRCodeDto.prototype, "staffId", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Redemption notes', example: 'Redeemed at counter' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Redemption notes',
+        example: 'Redeemed at counter',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -70,7 +88,10 @@ __decorate([
     __metadata("design:type", String)
 ], RevokeQRCodeDto.prototype, "couponId", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Reason for revocation', example: 'Customer requested cancellation' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Reason for revocation',
+        example: 'Customer requested cancellation',
+    }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], RevokeQRCodeDto.prototype, "reason", void 0);

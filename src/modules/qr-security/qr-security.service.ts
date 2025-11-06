@@ -1,4 +1,9 @@
-import { Injectable, Logger, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  UnauthorizedException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import * as jwt from 'jsonwebtoken';
 import * as crypto from 'crypto';
@@ -28,7 +33,8 @@ export interface QRCodeValidationResult {
 @Injectable()
 export class QRCodeSecurityService {
   private readonly logger = new Logger(QRCodeSecurityService.name);
-  private readonly qrSecret = process.env.QR_CODE_SECRET || 'qr-secret-key-change-in-production';
+  private readonly qrSecret =
+    process.env.QR_CODE_SECRET || 'qr-secret-key-change-in-production';
   private readonly qrExpirationHours = 24; // QR codes expire in 24 hours
 
   constructor(private prisma: PrismaService) {}
@@ -121,7 +127,10 @@ export class QRCodeSecurityService {
 
       return qrToken;
     } catch (error) {
-      this.logger.error(`Failed to generate QR code for coupon ${couponId}:`, error);
+      this.logger.error(
+        `Failed to generate QR code for coupon ${couponId}:`,
+        error,
+      );
       throw error;
     }
   }
@@ -129,7 +138,10 @@ export class QRCodeSecurityService {
   /**
    * Validate and verify a QR code
    */
-  async validateQRCode(qrToken: string, staffId?: string): Promise<QRCodeValidationResult> {
+  async validateQRCode(
+    qrToken: string,
+    redeemedByUserId?: string,
+  ): Promise<QRCodeValidationResult> {
     try {
       // Verify JWT signature
       let payload: QRCodePayload;
@@ -139,7 +151,9 @@ export class QRCodeSecurityService {
           audience: 'coupon-redemption',
         }) as QRCodePayload;
       } catch (jwtError) {
-        await this.logQRActivity('INVALID_SIGNATURE', null, { error: jwtError.message });
+        await this.logQRActivity('INVALID_SIGNATURE', null, {
+          error: jwtError.message,
+        });
         return {
           isValid: false,
           error: 'Invalid QR code signature',
@@ -148,7 +162,9 @@ export class QRCodeSecurityService {
 
       // Check if QR code has expired
       if (new Date() > payload.expiresAt) {
-        await this.logQRActivity('EXPIRED', payload.couponId, { expiresAt: payload.expiresAt });
+        await this.logQRActivity('EXPIRED', payload.couponId, {
+          expiresAt: payload.expiresAt,
+        });
         return {
           isValid: false,
           error: 'QR code has expired',
@@ -195,7 +211,9 @@ export class QRCodeSecurityService {
 
       // Check coupon status
       if (coupon.status !== 'ACTIVE') {
-        await this.logQRActivity('INVALID_STATUS', payload.couponId, { status: coupon.status });
+        await this.logQRActivity('INVALID_STATUS', payload.couponId, {
+          status: coupon.status,
+        });
         return {
           isValid: false,
           error: `Coupon is ${coupon.status.toLowerCase()}`,
@@ -204,7 +222,9 @@ export class QRCodeSecurityService {
 
       // Check if coupon has already been used
       if (coupon.usedAt) {
-        await this.logQRActivity('ALREADY_USED', payload.couponId, { usedAt: coupon.usedAt });
+        await this.logQRActivity('ALREADY_USED', payload.couponId, {
+          usedAt: coupon.usedAt,
+        });
         return {
           isValid: false,
           error: 'Coupon has already been used',
@@ -213,9 +233,9 @@ export class QRCodeSecurityService {
 
       // Verify nonce matches (prevents replay attacks)
       if (payload.nonce !== coupon.qrCode) {
-        await this.logQRActivity('INVALID_NONCE', payload.couponId, { 
-          expected: coupon.qrCode, 
-          received: payload.nonce 
+        await this.logQRActivity('INVALID_NONCE', payload.couponId, {
+          expected: coupon.qrCode,
+          received: payload.nonce,
         });
         return {
           isValid: false,
@@ -224,8 +244,8 @@ export class QRCodeSecurityService {
       }
 
       // Log successful validation
-      await this.logQRActivity('VALIDATED', payload.couponId, { 
-        staffId,
+      await this.logQRActivity('VALIDATED', payload.couponId, {
+        redeemedByUserId,
         orderId: payload.orderId,
         dealId: payload.dealId,
       });
@@ -251,7 +271,11 @@ export class QRCodeSecurityService {
   /**
    * Mark QR code as used (single-use enforcement)
    */
-  async markQRCodeAsUsed(couponId: string, staffId: string, notes?: string): Promise<void> {
+  async markQRCodeAsUsed(
+    couponId: string,
+    redeemedByUserId: string,
+    notes?: string,
+  ): Promise<void> {
     try {
       // Update coupon status
       await this.prisma.coupon.update({
@@ -266,22 +290,27 @@ export class QRCodeSecurityService {
       await this.prisma.redemption.create({
         data: {
           couponId,
-          staffId,
+          redeemedByUserId,
           notes,
           redeemedAt: new Date(),
         },
       });
 
       // Log QR code usage
-      await this.logQRActivity('REDEEMED', couponId, { 
-        staffId,
+      await this.logQRActivity('REDEEMED', couponId, {
+        redeemedByUserId,
         notes,
         redeemedAt: new Date(),
       });
 
-      this.logger.log(`QR code redeemed for coupon ${couponId} by staff ${staffId}`);
+      this.logger.log(
+        `QR code redeemed for coupon ${couponId} by user ${redeemedByUserId}`,
+      );
     } catch (error) {
-      this.logger.error(`Failed to mark QR code as used for coupon ${couponId}:`, error);
+      this.logger.error(
+        `Failed to mark QR code as used for coupon ${couponId}:`,
+        error,
+      );
       throw error;
     }
   }
@@ -300,14 +329,17 @@ export class QRCodeSecurityService {
       });
 
       // Log QR code revocation
-      await this.logQRActivity('REVOKED', couponId, { 
+      await this.logQRActivity('REVOKED', couponId, {
         reason,
         revokedAt: new Date(),
       });
 
       this.logger.log(`QR code revoked for coupon ${couponId}: ${reason}`);
     } catch (error) {
-      this.logger.error(`Failed to revoke QR code for coupon ${couponId}:`, error);
+      this.logger.error(
+        `Failed to revoke QR code for coupon ${couponId}:`,
+        error,
+      );
       throw error;
     }
   }
@@ -324,7 +356,10 @@ export class QRCodeSecurityService {
 
       return activities;
     } catch (error) {
-      this.logger.error(`Failed to get QR code history for coupon ${couponId}:`, error);
+      this.logger.error(
+        `Failed to get QR code history for coupon ${couponId}:`,
+        error,
+      );
       throw error;
     }
   }
@@ -363,8 +398,10 @@ export class QRCodeSecurityService {
         totalExpired,
         totalRevoked,
         recentActivity,
-        successRate: totalGenerated > 0 ? (totalRedeemed / totalGenerated) * 100 : 0,
-        expirationRate: totalGenerated > 0 ? (totalExpired / totalGenerated) * 100 : 0,
+        successRate:
+          totalGenerated > 0 ? (totalRedeemed / totalGenerated) * 100 : 0,
+        expirationRate:
+          totalGenerated > 0 ? (totalExpired / totalGenerated) * 100 : 0,
       };
     } catch (error) {
       this.logger.error('Failed to get QR code stats:', error);
@@ -375,7 +412,11 @@ export class QRCodeSecurityService {
   /**
    * Log QR code activity for audit trail
    */
-  private async logQRActivity(action: string, couponId: string | null, metadata?: any): Promise<void> {
+  private async logQRActivity(
+    action: string,
+    couponId: string | null,
+    metadata?: any,
+  ): Promise<void> {
     try {
       await this.prisma.qRCodeActivity.create({
         data: {

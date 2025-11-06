@@ -9,16 +9,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RolesGuard = exports.UserRole = void 0;
+exports.RolesGuard = void 0;
 const common_1 = require("@nestjs/common");
 const core_1 = require("@nestjs/core");
-var UserRole;
-(function (UserRole) {
-    UserRole["CUSTOMER"] = "customer";
-    UserRole["MERCHANT"] = "merchant";
-    UserRole["STAFF"] = "staff";
-    UserRole["ADMIN"] = "admin";
-})(UserRole || (exports.UserRole = UserRole = {}));
 let RolesGuard = class RolesGuard {
     reflector;
     constructor(reflector) {
@@ -37,9 +30,9 @@ let RolesGuard = class RolesGuard {
         if (!user) {
             return false;
         }
-        const needed = requiredRoles.map((r) => String(r).toLowerCase());
-        const have = String(user.role || '').toLowerCase();
-        if (have === 'admin')
+        const needed = requiredRoles.map((r) => String(r).toUpperCase());
+        const have = String(user.role || '').toUpperCase();
+        if (have === 'SUPER_ADMIN')
             return true;
         return needed.includes(have);
     }

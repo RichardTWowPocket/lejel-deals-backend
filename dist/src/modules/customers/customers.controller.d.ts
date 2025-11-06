@@ -35,36 +35,6 @@ export declare class CustomersController {
         dateOfBirth: Date | null;
         preferences: import("@prisma/client/runtime/library").JsonValue | null;
     }>;
-    createPublic(createCustomerDto: CreateCustomerDto): Promise<{
-        customerId?: string | undefined;
-        totalOrders?: number | undefined;
-        totalSpent?: number | undefined;
-        averageOrderValue?: number | undefined;
-        lastOrderDate?: Date | undefined;
-        firstOrderDate?: Date | undefined;
-        activeDeals?: number | undefined;
-        usedDeals?: number | undefined;
-        favoriteCategories?: string[] | undefined;
-        tier?: string | undefined;
-        loyaltyPoints?: number | undefined;
-        registrationDate?: Date | undefined;
-        daysSinceLastOrder?: number | undefined;
-        totalSavings?: number | undefined;
-        _count: {
-            orders: number;
-        };
-        id: string;
-        isActive: boolean;
-        createdAt: Date;
-        updatedAt: Date;
-        email: string;
-        phone: string | null;
-        userId: string | null;
-        firstName: string | null;
-        lastName: string | null;
-        dateOfBirth: Date | null;
-        preferences: import("@prisma/client/runtime/library").JsonValue | null;
-    }>;
     findAll(page: number, limit: number, search?: string, isActive?: string): Promise<{
         data: {
             customerId?: string | undefined;

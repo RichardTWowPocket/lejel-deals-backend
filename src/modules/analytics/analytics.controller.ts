@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Get,
-  Query,
-  UseGuards,
-  Request,
-} from '@nestjs/common';
+import { Controller, Get, Query, UseGuards, Request } from '@nestjs/common';
 import { AnalyticsService } from './analytics.service';
 import {
   DashboardAnalyticsDto,
@@ -19,7 +13,13 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/auth.decorators';
 import { UserRole } from '@prisma/client';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiQuery,
+} from '@nestjs/swagger';
 
 @ApiTags('Analytics')
 @Controller('analytics')
@@ -28,10 +28,14 @@ export class AnalyticsController {
 
   @Get('dashboard')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.MERCHANT, UserRole.STAFF)
+  @Roles(UserRole.MERCHANT)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get comprehensive dashboard analytics' })
-  @ApiResponse({ status: 200, description: 'Dashboard analytics retrieved successfully', type: DashboardAnalyticsDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Dashboard analytics retrieved successfully',
+    type: DashboardAnalyticsDto,
+  })
   async getDashboardAnalytics(
     @Request() req: any,
     @Query() query: AnalyticsQueryDto,
@@ -43,10 +47,14 @@ export class AnalyticsController {
 
   @Get('revenue')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.MERCHANT, UserRole.STAFF)
+  @Roles(UserRole.MERCHANT)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get revenue analytics' })
-  @ApiResponse({ status: 200, description: 'Revenue analytics retrieved successfully', type: RevenueAnalyticsDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Revenue analytics retrieved successfully',
+    type: RevenueAnalyticsDto,
+  })
   async getRevenueAnalytics(
     @Request() req: any,
     @Query() query: AnalyticsQueryDto,
@@ -58,10 +66,14 @@ export class AnalyticsController {
 
   @Get('customers')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.STAFF)
+  @Roles(UserRole.SUPER_ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get customer analytics' })
-  @ApiResponse({ status: 200, description: 'Customer analytics retrieved successfully', type: CustomerAnalyticsDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Customer analytics retrieved successfully',
+    type: CustomerAnalyticsDto,
+  })
   async getCustomerAnalytics(
     @Request() req: any,
     @Query() query: AnalyticsQueryDto,
@@ -73,10 +85,14 @@ export class AnalyticsController {
 
   @Get('merchants')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.STAFF)
+  @Roles(UserRole.SUPER_ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get merchant analytics' })
-  @ApiResponse({ status: 200, description: 'Merchant analytics retrieved successfully', type: MerchantAnalyticsDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Merchant analytics retrieved successfully',
+    type: MerchantAnalyticsDto,
+  })
   async getMerchantAnalytics(
     @Request() req: any,
     @Query() query: AnalyticsQueryDto,
@@ -88,10 +104,14 @@ export class AnalyticsController {
 
   @Get('deals')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.MERCHANT, UserRole.STAFF)
+  @Roles(UserRole.MERCHANT)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get deal analytics' })
-  @ApiResponse({ status: 200, description: 'Deal analytics retrieved successfully', type: DealAnalyticsDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Deal analytics retrieved successfully',
+    type: DealAnalyticsDto,
+  })
   async getDealAnalytics(
     @Request() req: any,
     @Query() query: AnalyticsQueryDto,
@@ -103,10 +123,14 @@ export class AnalyticsController {
 
   @Get('orders')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.MERCHANT, UserRole.STAFF)
+  @Roles(UserRole.MERCHANT)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get order analytics' })
-  @ApiResponse({ status: 200, description: 'Order analytics retrieved successfully', type: OrderAnalyticsDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Order analytics retrieved successfully',
+    type: OrderAnalyticsDto,
+  })
   async getOrderAnalytics(
     @Request() req: any,
     @Query() query: AnalyticsQueryDto,
@@ -118,33 +142,42 @@ export class AnalyticsController {
 
   @Get('overview')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.MERCHANT, UserRole.STAFF)
+  @Roles(UserRole.MERCHANT)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get overview metrics' })
-  @ApiResponse({ status: 200, description: 'Overview metrics retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Overview metrics retrieved successfully',
+  })
   async getOverviewMetrics(
     @Request() req: any,
     @Query() query: AnalyticsQueryDto,
   ): Promise<any> {
     const userRole = req.user.role;
     const userId = req.user.sub;
-    const dashboard = await this.analyticsService.getDashboardAnalytics(userRole, userId);
+    const dashboard = await this.analyticsService.getDashboardAnalytics(
+      userRole,
+      userId,
+    );
     return dashboard.overview;
   }
 
   @Get('trends')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.MERCHANT, UserRole.STAFF)
+  @Roles(UserRole.MERCHANT)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get business trends' })
-  @ApiResponse({ status: 200, description: 'Business trends retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Business trends retrieved successfully',
+  })
   async getBusinessTrends(
     @Request() req: any,
     @Query() query: AnalyticsQueryDto,
   ): Promise<any> {
     const userRole = req.user.role;
     const userId = req.user.sub;
-    
+
     const [revenue, orders] = await Promise.all([
       this.analyticsService.getRevenueAnalytics(userRole, userId),
       this.analyticsService.getOrderAnalytics(userRole, userId),
@@ -160,17 +193,20 @@ export class AnalyticsController {
 
   @Get('performance')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.MERCHANT, UserRole.STAFF)
+  @Roles(UserRole.MERCHANT)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get performance metrics' })
-  @ApiResponse({ status: 200, description: 'Performance metrics retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Performance metrics retrieved successfully',
+  })
   async getPerformanceMetrics(
     @Request() req: any,
     @Query() query: AnalyticsQueryDto,
   ): Promise<any> {
     const userRole = req.user.role;
     const userId = req.user.sub;
-    
+
     const [revenue, customers, merchants, deals, orders] = await Promise.all([
       this.analyticsService.getRevenueAnalytics(userRole, userId),
       this.analyticsService.getCustomerAnalytics(userRole, userId),
@@ -195,13 +231,11 @@ export class AnalyticsController {
         merchants: merchants.topPerformingMerchants.slice(0, 5),
       },
       performanceInsights: {
-        bestPerformingCategory: deals.categoryPerformance[0]?.categoryName || 'N/A',
+        bestPerformingCategory:
+          deals.categoryPerformance[0]?.categoryName || 'N/A',
         averageDiscount: 0, // Would need to calculate
         conversionRate: 0, // Would need to calculate
       },
     };
   }
 }
-
-
-

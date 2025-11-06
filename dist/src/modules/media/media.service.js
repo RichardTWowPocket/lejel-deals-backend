@@ -64,7 +64,14 @@ let MediaService = class MediaService {
             throw new common_1.BadRequestException(`File type ${contentType} is not allowed. Allowed types: ${allowedMimeTypes.join(', ')}`);
         }
         const ext = path.extname(filename).toLowerCase();
-        const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg'];
+        const allowedExtensions = [
+            '.jpg',
+            '.jpeg',
+            '.png',
+            '.webp',
+            '.gif',
+            '.svg',
+        ];
         if (!allowedExtensions.includes(ext)) {
             throw new common_1.BadRequestException(`File extension ${ext} is not allowed`);
         }

@@ -26,8 +26,8 @@ export declare class QRCodeSecurityService {
     private readonly qrExpirationHours;
     constructor(prisma: PrismaService);
     generateSecureQRCode(couponId: string): Promise<string>;
-    validateQRCode(qrToken: string, staffId?: string): Promise<QRCodeValidationResult>;
-    markQRCodeAsUsed(couponId: string, staffId: string, notes?: string): Promise<void>;
+    validateQRCode(qrToken: string, redeemedByUserId?: string): Promise<QRCodeValidationResult>;
+    markQRCodeAsUsed(couponId: string, redeemedByUserId: string, notes?: string): Promise<void>;
     revokeQRCode(couponId: string, reason: string): Promise<void>;
     getQRCodeHistory(couponId: string): Promise<any[]>;
     getQRCodeStats(): Promise<any>;

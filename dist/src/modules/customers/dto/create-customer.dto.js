@@ -38,7 +38,10 @@ __decorate([
     __metadata("design:type", Boolean)
 ], NotificationPreferencesDto.prototype, "push", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'WhatsApp notifications enabled', example: false }),
+    (0, swagger_1.ApiProperty)({
+        description: 'WhatsApp notifications enabled',
+        example: false,
+    }),
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
 ], NotificationPreferencesDto.prototype, "whatsapp", void 0);
@@ -53,7 +56,10 @@ __decorate([
     __metadata("design:type", Boolean)
 ], NotificationPreferencesDto.prototype, "orders", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Marketing notifications enabled', example: false }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Marketing notifications enabled',
+        example: false,
+    }),
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
 ], NotificationPreferencesDto.prototype, "marketing", void 0);
@@ -69,12 +75,18 @@ class CreateCustomerDto {
 }
 exports.CreateCustomerDto = CreateCustomerDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Customer email', example: 'customer@example.com' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Customer email',
+        example: 'customer@example.com',
+    }),
     (0, class_validator_1.IsEmail)(),
     __metadata("design:type", String)
 ], CreateCustomerDto.prototype, "email", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Customer phone number', example: '+6281234567890' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Customer phone number',
+        example: '+6281234567890',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -92,13 +104,19 @@ __decorate([
     __metadata("design:type", String)
 ], CreateCustomerDto.prototype, "lastName", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Date of birth', example: '1990-01-01T00:00:00.000Z' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Date of birth',
+        example: '1990-01-01T00:00:00.000Z',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsDateString)(),
     __metadata("design:type", String)
 ], CreateCustomerDto.prototype, "dateOfBirth", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Customer preferences', type: NotificationPreferencesDto }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Customer preferences',
+        type: NotificationPreferencesDto,
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsObject)(),
     __metadata("design:type", NotificationPreferencesDto)
@@ -110,7 +128,10 @@ __decorate([
     __metadata("design:type", Boolean)
 ], CreateCustomerDto.prototype, "isActive", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Additional metadata', example: { source: 'web', referrer: 'google' } }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Additional metadata',
+        example: { source: 'web', referrer: 'google' },
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsObject)(),
     __metadata("design:type", Object)

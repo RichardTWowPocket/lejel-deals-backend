@@ -18,6 +18,22 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       return true;
     }
 
+    // Extract and log the raw JWT token from the request
+    const request = context.switchToHttp().getRequest();
+    const authHeader = request.headers.authorization;
+    
+    if (authHeader) {
+      const token = authHeader.replace('Bearer ', '');
+      console.warn('🔑 Raw JWT Token received:', {
+        token: token.substring(0, 50) + '...', // Show first 50 chars for security
+        fullToken: token, // Full token for debugging (remove in production)
+        tokenLength: token.length,
+        endpoint: `${request.method} ${request.url}`,
+      });
+    } else {
+      console.warn('⚠️ No Authorization header found in request');
+    }
+
     return super.canActivate(context);
   }
 }

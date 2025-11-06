@@ -1,6 +1,5 @@
 import { PrismaService } from '../../prisma/prisma.service';
-import { CreateStaffDto, UpdateStaffDto, StaffLoginDto, StaffResponseDto, StaffLoginResponseDto, StaffStatsDto, ChangePinDto, StaffActivityDto } from './dto/staff.dto';
-import { StaffRole } from '@prisma/client';
+import { CreateStaffDto, UpdateStaffDto, StaffLoginDto, StaffResponseDto, StaffLoginResponseDto, StaffStatsDto, ChangePinDto, StaffActivityDto, StaffRole } from './dto/staff.dto';
 export declare class StaffService {
     private prisma;
     private readonly logger;

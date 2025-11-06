@@ -13,9 +13,20 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { DealsService } from './deals.service';
-import { CreateDealDto, UpdateDealDto, UpdateDealStatusDto, DealFiltersDto } from './dto/create-deal.dto';
+import {
+  CreateDealDto,
+  UpdateDealDto,
+  UpdateDealStatusDto,
+  DealFiltersDto,
+} from './dto/create-deal.dto';
 import { DealResponseDto, DealListResponseDto } from './dto/deal-response.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -30,19 +41,83 @@ export class DealsController {
   @Public()
   @Get()
   @ApiOperation({ summary: 'Get all deals with pagination and filters' })
-  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page' })
-  @ApiQuery({ name: 'status', required: false, enum: DealStatus, description: 'Filter by status' })
-  @ApiQuery({ name: 'merchantId', required: false, type: String, description: 'Filter by merchant' })
-  @ApiQuery({ name: 'categoryId', required: false, type: String, description: 'Filter by category' })
-  @ApiQuery({ name: 'search', required: false, type: String, description: 'Search in title/description' })
-  @ApiQuery({ name: 'featured', required: false, type: Boolean, description: 'Filter featured deals' })
-  @ApiQuery({ name: 'city', required: false, type: String, description: 'Filter by merchant city' })
-  @ApiQuery({ name: 'priceMin', required: false, type: Number, description: 'Minimum deal price (IDR)' })
-  @ApiQuery({ name: 'priceMax', required: false, type: Number, description: 'Maximum deal price (IDR)' })
-  @ApiQuery({ name: 'sortBy', required: false, type: String, description: 'Sort by field' })
-  @ApiQuery({ name: 'sortOrder', required: false, enum: ['asc', 'desc'], description: 'Sort order' })
-  @ApiResponse({ status: 200, description: 'Deals retrieved successfully', type: DealListResponseDto })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Items per page',
+  })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    enum: DealStatus,
+    description: 'Filter by status',
+  })
+  @ApiQuery({
+    name: 'merchantId',
+    required: false,
+    type: String,
+    description: 'Filter by merchant',
+  })
+  @ApiQuery({
+    name: 'categoryId',
+    required: false,
+    type: String,
+    description: 'Filter by category',
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    type: String,
+    description: 'Search in title/description',
+  })
+  @ApiQuery({
+    name: 'featured',
+    required: false,
+    type: Boolean,
+    description: 'Filter featured deals',
+  })
+  @ApiQuery({
+    name: 'city',
+    required: false,
+    type: String,
+    description: 'Filter by merchant city',
+  })
+  @ApiQuery({
+    name: 'priceMin',
+    required: false,
+    type: Number,
+    description: 'Minimum deal price (IDR)',
+  })
+  @ApiQuery({
+    name: 'priceMax',
+    required: false,
+    type: Number,
+    description: 'Maximum deal price (IDR)',
+  })
+  @ApiQuery({
+    name: 'sortBy',
+    required: false,
+    type: String,
+    description: 'Sort by field',
+  })
+  @ApiQuery({
+    name: 'sortOrder',
+    required: false,
+    enum: ['asc', 'desc'],
+    description: 'Sort order',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Deals retrieved successfully',
+    type: DealListResponseDto,
+  })
   async findAll(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(12), ParseIntPipe) limit: number,
@@ -78,7 +153,10 @@ export class DealsController {
   @ApiOperation({ summary: 'Get all active deals' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  @ApiResponse({ status: 200, description: 'Active deals retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Active deals retrieved successfully',
+  })
   async findActive(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(12), ParseIntPipe) limit: number,
@@ -105,7 +183,10 @@ export class DealsController {
   @ApiOperation({ summary: 'Get deals by merchant' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  @ApiResponse({ status: 200, description: 'Merchant deals retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Merchant deals retrieved successfully',
+  })
   async findByMerchant(
     @Param('merchantId') merchantId: string,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
@@ -119,7 +200,10 @@ export class DealsController {
   @ApiOperation({ summary: 'Get deals by category' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  @ApiResponse({ status: 200, description: 'Category deals retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Category deals retrieved successfully',
+  })
   async findByCategory(
     @Param('categoryId') categoryId: string,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
@@ -131,7 +215,10 @@ export class DealsController {
   @Public()
   @Get('stats')
   @ApiOperation({ summary: 'Get deal statistics' })
-  @ApiResponse({ status: 200, description: 'Deal statistics retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Deal statistics retrieved successfully',
+  })
   async getStats() {
     return this.dealsService.getStats();
   }
@@ -139,7 +226,11 @@ export class DealsController {
   @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Get deal by ID or slug' })
-  @ApiResponse({ status: 200, description: 'Deal retrieved successfully', type: DealResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Deal retrieved successfully',
+    type: DealResponseDto,
+  })
   @ApiResponse({ status: 404, description: 'Deal not found' })
   async findOne(@Param('id') id: string): Promise<DealResponseDto> {
     // Try to find by ID first, if fails, try by slug
@@ -152,11 +243,15 @@ export class DealsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.MERCHANT, UserRole.ADMIN)
+  @Roles(UserRole.MERCHANT, UserRole.SUPER_ADMIN)
   @Post()
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Create a new deal' })
-  @ApiResponse({ status: 201, description: 'Deal created successfully', type: DealResponseDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Deal created successfully',
+    type: DealResponseDto,
+  })
   @ApiResponse({ status: 400, description: 'Invalid deal data' })
   @ApiResponse({ status: 404, description: 'Merchant or category not found' })
   async create(
@@ -167,11 +262,15 @@ export class DealsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.MERCHANT, UserRole.ADMIN)
+  @Roles(UserRole.MERCHANT, UserRole.SUPER_ADMIN)
   @Patch(':id')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Update deal' })
-  @ApiResponse({ status: 200, description: 'Deal updated successfully', type: DealResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Deal updated successfully',
+    type: DealResponseDto,
+  })
   @ApiResponse({ status: 400, description: 'Invalid update data' })
   @ApiResponse({ status: 404, description: 'Deal not found' })
   async update(
@@ -183,7 +282,7 @@ export class DealsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.MERCHANT, UserRole.ADMIN)
+  @Roles(UserRole.MERCHANT, UserRole.SUPER_ADMIN)
   @Patch(':id/status')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Update deal status' })
@@ -199,31 +298,37 @@ export class DealsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.MERCHANT, UserRole.ADMIN)
+  @Roles(UserRole.MERCHANT, UserRole.SUPER_ADMIN)
   @Post(':id/publish')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Publish deal (DRAFT -> ACTIVE)' })
   @ApiResponse({ status: 200, description: 'Deal published successfully' })
   @ApiResponse({ status: 400, description: 'Invalid status transition' })
   @ApiResponse({ status: 404, description: 'Deal not found' })
-  async publish(@Param('id') id: string, @CurrentUser() user: any): Promise<DealResponseDto> {
+  async publish(
+    @Param('id') id: string,
+    @CurrentUser() user: any,
+  ): Promise<DealResponseDto> {
     return this.dealsService.publish(id, user.id);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.MERCHANT, UserRole.ADMIN)
+  @Roles(UserRole.MERCHANT, UserRole.SUPER_ADMIN)
   @Post(':id/pause')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Pause deal (ACTIVE -> PAUSED)' })
   @ApiResponse({ status: 200, description: 'Deal paused successfully' })
   @ApiResponse({ status: 400, description: 'Invalid status transition' })
   @ApiResponse({ status: 404, description: 'Deal not found' })
-  async pause(@Param('id') id: string, @CurrentUser() user: any): Promise<DealResponseDto> {
+  async pause(
+    @Param('id') id: string,
+    @CurrentUser() user: any,
+  ): Promise<DealResponseDto> {
     return this.dealsService.pause(id, user.id);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Post('expired/check')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Check and update expired deals (Admin only)' })
@@ -233,7 +338,7 @@ export class DealsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Post('sold-out/check')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Check and update sold out deals (Admin only)' })
@@ -243,15 +348,17 @@ export class DealsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Delete deal (Admin only - soft delete)' })
   @ApiResponse({ status: 204, description: 'Deal deleted successfully' })
   @ApiResponse({ status: 404, description: 'Deal not found' })
-  async remove(@Param('id') id: string, @CurrentUser() user: any): Promise<void> {
+  async remove(
+    @Param('id') id: string,
+    @CurrentUser() user: any,
+  ): Promise<void> {
     await this.dealsService.remove(id, user.id);
   }
 }
-

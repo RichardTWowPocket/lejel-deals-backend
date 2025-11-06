@@ -20,11 +20,12 @@ import {
   StaffStatsDto,
   ChangePinDto,
   StaffActivityDto,
+  StaffRole,
 } from './dto/staff.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/auth.decorators';
-import { UserRole, StaffRole } from '@prisma/client';
+import { UserRole } from '@prisma/client';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 
 @ApiTags('Staff Management')
@@ -34,7 +35,7 @@ export class StaffController {
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create new staff member' })
   @ApiResponse({ status: 201, description: 'Staff created successfully', type: StaffResponseDto })
@@ -44,7 +45,7 @@ export class StaffController {
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.MERCHANT)
+  @Roles(UserRole.MERCHANT)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get paginated list of staff members' })
   @ApiResponse({ status: 200, description: 'Staff list retrieved successfully' })
@@ -65,7 +66,7 @@ export class StaffController {
 
   @Get('stats')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get staff statistics and analytics' })
   @ApiResponse({ status: 200, description: 'Staff statistics retrieved successfully', type: StaffStatsDto })
@@ -75,7 +76,7 @@ export class StaffController {
 
   @Get(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.MERCHANT)
+  @Roles(UserRole.MERCHANT)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get staff member by ID' })
   @ApiResponse({ status: 200, description: 'Staff retrieved successfully', type: StaffResponseDto })
@@ -85,7 +86,7 @@ export class StaffController {
 
   @Get('email/:email')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.MERCHANT)
+  @Roles(UserRole.MERCHANT)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get staff member by email' })
   @ApiResponse({ status: 200, description: 'Staff retrieved successfully', type: StaffResponseDto })
@@ -95,7 +96,7 @@ export class StaffController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.MERCHANT)
+  @Roles(UserRole.MERCHANT)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update staff member' })
   @ApiResponse({ status: 200, description: 'Staff updated successfully', type: StaffResponseDto })
@@ -105,7 +106,7 @@ export class StaffController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete staff member' })
   @ApiResponse({ status: 200, description: 'Staff deleted successfully' })
@@ -122,7 +123,7 @@ export class StaffController {
 
   @Post(':id/change-pin')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.MERCHANT)
+  @Roles(UserRole.MERCHANT)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Change staff PIN' })
   @ApiResponse({ status: 200, description: 'PIN changed successfully' })
@@ -132,7 +133,7 @@ export class StaffController {
 
   @Patch(':id/deactivate')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.MERCHANT)
+  @Roles(UserRole.MERCHANT)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Deactivate staff member' })
   @ApiResponse({ status: 200, description: 'Staff deactivated successfully', type: StaffResponseDto })
@@ -142,7 +143,7 @@ export class StaffController {
 
   @Patch(':id/activate')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.MERCHANT)
+  @Roles(UserRole.MERCHANT)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Activate staff member' })
   @ApiResponse({ status: 200, description: 'Staff activated successfully', type: StaffResponseDto })
@@ -152,7 +153,7 @@ export class StaffController {
 
   @Get(':id/activity')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.MERCHANT)
+  @Roles(UserRole.MERCHANT)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get staff activity history' })
   @ApiResponse({ status: 200, description: 'Staff activity retrieved successfully', type: [StaffActivityDto] })

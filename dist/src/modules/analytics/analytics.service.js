@@ -22,7 +22,7 @@ let AnalyticsService = AnalyticsService_1 = class AnalyticsService {
     }
     async getDashboardAnalytics(userRole, userId) {
         try {
-            const [overview, revenue, customers, merchants, deals, orders,] = await Promise.all([
+            const [overview, revenue, customers, merchants, deals, orders] = await Promise.all([
                 this.getOverviewMetrics(userRole, userId),
                 this.getRevenueAnalytics(userRole, userId),
                 this.getCustomerAnalytics(userRole, userId),
@@ -226,7 +226,7 @@ let AnalyticsService = AnalyticsService_1 = class AnalyticsService {
                 cancelled: 0,
                 refunded: 0,
             };
-            orderCounts.forEach(count => {
+            orderCounts.forEach((count) => {
                 switch (count.status) {
                     case 'PENDING':
                         orderStatusDistribution.pending = count._count.id;
@@ -319,7 +319,7 @@ let AnalyticsService = AnalyticsService_1 = class AnalyticsService {
             },
         });
         const monthlyRevenue = {};
-        monthlyData.forEach(data => {
+        monthlyData.forEach((data) => {
             const month = data.createdAt.toISOString().substring(0, 7);
             if (!monthlyRevenue[month]) {
                 monthlyRevenue[month] = { revenue: 0, orders: 0 };
@@ -353,7 +353,7 @@ let AnalyticsService = AnalyticsService_1 = class AnalyticsService {
             },
         });
         const dailyRevenue = {};
-        dailyData.forEach(data => {
+        dailyData.forEach((data) => {
             const date = data.createdAt.toISOString().substring(0, 10);
             if (!dailyRevenue[date]) {
                 dailyRevenue[date] = { revenue: 0, orders: 0 };
@@ -381,7 +381,7 @@ let AnalyticsService = AnalyticsService_1 = class AnalyticsService {
                 id: true,
             },
         });
-        const dealIds = dealPerformance.map(d => d.dealId);
+        const dealIds = dealPerformance.map((d) => d.dealId);
         const deals = await this.prisma.deal.findMany({
             where: {
                 id: { in: dealIds },
@@ -395,8 +395,8 @@ let AnalyticsService = AnalyticsService_1 = class AnalyticsService {
             },
         });
         return dealPerformance
-            .map(perf => {
-            const deal = deals.find(d => d.id === perf.dealId);
+            .map((perf) => {
+            const deal = deals.find((d) => d.id === perf.dealId);
             return {
                 dealId: perf.dealId,
                 dealTitle: deal?.title || 'Unknown Deal',
@@ -466,7 +466,9 @@ let AnalyticsService = AnalyticsService_1 = class AnalyticsService {
                 },
             }),
         ]);
-        return previousCustomers > 0 ? ((recentCustomers - previousCustomers) / previousCustomers) * 100 : 0;
+        return previousCustomers > 0
+            ? ((recentCustomers - previousCustomers) / previousCustomers) * 100
+            : 0;
     }
     async getTopCustomers(whereClause) {
         const customerPerformance = await this.prisma.order.groupBy({
@@ -485,7 +487,7 @@ let AnalyticsService = AnalyticsService_1 = class AnalyticsService {
                 createdAt: true,
             },
         });
-        const customerIds = customerPerformance.map(c => c.customerId);
+        const customerIds = customerPerformance.map((c) => c.customerId);
         const customers = await this.prisma.customer.findMany({
             where: {
                 id: { in: customerIds },
@@ -497,12 +499,13 @@ let AnalyticsService = AnalyticsService_1 = class AnalyticsService {
             },
         });
         return customerPerformance
-            .map(perf => {
-            const customer = customers.find(c => c.id === perf.customerId);
+            .map((perf) => {
+            const customer = customers.find((c) => c.id === perf.customerId);
             return {
                 customerId: perf.customerId,
                 customerName: customer
-                    ? `${customer.firstName || ''} ${customer.lastName || ''}`.trim() || 'Unknown Customer'
+                    ? `${customer.firstName || ''} ${customer.lastName || ''}`.trim() ||
+                        'Unknown Customer'
                     : 'Unknown Customer',
                 totalSpent: Number(perf._sum.totalAmount || 0),
                 orders: perf._count.id,
@@ -521,7 +524,9 @@ let AnalyticsService = AnalyticsService_1 = class AnalyticsService {
                 },
             },
         });
-        return totalCustomers > 0 ? (customersWithMultipleOrders / totalCustomers) * 100 : 0;
+        return totalCustomers > 0
+            ? (customersWithMultipleOrders / totalCustomers) * 100
+            : 0;
     }
     async getCustomerSegments() {
         const customerSpending = await this.prisma.order.groupBy({
@@ -533,11 +538,12 @@ let AnalyticsService = AnalyticsService_1 = class AnalyticsService {
                 totalAmount: true,
             },
         });
-        const spendingAmounts = customerSpending.map(c => Number(c._sum.totalAmount || 0));
-        const avgSpending = spendingAmounts.reduce((sum, amount) => sum + amount, 0) / spendingAmounts.length;
-        const highValue = spendingAmounts.filter(amount => amount > avgSpending * 2).length;
-        const mediumValue = spendingAmounts.filter(amount => amount > avgSpending && amount <= avgSpending * 2).length;
-        const lowValue = spendingAmounts.filter(amount => amount <= avgSpending).length;
+        const spendingAmounts = customerSpending.map((c) => Number(c._sum.totalAmount || 0));
+        const avgSpending = spendingAmounts.reduce((sum, amount) => sum + amount, 0) /
+            spendingAmounts.length;
+        const highValue = spendingAmounts.filter((amount) => amount > avgSpending * 2).length;
+        const mediumValue = spendingAmounts.filter((amount) => amount > avgSpending && amount <= avgSpending * 2).length;
+        const lowValue = spendingAmounts.filter((amount) => amount <= avgSpending).length;
         return {
             highValue,
             mediumValue,
@@ -558,7 +564,7 @@ let AnalyticsService = AnalyticsService_1 = class AnalyticsService {
                 id: true,
             },
         });
-        const dealIds = merchantPerformance.map(d => d.dealId);
+        const dealIds = merchantPerformance.map((d) => d.dealId);
         const deals = await this.prisma.deal.findMany({
             where: {
                 id: { in: dealIds },
@@ -573,8 +579,8 @@ let AnalyticsService = AnalyticsService_1 = class AnalyticsService {
             },
         });
         const merchantStats = {};
-        merchantPerformance.forEach(perf => {
-            const deal = deals.find(d => d.id === perf.dealId);
+        merchantPerformance.forEach((perf) => {
+            const deal = deals.find((d) => d.id === perf.dealId);
             if (deal) {
                 const merchantId = deal.merchant.id;
                 if (!merchantStats[merchantId]) {
@@ -587,7 +593,7 @@ let AnalyticsService = AnalyticsService_1 = class AnalyticsService {
         });
         return Object.entries(merchantStats)
             .map(([merchantId, stats]) => {
-            const merchant = deals.find(d => d.merchant.id === merchantId)?.merchant;
+            const merchant = deals.find((d) => d.merchant.id === merchantId)?.merchant;
             return {
                 merchantId,
                 merchantName: merchant?.name || 'Unknown Merchant',
@@ -621,7 +627,9 @@ let AnalyticsService = AnalyticsService_1 = class AnalyticsService {
                 },
             }),
         ]);
-        return previousMerchants > 0 ? ((recentMerchants - previousMerchants) / previousMerchants) * 100 : 0;
+        return previousMerchants > 0
+            ? ((recentMerchants - previousMerchants) / previousMerchants) * 100
+            : 0;
     }
     async getMerchantPerformanceMetrics(whereClause) {
         return [];
@@ -640,7 +648,7 @@ let AnalyticsService = AnalyticsService_1 = class AnalyticsService {
                 id: true,
             },
         });
-        const dealIds = dealPerformance.map(d => d.dealId);
+        const dealIds = dealPerformance.map((d) => d.dealId);
         const deals = await this.prisma.deal.findMany({
             where: {
                 id: { in: dealIds },
@@ -659,8 +667,8 @@ let AnalyticsService = AnalyticsService_1 = class AnalyticsService {
             },
         });
         return dealPerformance
-            .map(perf => {
-            const deal = deals.find(d => d.id === perf.dealId);
+            .map((perf) => {
+            const deal = deals.find((d) => d.id === perf.dealId);
             return {
                 dealId: perf.dealId,
                 dealTitle: deal?.title || 'Unknown Deal',
@@ -689,7 +697,7 @@ let AnalyticsService = AnalyticsService_1 = class AnalyticsService {
                 id: true,
             },
         });
-        const dealIds = dealPerformance.map(d => d.dealId);
+        const dealIds = dealPerformance.map((d) => d.dealId);
         const deals = await this.prisma.deal.findMany({
             where: {
                 id: { in: dealIds },
@@ -704,12 +712,17 @@ let AnalyticsService = AnalyticsService_1 = class AnalyticsService {
             },
         });
         const categoryStats = {};
-        dealPerformance.forEach(perf => {
-            const deal = deals.find(d => d.id === perf.dealId);
+        dealPerformance.forEach((perf) => {
+            const deal = deals.find((d) => d.id === perf.dealId);
             if (deal?.category) {
                 const categoryId = deal.category.id;
                 if (!categoryStats[categoryId]) {
-                    categoryStats[categoryId] = { deals: 0, revenue: 0, orders: 0, name: deal.category.name };
+                    categoryStats[categoryId] = {
+                        deals: 0,
+                        revenue: 0,
+                        orders: 0,
+                        name: deal.category.name,
+                    };
                 }
                 categoryStats[categoryId].revenue += Number(perf._sum.totalAmount || 0);
                 categoryStats[categoryId].orders += perf._count.id;
@@ -748,7 +761,7 @@ let AnalyticsService = AnalyticsService_1 = class AnalyticsService {
             },
         });
         const dailyTrends = {};
-        dailyData.forEach(data => {
+        dailyData.forEach((data) => {
             const date = data.createdAt.toISOString().substring(0, 10);
             if (!dailyTrends[date]) {
                 dailyTrends[date] = { orders: 0, revenue: 0, averageOrderValue: 0 };

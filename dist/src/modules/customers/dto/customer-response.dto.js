@@ -34,7 +34,10 @@ __decorate([
     __metadata("design:type", Boolean)
 ], NotificationPreferencesResponseDto.prototype, "push", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'WhatsApp notifications enabled', example: false }),
+    (0, swagger_1.ApiProperty)({
+        description: 'WhatsApp notifications enabled',
+        example: false,
+    }),
     __metadata("design:type", Boolean)
 ], NotificationPreferencesResponseDto.prototype, "whatsapp", void 0);
 __decorate([
@@ -46,7 +49,10 @@ __decorate([
     __metadata("design:type", Boolean)
 ], NotificationPreferencesResponseDto.prototype, "orders", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Marketing notifications enabled', example: false }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Marketing notifications enabled',
+        example: false,
+    }),
     __metadata("design:type", Boolean)
 ], NotificationPreferencesResponseDto.prototype, "marketing", void 0);
 class CustomerResponseDto {
@@ -73,11 +79,17 @@ __decorate([
     __metadata("design:type", String)
 ], CustomerResponseDto.prototype, "id", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Customer email', example: 'customer@example.com' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Customer email',
+        example: 'customer@example.com',
+    }),
     __metadata("design:type", String)
 ], CustomerResponseDto.prototype, "email", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Customer phone number', example: '+6281234567890' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Customer phone number',
+        example: '+6281234567890',
+    }),
     __metadata("design:type", String)
 ], CustomerResponseDto.prototype, "phone", void 0);
 __decorate([
@@ -89,11 +101,17 @@ __decorate([
     __metadata("design:type", String)
 ], CustomerResponseDto.prototype, "lastName", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Date of birth', example: '1990-01-01T00:00:00.000Z' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Date of birth',
+        example: '1990-01-01T00:00:00.000Z',
+    }),
     __metadata("design:type", Date)
 ], CustomerResponseDto.prototype, "dateOfBirth", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Customer preferences', type: NotificationPreferencesResponseDto }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Customer preferences',
+        type: NotificationPreferencesResponseDto,
+    }),
     __metadata("design:type", NotificationPreferencesResponseDto)
 ], CustomerResponseDto.prototype, "preferences", void 0);
 __decorate([
@@ -101,11 +119,17 @@ __decorate([
     __metadata("design:type", Boolean)
 ], CustomerResponseDto.prototype, "isActive", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Creation date', example: '2024-01-01T00:00:00.000Z' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Creation date',
+        example: '2024-01-01T00:00:00.000Z',
+    }),
     __metadata("design:type", Date)
 ], CustomerResponseDto.prototype, "createdAt", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Last update date', example: '2024-01-01T00:00:00.000Z' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Last update date',
+        example: '2024-01-01T00:00:00.000Z',
+    }),
     __metadata("design:type", Date)
 ], CustomerResponseDto.prototype, "updatedAt", void 0);
 __decorate([
@@ -117,11 +141,17 @@ __decorate([
     __metadata("design:type", Number)
 ], CustomerResponseDto.prototype, "totalSpent", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Last order date', example: '2024-01-15T00:00:00.000Z' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Last order date',
+        example: '2024-01-15T00:00:00.000Z',
+    }),
     __metadata("design:type", Date)
 ], CustomerResponseDto.prototype, "lastOrderDate", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Favorite categories', example: ['Food & Beverage', 'Entertainment'] }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Favorite categories',
+        example: ['Food & Beverage', 'Entertainment'],
+    }),
     __metadata("design:type", Array)
 ], CustomerResponseDto.prototype, "favoriteCategories", void 0);
 __decorate([

@@ -1,10 +1,16 @@
-import { Controller, Get, UseGuards, Post, Body, HttpCode } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, UseGuards, Post, Body } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser, Public } from './decorators/auth.decorators';
 import type { AuthUser } from './types';
-import { RegisterDto } from './dto/auth.dto';
+import { RegisterDto, OAuthGoogleDto } from './dto/auth.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -19,49 +25,15 @@ export class AuthController {
     return { status: 'ok', message: 'Auth service is running' };
   }
 
-  // Login and register are handled by NextAuth on the frontend
-
-  @UseGuards(JwtAuthGuard)
-  @Get('profile')
-  @ApiOperation({ summary: 'Get current user profile' })
-  @ApiBearerAuth('JWT-auth')
-  @ApiResponse({ status: 200, description: 'Returns user profile' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getProfile(@CurrentUser() user: AuthUser) {
-    return {
-      id: user.id,
-      email: user.email,
-      role: user.role,
-      metadata: user.user_metadata,
-    };
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post('refresh')
-  @ApiOperation({ summary: 'Refresh authentication token' })
-  @ApiBearerAuth('JWT-auth')
-  @ApiResponse({ status: 200, description: 'Token refreshed successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async refreshToken(@CurrentUser() user: AuthUser) {
-    // In a real implementation, you might want to generate a new token
-    // For now, we'll just return the current user info
-    return {
-      message: 'Token is valid',
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-      },
-    };
-  }
-
   @Public()
   @Post('verify')
-  @HttpCode(200)
-  @ApiOperation({ summary: 'Verify user credentials (NextAuth authorize support)' })
+  @ApiOperation({
+    summary: 'Verify user credentials (NextAuth authorize support)',
+  })
   @ApiResponse({ status: 200, description: 'Credentials valid' })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
-  async verify(@Body() body: { email: string; password: string }) {
+  @Throttle({ short: { limit: 5, ttl: 60 } })
+  async verifyCredentials(@Body() body: { email: string; password: string }) {
     return this.authService.verifyCredentials(body.email, body.password);
   }
 
@@ -70,7 +42,33 @@ export class AuthController {
   @ApiOperation({ summary: 'Register a new user' })
   @ApiResponse({ status: 201, description: 'Registration successful' })
   @ApiResponse({ status: 400, description: 'Invalid registration data' })
+  @Throttle({ short: { limit: 3, ttl: 60 } })
   async register(@Body() body: RegisterDto) {
     return this.authService.registerUser(body);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  @ApiOperation({ summary: 'Get current user profile' })
+  @ApiBearerAuth('JWT-auth')
+  @ApiResponse({ status: 200, description: 'Returns user profile' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getProfile(@CurrentUser() user: AuthUser) {
+    return this.authService.getProfile(user.id);
+  }
+
+  @Public()
+  @Post('oauth/google')
+  @ApiOperation({
+    summary: 'Find or create user from Google OAuth (NextAuth support)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'User found or created successfully',
+  })
+  @ApiResponse({ status: 401, description: 'Account is inactive' })
+  @Throttle({ short: { limit: 10, ttl: 60 } })
+  async oauthGoogle(@Body() body: OAuthGoogleDto) {
+    return this.authService.findOrCreateOAuthUser(body);
   }
 }

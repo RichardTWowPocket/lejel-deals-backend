@@ -19,7 +19,10 @@ class CategoryHierarchyResponseDto {
 }
 exports.CategoryHierarchyResponseDto = CategoryHierarchyResponseDto;
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Parent category ID', example: 'parent-category-123' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Parent category ID',
+        example: 'parent-category-123',
+    }),
     __metadata("design:type", String)
 ], CategoryHierarchyResponseDto.prototype, "parentId", void 0);
 __decorate([
@@ -27,7 +30,10 @@ __decorate([
     __metadata("design:type", Number)
 ], CategoryHierarchyResponseDto.prototype, "level", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Category path in hierarchy', example: 'food/beverage' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Category path in hierarchy',
+        example: 'food/beverage',
+    }),
     __metadata("design:type", String)
 ], CategoryHierarchyResponseDto.prototype, "path", void 0);
 __decorate([
@@ -67,7 +73,10 @@ __decorate([
     __metadata("design:type", String)
 ], CategoryResponseDto.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Category description', example: 'Restaurants, cafes, and food delivery' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Category description',
+        example: 'Restaurants, cafes, and food delivery',
+    }),
     __metadata("design:type", String)
 ], CategoryResponseDto.prototype, "description", void 0);
 __decorate([
@@ -75,15 +84,24 @@ __decorate([
     __metadata("design:type", String)
 ], CategoryResponseDto.prototype, "icon", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Category image URL', example: 'https://example.com/category-image.jpg' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Category image URL',
+        example: 'https://example.com/category-image.jpg',
+    }),
     __metadata("design:type", String)
 ], CategoryResponseDto.prototype, "image", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Category color for UI theming', example: '#FF6B6B' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Category color for UI theming',
+        example: '#FF6B6B',
+    }),
     __metadata("design:type", String)
 ], CategoryResponseDto.prototype, "color", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Parent category ID', example: 'parent-category-123' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Parent category ID',
+        example: 'parent-category-123',
+    }),
     __metadata("design:type", String)
 ], CategoryResponseDto.prototype, "parentId", void 0);
 __decorate([
@@ -91,19 +109,31 @@ __decorate([
     __metadata("design:type", Number)
 ], CategoryResponseDto.prototype, "level", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Category path in hierarchy', example: 'food/beverage' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Category path in hierarchy',
+        example: 'food/beverage',
+    }),
     __metadata("design:type", String)
 ], CategoryResponseDto.prototype, "path", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Category sort order within level', example: 1 }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Category sort order within level',
+        example: 1,
+    }),
     __metadata("design:type", Number)
 ], CategoryResponseDto.prototype, "sortOrder", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Category tags', example: ['food', 'restaurant', 'delivery'] }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Category tags',
+        example: ['food', 'restaurant', 'delivery'],
+    }),
     __metadata("design:type", Array)
 ], CategoryResponseDto.prototype, "tags", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Category metadata', example: { featured: true, priority: 1 } }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Category metadata',
+        example: { featured: true, priority: 1 },
+    }),
     __metadata("design:type", Object)
 ], CategoryResponseDto.prototype, "metadata", void 0);
 __decorate([
@@ -111,15 +141,24 @@ __decorate([
     __metadata("design:type", Boolean)
 ], CategoryResponseDto.prototype, "isActive", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Creation date', example: '2024-01-01T00:00:00.000Z' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Creation date',
+        example: '2024-01-01T00:00:00.000Z',
+    }),
     __metadata("design:type", Date)
 ], CategoryResponseDto.prototype, "createdAt", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Last update date', example: '2024-01-01T00:00:00.000Z' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Last update date',
+        example: '2024-01-01T00:00:00.000Z',
+    }),
     __metadata("design:type", Date)
 ], CategoryResponseDto.prototype, "updatedAt", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Category hierarchy information', type: CategoryHierarchyResponseDto }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Category hierarchy information',
+        type: CategoryHierarchyResponseDto,
+    }),
     __metadata("design:type", CategoryHierarchyResponseDto)
 ], CategoryResponseDto.prototype, "hierarchy", void 0);
 __decorate([
@@ -139,7 +178,10 @@ __decorate([
     __metadata("design:type", Number)
 ], CategoryResponseDto.prototype, "childCategoriesCount", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Child categories', type: [CategoryResponseDto] }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Child categories',
+        type: [CategoryResponseDto],
+    }),
     __metadata("design:type", Array)
 ], CategoryResponseDto.prototype, "children", void 0);
 //# sourceMappingURL=category-response.dto.js.map

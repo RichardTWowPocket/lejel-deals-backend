@@ -21,16 +21,25 @@ export class MerchantResponseDto {
   @ApiProperty({ description: 'Merchant name', example: 'Demo Restaurant' })
   name: string;
 
-  @ApiPropertyOptional({ description: 'Merchant description', example: 'A sample restaurant for testing' })
+  @ApiPropertyOptional({
+    description: 'Merchant description',
+    example: 'A sample restaurant for testing',
+  })
   description?: string;
 
   @ApiProperty({ description: 'Merchant email', example: 'demo@merchant.com' })
   email: string;
 
-  @ApiPropertyOptional({ description: 'Merchant phone number', example: '+6281234567890' })
+  @ApiPropertyOptional({
+    description: 'Merchant phone number',
+    example: '+6281234567890',
+  })
   phone?: string;
 
-  @ApiPropertyOptional({ description: 'Merchant address', example: 'Jl. Demo No. 123' })
+  @ApiPropertyOptional({
+    description: 'Merchant address',
+    example: 'Jl. Demo No. 123',
+  })
   address?: string;
 
   @ApiPropertyOptional({ description: 'City', example: 'Jakarta' })
@@ -42,25 +51,43 @@ export class MerchantResponseDto {
   @ApiPropertyOptional({ description: 'Postal code', example: '12345' })
   postalCode?: string;
 
-  @ApiPropertyOptional({ description: 'Website URL', example: 'https://demo-restaurant.com' })
+  @ApiPropertyOptional({
+    description: 'Website URL',
+    example: 'https://demo-restaurant.com',
+  })
   website?: string;
 
-  @ApiPropertyOptional({ description: 'Logo URL', example: 'https://via.placeholder.com/200x200' })
+  @ApiPropertyOptional({
+    description: 'Logo URL',
+    example: 'https://via.placeholder.com/200x200',
+  })
   logo?: string;
 
-  @ApiProperty({ description: 'Merchant images URLs', example: ['https://via.placeholder.com/400x300'] })
+  @ApiProperty({
+    description: 'Merchant images URLs',
+    example: ['https://via.placeholder.com/400x300'],
+  })
   images: string[];
 
-  @ApiPropertyOptional({ description: 'Operating hours', type: [OperatingHoursResponseDto] })
+  @ApiPropertyOptional({
+    description: 'Operating hours',
+    type: [OperatingHoursResponseDto],
+  })
   operatingHours?: OperatingHoursResponseDto[];
 
   @ApiProperty({ description: 'Is merchant active', example: true })
   isActive: boolean;
 
-  @ApiProperty({ description: 'Creation date', example: '2024-01-01T00:00:00.000Z' })
+  @ApiProperty({
+    description: 'Creation date',
+    example: '2024-01-01T00:00:00.000Z',
+  })
   createdAt: Date;
 
-  @ApiProperty({ description: 'Last update date', example: '2024-01-01T00:00:00.000Z' })
+  @ApiProperty({
+    description: 'Last update date',
+    example: '2024-01-01T00:00:00.000Z',
+  })
   updatedAt: Date;
 
   // Statistics
@@ -73,6 +100,3 @@ export class MerchantResponseDto {
   @ApiPropertyOptional({ description: 'Total orders count', example: 1250 })
   totalOrders?: number;
 }
-
-
-

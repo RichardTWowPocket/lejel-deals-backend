@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserProfileDto = exports.RegisterDto = exports.LoginDto = void 0;
+exports.OAuthGoogleDto = exports.UserProfileDto = exports.RegisterDto = exports.LoginDto = void 0;
 const class_validator_1 = require("class-validator");
 class LoginDto {
     email;
@@ -73,4 +73,41 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], UserProfileDto.prototype, "lastName", void 0);
+class OAuthGoogleDto {
+    email;
+    providerId;
+    name;
+    avatar;
+    firstName;
+    lastName;
+}
+exports.OAuthGoogleDto = OAuthGoogleDto;
+__decorate([
+    (0, class_validator_1.IsEmail)(),
+    __metadata("design:type", String)
+], OAuthGoogleDto.prototype, "email", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], OAuthGoogleDto.prototype, "providerId", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], OAuthGoogleDto.prototype, "name", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], OAuthGoogleDto.prototype, "avatar", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], OAuthGoogleDto.prototype, "firstName", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], OAuthGoogleDto.prototype, "lastName", void 0);
 //# sourceMappingURL=auth.dto.js.map

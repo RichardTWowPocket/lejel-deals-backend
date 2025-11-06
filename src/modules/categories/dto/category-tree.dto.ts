@@ -7,7 +7,10 @@ export class CategoryTreeNodeDto {
   @ApiProperty({ description: 'Category name', example: 'Food & Beverage' })
   name: string;
 
-  @ApiPropertyOptional({ description: 'Category description', example: 'Restaurants, cafes, and food delivery' })
+  @ApiPropertyOptional({
+    description: 'Category description',
+    example: 'Restaurants, cafes, and food delivery',
+  })
   description?: string;
 
   @ApiPropertyOptional({ description: 'Category icon', example: '🍽️' })
@@ -16,7 +19,10 @@ export class CategoryTreeNodeDto {
   @ApiPropertyOptional({ description: 'Category color', example: '#FF6B6B' })
   color?: string;
 
-  @ApiPropertyOptional({ description: 'Parent category ID', example: 'parent-category-123' })
+  @ApiPropertyOptional({
+    description: 'Parent category ID',
+    example: 'parent-category-123',
+  })
   parentId?: string;
 
   @ApiProperty({ description: 'Category level in tree', example: 1 })
@@ -40,6 +46,3 @@ export class CategoryTreeNodeDto {
   @ApiProperty({ description: 'Child categories', type: [CategoryTreeNodeDto] })
   children: CategoryTreeNodeDto[];
 }
-
-
-

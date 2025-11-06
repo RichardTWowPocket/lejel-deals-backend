@@ -30,9 +30,12 @@ let PaymentService = PaymentService_1 = class PaymentService {
     constructor(configService, prisma) {
         this.configService = configService;
         this.prisma = prisma;
-        this.midtransServerKey = this.configService.get('MIDTRANS_SERVER_KEY') || '';
-        this.midtransClientKey = this.configService.get('MIDTRANS_CLIENT_KEY') || '';
-        this.midtransIsProduction = this.configService.get('NODE_ENV') === 'production';
+        this.midtransServerKey =
+            this.configService.get('MIDTRANS_SERVER_KEY') || '';
+        this.midtransClientKey =
+            this.configService.get('MIDTRANS_CLIENT_KEY') || '';
+        this.midtransIsProduction =
+            this.configService.get('NODE_ENV') === 'production';
         this.midtransBaseUrl = this.midtransIsProduction
             ? 'https://api.midtrans.com'
             : 'https://api.sandbox.midtrans.com';
@@ -89,8 +92,8 @@ let PaymentService = PaymentService_1 = class PaymentService {
             const response = await axios_1.default.post(`${this.midtransBaseUrl}/v2/charge`, midtransRequest, {
                 headers: {
                     'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'Authorization': `Basic ${Buffer.from(this.midtransServerKey + ':').toString('base64')}`,
+                    Accept: 'application/json',
+                    Authorization: `Basic ${Buffer.from(this.midtransServerKey + ':').toString('base64')}`,
                 },
             });
             const paymentResponse = response.data;
@@ -137,7 +140,7 @@ let PaymentService = PaymentService_1 = class PaymentService {
                 throw new common_1.NotFoundException('Order not found');
             }
             let newStatus;
-            let updateData = {
+            const updateData = {
                 paymentReference: payload.transaction_id,
             };
             switch (payload.transaction_status) {
@@ -211,8 +214,8 @@ let PaymentService = PaymentService_1 = class PaymentService {
             }
             const response = await axios_1.default.get(`${this.midtransBaseUrl}/v2/${order.orderNumber}/status`, {
                 headers: {
-                    'Accept': 'application/json',
-                    'Authorization': `Basic ${Buffer.from(this.midtransServerKey + ':').toString('base64')}`,
+                    Accept: 'application/json',
+                    Authorization: `Basic ${Buffer.from(this.midtransServerKey + ':').toString('base64')}`,
                 },
             });
             return response.data;
@@ -235,8 +238,8 @@ let PaymentService = PaymentService_1 = class PaymentService {
             }
             await axios_1.default.post(`${this.midtransBaseUrl}/v2/${order.orderNumber}/cancel`, {}, {
                 headers: {
-                    'Accept': 'application/json',
-                    'Authorization': `Basic ${Buffer.from(this.midtransServerKey + ':').toString('base64')}`,
+                    Accept: 'application/json',
+                    Authorization: `Basic ${Buffer.from(this.midtransServerKey + ':').toString('base64')}`,
                 },
             });
             await this.prisma.order.update({
@@ -276,7 +279,9 @@ let PaymentService = PaymentService_1 = class PaymentService {
                     event,
                     payload: payload,
                     status,
-                    response: status === 'success' ? { processed: true } : { error: payload.error },
+                    response: status === 'success'
+                        ? { processed: true }
+                        : { error: payload.error },
                 },
             });
         }
@@ -298,7 +303,7 @@ let PaymentService = PaymentService_1 = class PaymentService {
             const coupons = [];
             for (let i = 0; i < order.quantity; i++) {
                 const qrCode = await this.generateQRCode(orderId, i + 1);
-                const expiresAt = new Date(order.deal.validUntil.getTime() + (30 * 24 * 60 * 60 * 1000));
+                const expiresAt = new Date(order.deal.validUntil.getTime() + 30 * 24 * 60 * 60 * 1000);
                 coupons.push({
                     orderId: order.id,
                     dealId: order.dealId,

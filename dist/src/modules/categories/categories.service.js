@@ -69,9 +69,7 @@ let CategoriesService = class CategoriesService {
                 where,
                 skip,
                 take: limit,
-                orderBy: [
-                    { name: 'asc' },
-                ],
+                orderBy: [{ name: 'asc' }],
             }),
             this.prisma.category.count({ where }),
         ]);
@@ -147,7 +145,8 @@ let CategoriesService = class CategoriesService {
                 throw new common_1.ConflictException('Category name is already taken');
             }
         }
-        if (updateCategoryDto.parentId !== undefined && updateCategoryDto.parentId !== category.parentId) {
+        if (updateCategoryDto.parentId !== undefined &&
+            updateCategoryDto.parentId !== category.parentId) {
             if (updateCategoryDto.parentId) {
                 const parentCategory = await this.prisma.category.findUnique({
                     where: { id: updateCategoryDto.parentId },
@@ -170,8 +169,11 @@ let CategoriesService = class CategoriesService {
         const { tags, metadata, ...categoryData } = updateCategoryDto;
         let updateData = { ...categoryData };
         if (updateCategoryDto.parentId !== undefined) {
-            const parent = updateCategoryDto.parentId ?
-                await this.prisma.category.findUnique({ where: { id: updateCategoryDto.parentId } }) : null;
+            const parent = updateCategoryDto.parentId
+                ? await this.prisma.category.findUnique({
+                    where: { id: updateCategoryDto.parentId },
+                })
+                : null;
             const newLevel = parent ? parent.level + 1 : 0;
             const newPath = await this.generateCategoryPath(updateCategoryDto.parentId || null, updateCategoryDto.name || category.name);
             updateData = {
@@ -217,12 +219,9 @@ let CategoriesService = class CategoriesService {
                 parentId: null,
                 isActive: true,
             },
-            orderBy: [
-                { sortOrder: 'asc' },
-                { name: 'asc' },
-            ],
+            orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
         });
-        const tree = await Promise.all(rootCategories.map(category => this.buildCategoryTreeNode(category.id)));
+        const tree = await Promise.all(rootCategories.map((category) => this.buildCategoryTreeNode(category.id)));
         return tree;
     }
     async buildCategoryTreeNode(categoryId, level = 0) {
@@ -246,12 +245,9 @@ let CategoriesService = class CategoriesService {
                 parentId: categoryId,
                 isActive: true,
             },
-            orderBy: [
-                { sortOrder: 'asc' },
-                { name: 'asc' },
-            ],
+            orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
         });
-        const childNodes = await Promise.all(children.map(child => this.buildCategoryTreeNode(child.id, level + 1)));
+        const childNodes = await Promise.all(children.map((child) => this.buildCategoryTreeNode(child.id, level + 1)));
         return {
             id: category.id,
             name: category.name,
@@ -271,10 +267,7 @@ let CategoriesService = class CategoriesService {
     async getChildCategories(parentId) {
         const children = await this.prisma.category.findMany({
             where: { parentId },
-            orderBy: [
-                { sortOrder: 'asc' },
-                { name: 'asc' },
-            ],
+            orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
             include: {
                 parent: {
                     select: {
@@ -305,7 +298,7 @@ let CategoriesService = class CategoriesService {
         return this.findAll(1, 100, undefined, true, undefined, level);
     }
     async calculateCategoryStats(categoryId) {
-        const [totalDeals, activeDeals, totalMerchants, childCategoriesCount,] = await Promise.all([
+        const [totalDeals, activeDeals, totalMerchants, childCategoriesCount] = await Promise.all([
             this.prisma.deal.count({
                 where: { categoryId },
             }),
@@ -315,11 +308,13 @@ let CategoriesService = class CategoriesService {
                     status: 'ACTIVE',
                 },
             }),
-            this.prisma.deal.groupBy({
+            this.prisma.deal
+                .groupBy({
                 by: ['merchantId'],
                 where: { categoryId },
                 _count: { merchantId: true },
-            }).then(result => result.length),
+            })
+                .then((result) => result.length),
             this.prisma.category.count({
                 where: { parentId: categoryId },
             }),
@@ -403,9 +398,7 @@ let CategoriesService = class CategoriesService {
                     },
                 },
             },
-            orderBy: [
-                { name: 'asc' },
-            ],
+            orderBy: [{ name: 'asc' }],
         });
     }
     async activate(id) {
@@ -481,11 +474,11 @@ let CategoriesService = class CategoriesService {
             activeCategories,
             rootCategories,
             categoriesWithDeals,
-            levelDistribution: levelDistribution.map(item => ({
+            levelDistribution: levelDistribution.map((item) => ({
                 level: item.level,
                 count: item._count.level,
             })),
-            topCategories: topCategories.map(category => ({
+            topCategories: topCategories.map((category) => ({
                 id: category.id,
                 name: category.name,
                 level: category.level,
@@ -496,9 +489,7 @@ let CategoriesService = class CategoriesService {
     async getAllCategories() {
         return this.prisma.category.findMany({
             where: { isActive: true },
-            orderBy: [
-                { name: 'asc' },
-            ],
+            orderBy: [{ name: 'asc' }],
             include: {
                 parent: {
                     select: {

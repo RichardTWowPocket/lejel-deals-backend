@@ -1,23 +1,23 @@
-import { 
-  Controller, 
-  Get, 
-  Post, 
-  Body, 
-  Patch, 
-  Param, 
-  Delete, 
-  UseGuards, 
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
   Query,
   ParseIntPipe,
-  DefaultValuePipe
+  DefaultValuePipe,
 } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiResponse, 
-  ApiBearerAuth, 
-  ApiParam, 
-  ApiQuery 
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { CustomersService } from './customers.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
@@ -33,34 +33,48 @@ import type { AuthUser } from '../auth/types';
 export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
 
-  @Roles('customer', 'admin')
+  @Roles('admin')
   @Post()
   @ApiOperation({ summary: 'Create a new customer' })
   @ApiBearerAuth('JWT-auth')
   @ApiResponse({ status: 201, description: 'Customer created successfully' })
-  @ApiResponse({ status: 400, description: 'Invalid input data or email already exists' })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid input data or email already exists',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 403, description: 'Forbidden - insufficient permissions' })
-  create(@Body() createCustomerDto: CreateCustomerDto, @CurrentUser() user: AuthUser) {
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - insufficient permissions',
+  })
+  create(
+    @Body() createCustomerDto: CreateCustomerDto,
+    @CurrentUser() user: AuthUser,
+  ) {
     return this.customersService.create(createCustomerDto, user.id);
-  }
-
-  @Public()
-  @Post('create-from-supabase')
-  @ApiOperation({ summary: 'Public: Create customer after Supabase signup (email verification flow)' })
-  @ApiResponse({ status: 201, description: 'Customer created successfully' })
-  @ApiResponse({ status: 400, description: 'Invalid input data or email already exists' })
-  createPublic(@Body() createCustomerDto: CreateCustomerDto) {
-    return this.customersService.create(createCustomerDto, 'public');
   }
 
   @Public()
   @Get()
   @ApiOperation({ summary: 'Get all customers with pagination and filtering' })
-  @ApiQuery({ name: 'page', required: false, description: 'Page number', example: 1 })
-  @ApiQuery({ name: 'limit', required: false, description: 'Items per page', example: 10 })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Page number',
+    example: 1,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'Items per page',
+    example: 10,
+  })
   @ApiQuery({ name: 'search', required: false, description: 'Search query' })
-  @ApiQuery({ name: 'isActive', required: false, description: 'Filter by active status' })
+  @ApiQuery({
+    name: 'isActive',
+    required: false,
+    description: 'Filter by active status',
+  })
   @ApiResponse({ status: 200, description: 'Returns paginated customers list' })
   findAll(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
@@ -76,21 +90,32 @@ export class CustomersController {
   @Get('search')
   @ApiOperation({ summary: 'Search customers' })
   @ApiQuery({ name: 'q', description: 'Search query', example: 'john' })
-  @ApiQuery({ name: 'isActive', required: false, description: 'Filter by active status' })
+  @ApiQuery({
+    name: 'isActive',
+    required: false,
+    description: 'Filter by active status',
+  })
   @ApiResponse({ status: 200, description: 'Returns search results' })
-  search(
-    @Query('q') query: string,
-    @Query('isActive') isActive?: string,
-  ) {
+  search(@Query('q') query: string, @Query('isActive') isActive?: string) {
     const isActiveBool = isActive ? isActive === 'true' : undefined;
-    return this.customersService.searchCustomers(query, { isActive: isActiveBool });
+    return this.customersService.searchCustomers(query, {
+      isActive: isActiveBool,
+    });
   }
 
   @Public()
   @Get('top')
   @ApiOperation({ summary: 'Get top customers by spending' })
-  @ApiQuery({ name: 'limit', required: false, description: 'Number of top customers', example: 10 })
-  @ApiResponse({ status: 200, description: 'Returns top customers by spending' })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'Number of top customers',
+    example: 10,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns top customers by spending',
+  })
   getTopCustomers(
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
   ) {
@@ -117,79 +142,100 @@ export class CustomersController {
     return this.customersService.findByEmail(email);
   }
 
-  @Roles('customer', 'admin')
+  @Roles('admin')
   @Patch(':id')
   @ApiOperation({ summary: 'Update a customer' })
   @ApiParam({ name: 'id', description: 'Customer ID' })
   @ApiBearerAuth('JWT-auth')
   @ApiResponse({ status: 200, description: 'Customer updated successfully' })
-  @ApiResponse({ status: 400, description: 'Invalid input data or email already taken' })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid input data or email already taken',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 403, description: 'Forbidden - insufficient permissions' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - insufficient permissions',
+  })
   @ApiResponse({ status: 404, description: 'Customer not found' })
   update(
-    @Param('id') id: string, 
-    @Body() updateCustomerDto: UpdateCustomerDto, 
-    @CurrentUser() user: AuthUser
+    @Param('id') id: string,
+    @Body() updateCustomerDto: UpdateCustomerDto,
+    @CurrentUser() user: AuthUser,
   ) {
     return this.customersService.update(id, updateCustomerDto, user.id);
   }
 
-  @Roles('customer', 'admin')
+  @Roles('admin')
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a customer' })
   @ApiParam({ name: 'id', description: 'Customer ID' })
   @ApiBearerAuth('JWT-auth')
   @ApiResponse({ status: 200, description: 'Customer deleted successfully' })
-  @ApiResponse({ status: 400, description: 'Cannot delete customer with active orders' })
+  @ApiResponse({
+    status: 400,
+    description: 'Cannot delete customer with active orders',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 403, description: 'Forbidden - insufficient permissions' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - insufficient permissions',
+  })
   @ApiResponse({ status: 404, description: 'Customer not found' })
   remove(@Param('id') id: string, @CurrentUser() user: AuthUser) {
     return this.customersService.remove(id, user.id);
   }
 
   // Customer statistics and analytics
-  @Roles('customer', 'admin')
+  @Roles('admin')
   @Get(':id/stats')
   @ApiOperation({ summary: 'Get customer statistics' })
   @ApiParam({ name: 'id', description: 'Customer ID' })
   @ApiBearerAuth('JWT-auth')
   @ApiResponse({ status: 200, description: 'Returns customer statistics' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 403, description: 'Forbidden - insufficient permissions' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - insufficient permissions',
+  })
   @ApiResponse({ status: 404, description: 'Customer not found' })
   getStats(@Param('id') id: string, @CurrentUser() user: AuthUser) {
     return this.customersService.getCustomerStats(id);
   }
 
-  @Roles('customer', 'admin')
+  @Roles('admin')
   @Get(':id/insights')
   @ApiOperation({ summary: 'Get customer insights and analytics' })
   @ApiParam({ name: 'id', description: 'Customer ID' })
   @ApiBearerAuth('JWT-auth')
   @ApiResponse({ status: 200, description: 'Returns customer insights' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 403, description: 'Forbidden - insufficient permissions' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - insufficient permissions',
+  })
   @ApiResponse({ status: 404, description: 'Customer not found' })
   getInsights(@Param('id') id: string, @CurrentUser() user: AuthUser) {
     return this.customersService.getCustomerInsights(id);
   }
 
   // Customer preferences management
-  @Roles('customer', 'admin')
+  @Roles('admin')
   @Patch(':id/preferences')
   @ApiOperation({ summary: 'Update customer notification preferences' })
   @ApiParam({ name: 'id', description: 'Customer ID' })
   @ApiBearerAuth('JWT-auth')
   @ApiResponse({ status: 200, description: 'Preferences updated successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 403, description: 'Forbidden - insufficient permissions' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - insufficient permissions',
+  })
   @ApiResponse({ status: 404, description: 'Customer not found' })
   updatePreferences(
     @Param('id') id: string,
     @Body() preferences: any,
-    @CurrentUser() user: AuthUser
+    @CurrentUser() user: AuthUser,
   ) {
     return this.customersService.updatePreferences(id, preferences, user.id);
   }
@@ -205,27 +251,39 @@ export class CustomersController {
   }
 
   // Customer activation/deactivation
-  @Roles('customer', 'admin')
+  @Roles('admin')
   @Patch(':id/deactivate')
   @ApiOperation({ summary: 'Deactivate a customer' })
   @ApiParam({ name: 'id', description: 'Customer ID' })
   @ApiBearerAuth('JWT-auth')
-  @ApiResponse({ status: 200, description: 'Customer deactivated successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Customer deactivated successfully',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 403, description: 'Forbidden - insufficient permissions' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - insufficient permissions',
+  })
   @ApiResponse({ status: 404, description: 'Customer not found' })
   deactivate(@Param('id') id: string, @CurrentUser() user: AuthUser) {
     return this.customersService.deactivate(id, user.id);
   }
 
-  @Roles('customer', 'admin')
+  @Roles('admin')
   @Patch(':id/reactivate')
   @ApiOperation({ summary: 'Reactivate a customer' })
   @ApiParam({ name: 'id', description: 'Customer ID' })
   @ApiBearerAuth('JWT-auth')
-  @ApiResponse({ status: 200, description: 'Customer reactivated successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Customer reactivated successfully',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 403, description: 'Forbidden - insufficient permissions' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - insufficient permissions',
+  })
   @ApiResponse({ status: 404, description: 'Customer not found' })
   reactivate(@Param('id') id: string, @CurrentUser() user: AuthUser) {
     return this.customersService.reactivate(id, user.id);

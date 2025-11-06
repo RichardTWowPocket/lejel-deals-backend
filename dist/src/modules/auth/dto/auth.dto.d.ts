@@ -14,3 +14,11 @@ export declare class UserProfileDto {
     firstName?: string;
     lastName?: string;
 }
+export declare class OAuthGoogleDto {
+    email: string;
+    providerId: string;
+    name?: string;
+    avatar?: string;
+    firstName?: string;
+    lastName?: string;
+}

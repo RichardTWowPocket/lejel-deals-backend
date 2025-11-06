@@ -37,7 +37,8 @@ let CustomersService = class CustomersService {
         const customer = await this.prisma.customer.create({
             data: {
                 ...customerData,
-                preferences: (createCustomerDto.preferences || defaultPreferences),
+                preferences: (createCustomerDto.preferences ||
+                    defaultPreferences),
             },
         });
         return this.findOne(customer.id);
@@ -210,8 +211,9 @@ let CustomersService = class CustomersService {
         ]);
         const totalSpentAmount = Number(totalSpent._sum.totalAmount || 0);
         const averageOrderValue = totalOrders > 0 ? totalSpentAmount / totalOrders : 0;
-        const daysSinceLastOrder = lastOrder ?
-            Math.floor((Date.now() - lastOrder.createdAt.getTime()) / (1000 * 60 * 60 * 24)) : 0;
+        const daysSinceLastOrder = lastOrder
+            ? Math.floor((Date.now() - lastOrder.createdAt.getTime()) / (1000 * 60 * 60 * 24))
+            : 0;
         const tier = this.calculateCustomerTier(totalSpentAmount);
         const loyaltyPoints = Math.floor(totalSpentAmount / 1000);
         const totalSavings = await this.calculateTotalSavings(customerId);
@@ -242,7 +244,7 @@ let CustomersService = class CustomersService {
             },
         });
         const categoryCount = {};
-        orderCategories.forEach(order => {
+        orderCategories.forEach((order) => {
             if (order.deal.category) {
                 const categoryName = order.deal.category.name;
                 categoryCount[categoryName] = (categoryCount[categoryName] || 0) + 1;
@@ -358,7 +360,8 @@ let CustomersService = class CustomersService {
         return {
             customer: {
                 id: customer.id,
-                name: `${customer.firstName || ''} ${customer.lastName || ''}`.trim() || 'Unknown',
+                name: `${customer.firstName || ''} ${customer.lastName || ''}`.trim() ||
+                    'Unknown',
                 email: customer.email,
                 tier: stats.tier,
                 loyaltyPoints: stats.loyaltyPoints,
@@ -376,7 +379,7 @@ let CustomersService = class CustomersService {
                 },
             },
         });
-        const customersWithSpending = customers.map(customer => {
+        const customersWithSpending = customers.map((customer) => {
             const totalSpent = customer.orders.reduce((sum, order) => sum + Number(order.totalAmount), 0);
             return {
                 ...customer,

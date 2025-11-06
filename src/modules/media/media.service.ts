@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import * as crypto from 'crypto';
 import * as path from 'path';
@@ -11,7 +15,11 @@ export class MediaService {
    * Generate a presigned upload URL for media
    * In production, this would integrate with S3 or Cloudinary
    */
-  async generateUploadUrl(filename: string, contentType: string, uploadedBy?: string) {
+  async generateUploadUrl(
+    filename: string,
+    contentType: string,
+    uploadedBy?: string,
+  ) {
     // Validate file type
     const allowedMimeTypes = [
       'image/jpeg',
@@ -22,12 +30,21 @@ export class MediaService {
     ];
 
     if (!allowedMimeTypes.includes(contentType)) {
-      throw new BadRequestException(`File type ${contentType} is not allowed. Allowed types: ${allowedMimeTypes.join(', ')}`);
+      throw new BadRequestException(
+        `File type ${contentType} is not allowed. Allowed types: ${allowedMimeTypes.join(', ')}`,
+      );
     }
 
     // Validate file extension
     const ext = path.extname(filename).toLowerCase();
-    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg'];
+    const allowedExtensions = [
+      '.jpg',
+      '.jpeg',
+      '.png',
+      '.webp',
+      '.gif',
+      '.svg',
+    ];
 
     if (!allowedExtensions.includes(ext)) {
       throw new BadRequestException(`File extension ${ext} is not allowed`);
@@ -143,7 +160,6 @@ export class MediaService {
     };
   }
 }
-
 
 
 

@@ -9,10 +9,38 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.StaffActivityDto = exports.ChangePinDto = exports.StaffStatsDto = exports.StaffLoginResponseDto = exports.StaffResponseDto = exports.StaffLoginDto = exports.UpdateStaffDto = exports.CreateStaffDto = void 0;
+exports.StaffActivityDto = exports.ChangePinDto = exports.StaffStatsDto = exports.StaffLoginResponseDto = exports.StaffResponseDto = exports.StaffLoginDto = exports.UpdateStaffDto = exports.CreateStaffDto = exports.StaffRole = void 0;
+exports.mapMerchantRoleToStaffRole = mapMerchantRoleToStaffRole;
+exports.mapStaffRoleToMerchantRole = mapStaffRoleToMerchantRole;
 const class_validator_1 = require("class-validator");
 const swagger_1 = require("@nestjs/swagger");
 const client_1 = require("@prisma/client");
+var StaffRole;
+(function (StaffRole) {
+    StaffRole["MANAGER"] = "MANAGER";
+    StaffRole["CASHIER"] = "CASHIER";
+    StaffRole["SUPERVISOR"] = "SUPERVISOR";
+    StaffRole["ADMIN"] = "ADMIN";
+})(StaffRole || (exports.StaffRole = StaffRole = {}));
+function mapMerchantRoleToStaffRole(merchantRole) {
+    const mapping = {
+        [client_1.MerchantRole.OWNER]: StaffRole.ADMIN,
+        [client_1.MerchantRole.ADMIN]: StaffRole.ADMIN,
+        [client_1.MerchantRole.MANAGER]: StaffRole.MANAGER,
+        [client_1.MerchantRole.SUPERVISOR]: StaffRole.SUPERVISOR,
+        [client_1.MerchantRole.CASHIER]: StaffRole.CASHIER,
+    };
+    return mapping[merchantRole] || StaffRole.CASHIER;
+}
+function mapStaffRoleToMerchantRole(staffRole) {
+    const mapping = {
+        [StaffRole.ADMIN]: client_1.MerchantRole.ADMIN,
+        [StaffRole.MANAGER]: client_1.MerchantRole.MANAGER,
+        [StaffRole.SUPERVISOR]: client_1.MerchantRole.SUPERVISOR,
+        [StaffRole.CASHIER]: client_1.MerchantRole.CASHIER,
+    };
+    return mapping[staffRole] || client_1.MerchantRole.CASHIER;
+}
 class CreateStaffDto {
     firstName;
     lastName;
@@ -59,9 +87,9 @@ __decorate([
     __metadata("design:type", String)
 ], CreateStaffDto.prototype, "pin", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Staff role', enum: client_1.StaffRole, example: client_1.StaffRole.CASHIER }),
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Staff role', enum: StaffRole, example: StaffRole.CASHIER }),
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsEnum)(client_1.StaffRole),
+    (0, class_validator_1.IsEnum)(StaffRole),
     __metadata("design:type", String)
 ], CreateStaffDto.prototype, "role", void 0);
 __decorate([
@@ -133,9 +161,9 @@ __decorate([
     __metadata("design:type", String)
 ], UpdateStaffDto.prototype, "pin", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Staff role', enum: client_1.StaffRole }),
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Staff role', enum: StaffRole }),
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsEnum)(client_1.StaffRole),
+    (0, class_validator_1.IsEnum)(StaffRole),
     __metadata("design:type", String)
 ], UpdateStaffDto.prototype, "role", void 0);
 __decorate([
@@ -198,7 +226,7 @@ class StaffResponseDto {
 }
 exports.StaffResponseDto = StaffResponseDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Staff ID' }),
+    (0, swagger_1.ApiProperty)({ description: 'Staff ID (MerchantMembership ID)' }),
     __metadata("design:type", String)
 ], StaffResponseDto.prototype, "id", void 0);
 __decorate([
@@ -218,7 +246,7 @@ __decorate([
     __metadata("design:type", String)
 ], StaffResponseDto.prototype, "phone", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Staff role', enum: client_1.StaffRole }),
+    (0, swagger_1.ApiProperty)({ description: 'Staff role', enum: StaffRole }),
     __metadata("design:type", String)
 ], StaffResponseDto.prototype, "role", void 0);
 __decorate([
@@ -250,7 +278,7 @@ __decorate([
     __metadata("design:type", Date)
 ], StaffResponseDto.prototype, "createdAt", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Last update timestamp' }),
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Last update timestamp' }),
     __metadata("design:type", Date)
 ], StaffResponseDto.prototype, "updatedAt", void 0);
 class StaffLoginResponseDto {

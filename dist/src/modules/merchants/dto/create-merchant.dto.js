@@ -62,7 +62,10 @@ __decorate([
     __metadata("design:type", String)
 ], CreateMerchantDto.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Merchant description', example: 'A sample restaurant for testing' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Merchant description',
+        example: 'A sample restaurant for testing',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -73,13 +76,19 @@ __decorate([
     __metadata("design:type", String)
 ], CreateMerchantDto.prototype, "email", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Merchant phone number', example: '+6281234567890' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Merchant phone number',
+        example: '+6281234567890',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateMerchantDto.prototype, "phone", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Merchant address', example: 'Jl. Demo No. 123' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Merchant address',
+        example: 'Jl. Demo No. 123',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -103,26 +112,38 @@ __decorate([
     __metadata("design:type", String)
 ], CreateMerchantDto.prototype, "postalCode", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Website URL', example: 'https://demo-restaurant.com' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Website URL',
+        example: 'https://demo-restaurant.com',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateMerchantDto.prototype, "website", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Logo URL', example: 'https://via.placeholder.com/200x200' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Logo URL',
+        example: 'https://via.placeholder.com/200x200',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateMerchantDto.prototype, "logo", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Merchant images URLs', example: ['https://via.placeholder.com/400x300'] }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Merchant images URLs',
+        example: ['https://via.placeholder.com/400x300'],
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsString)({ each: true }),
     __metadata("design:type", Array)
 ], CreateMerchantDto.prototype, "images", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Operating hours', type: [OperatingHoursDto] }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Operating hours',
+        type: [OperatingHoursDto],
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsArray)(),
     (0, class_validator_1.ValidateNested)({ each: true }),

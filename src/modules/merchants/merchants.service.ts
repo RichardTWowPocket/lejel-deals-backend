@@ -1,8 +1,16 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateMerchantDto } from './dto/create-merchant.dto';
 import { UpdateMerchantDto } from './dto/update-merchant.dto';
-import { MerchantVerificationDto, VerificationStatus } from './dto/merchant-verification.dto';
+import {
+  MerchantVerificationDto,
+  VerificationStatus,
+} from './dto/merchant-verification.dto';
 
 @Injectable()
 export class MerchantsService {
@@ -33,11 +41,17 @@ export class MerchantsService {
     return this.findOne(merchant.id);
   }
 
-  async findAll(page: number = 1, limit: number = 10, search?: string, city?: string, isActive?: boolean) {
+  async findAll(
+    page: number = 1,
+    limit: number = 10,
+    search?: string,
+    city?: string,
+    isActive?: boolean,
+  ) {
     const skip = (page - 1) * limit;
-    
+
     const where: any = {};
-    
+
     if (search) {
       where.OR = [
         { name: { contains: search, mode: 'insensitive' } },
@@ -45,11 +59,11 @@ export class MerchantsService {
         { email: { contains: search, mode: 'insensitive' } },
       ];
     }
-    
+
     if (city) {
       where.city = { contains: city, mode: 'insensitive' };
     }
-    
+
     if (isActive !== undefined) {
       where.isActive = isActive;
     }
@@ -95,7 +109,7 @@ export class MerchantsService {
           activeDeals,
           totalOrders,
         };
-      })
+      }),
     );
 
     return {
@@ -168,13 +182,25 @@ export class MerchantsService {
     return this.findOne(merchant.id);
   }
 
-  async update(id: string, updateMerchantDto: UpdateMerchantDto, userId: string) {
+  async update(
+    id: string,
+    updateMerchantDto: UpdateMerchantDto,
+    userId: string,
+  ) {
     const merchant = await this.findOne(id);
-    
-    // Check if user owns this merchant (in a real app, you'd have proper ownership logic)
-    // For now, we'll allow updates if the user email matches the merchant email
-    if (merchant.email !== userId) {
-      throw new ForbiddenException('You can only update your own merchant profile');
+
+    // Check if user has access to this merchant via MerchantMembership
+    const membership = await this.prisma.merchantMembership.findFirst({
+      where: {
+        userId: userId,
+        merchantId: id,
+      },
+    });
+
+    if (!membership) {
+      throw new ForbiddenException(
+        'You do not have access to update this merchant profile',
+      );
     }
 
     // Check if email is being changed and if it's already taken
@@ -184,7 +210,9 @@ export class MerchantsService {
       });
 
       if (existingMerchant) {
-        throw new BadRequestException('Email is already taken by another merchant');
+        throw new BadRequestException(
+          'Email is already taken by another merchant',
+        );
       }
     }
 
@@ -204,10 +232,21 @@ export class MerchantsService {
 
   async remove(id: string, userId: string) {
     const merchant = await this.findOne(id);
-    
-    // Check if user owns this merchant
-    if (merchant.email !== userId) {
-      throw new ForbiddenException('You can only delete your own merchant profile');
+
+    // Check if user has access to this merchant via MerchantMembership
+    // Only allow deletion if user is the owner (isOwner = true)
+    const membership = await this.prisma.merchantMembership.findFirst({
+      where: {
+        userId: userId,
+        merchantId: id,
+        isOwner: true, // Only owners can delete
+      },
+    });
+
+    if (!membership) {
+      throw new ForbiddenException(
+        'You do not have permission to delete this merchant. Only owners can delete merchants.',
+      );
     }
 
     // Check if merchant has active deals
@@ -219,7 +258,9 @@ export class MerchantsService {
     });
 
     if (activeDeals > 0) {
-      throw new BadRequestException('Cannot delete merchant with active deals. Please deactivate or delete all active deals first.');
+      throw new BadRequestException(
+        'Cannot delete merchant with active deals. Please deactivate or delete all active deals first.',
+      );
     }
 
     return this.prisma.merchant.delete({
@@ -228,7 +269,11 @@ export class MerchantsService {
   }
 
   // Merchant verification methods
-  async updateVerificationStatus(id: string, verificationDto: MerchantVerificationDto, adminId: string) {
+  async updateVerificationStatus(
+    id: string,
+    verificationDto: MerchantVerificationDto,
+    adminId: string,
+  ) {
     const merchant = await this.findOne(id);
 
     // In a real app, you'd store verification data in a separate table
@@ -246,24 +291,41 @@ export class MerchantsService {
 
   async getVerificationStatus(id: string) {
     const merchant = await this.findOne(id);
-    
+
     // In a real app, you'd fetch this from a verification table
     // For now, we'll return a mock status based on isActive
     return {
       merchantId: id,
-      status: merchant.isActive ? VerificationStatus.VERIFIED : VerificationStatus.PENDING,
+      status: merchant.isActive
+        ? VerificationStatus.VERIFIED
+        : VerificationStatus.PENDING,
       verifiedAt: merchant.isActive ? merchant.createdAt : null,
-      notes: merchant.isActive ? 'Merchant is active and verified' : 'Verification pending',
+      notes: merchant.isActive
+        ? 'Merchant is active and verified'
+        : 'Verification pending',
     };
   }
 
   // Business profile management
-  async updateOperatingHours(id: string, operatingHours: any[], userId: string) {
+  async updateOperatingHours(
+    id: string,
+    operatingHours: any[],
+    userId: string,
+  ) {
     const merchant = await this.findOne(id);
-    
-    // Check if user owns this merchant
-    if (merchant.email !== userId) {
-      throw new ForbiddenException('You can only update your own merchant profile');
+
+    // Check if user has access to this merchant via MerchantMembership
+    const membership = await this.prisma.merchantMembership.findFirst({
+      where: {
+        userId: userId,
+        merchantId: id,
+      },
+    });
+
+    if (!membership) {
+      throw new ForbiddenException(
+        'You do not have access to update this merchant profile',
+      );
     }
 
     // In a real app, you'd store this in a separate operating hours table
@@ -276,7 +338,7 @@ export class MerchantsService {
 
   async getOperatingHours(id: string) {
     const merchant = await this.findOne(id);
-    
+
     // In a real app, you'd fetch this from an operating hours table
     // For now, we'll return mock data
     return {
@@ -284,10 +346,25 @@ export class MerchantsService {
       operatingHours: [
         { day: 'monday', openTime: '09:00', closeTime: '22:00', isOpen: true },
         { day: 'tuesday', openTime: '09:00', closeTime: '22:00', isOpen: true },
-        { day: 'wednesday', openTime: '09:00', closeTime: '22:00', isOpen: true },
-        { day: 'thursday', openTime: '09:00', closeTime: '22:00', isOpen: true },
+        {
+          day: 'wednesday',
+          openTime: '09:00',
+          closeTime: '22:00',
+          isOpen: true,
+        },
+        {
+          day: 'thursday',
+          openTime: '09:00',
+          closeTime: '22:00',
+          isOpen: true,
+        },
         { day: 'friday', openTime: '09:00', closeTime: '22:00', isOpen: true },
-        { day: 'saturday', openTime: '10:00', closeTime: '23:00', isOpen: true },
+        {
+          day: 'saturday',
+          openTime: '10:00',
+          closeTime: '23:00',
+          isOpen: true,
+        },
         { day: 'sunday', openTime: '10:00', closeTime: '21:00', isOpen: true },
       ],
     };
@@ -297,43 +374,38 @@ export class MerchantsService {
   async getMerchantStats(id: string) {
     const merchant = await this.findOne(id);
 
-    const [
-      totalDeals,
-      activeDeals,
-      totalOrders,
-      totalRevenue,
-      recentOrders,
-    ] = await Promise.all([
-      this.prisma.deal.count({
-        where: { merchantId: id },
-      }),
-      this.prisma.deal.count({
-        where: { merchantId: id, status: 'ACTIVE' },
-      }),
-      this.prisma.order.count({
-        where: {
-          deal: { merchantId: id },
-        },
-      }),
-      this.prisma.order.aggregate({
-        where: {
-          deal: { merchantId: id },
-          status: 'PAID',
-        },
-        _sum: { totalAmount: true },
-      }),
-      this.prisma.order.findMany({
-        where: {
-          deal: { merchantId: id },
-        },
-        take: 5,
-        orderBy: { createdAt: 'desc' },
-        include: {
-          deal: true,
-          customer: true,
-        },
-      }),
-    ]);
+    const [totalDeals, activeDeals, totalOrders, totalRevenue, recentOrders] =
+      await Promise.all([
+        this.prisma.deal.count({
+          where: { merchantId: id },
+        }),
+        this.prisma.deal.count({
+          where: { merchantId: id, status: 'ACTIVE' },
+        }),
+        this.prisma.order.count({
+          where: {
+            deal: { merchantId: id },
+          },
+        }),
+        this.prisma.order.aggregate({
+          where: {
+            deal: { merchantId: id },
+            status: 'PAID',
+          },
+          _sum: { totalAmount: true },
+        }),
+        this.prisma.order.findMany({
+          where: {
+            deal: { merchantId: id },
+          },
+          take: 5,
+          orderBy: { createdAt: 'desc' },
+          include: {
+            deal: true,
+            customer: true,
+          },
+        }),
+      ]);
 
     return {
       merchantId: id,
@@ -381,10 +453,12 @@ export class MerchantsService {
   // Deactivate merchant (soft delete)
   async deactivate(id: string, userId: string) {
     const merchant = await this.findOne(id);
-    
+
     // Check if user owns this merchant
     if (merchant.email !== userId) {
-      throw new ForbiddenException('You can only deactivate your own merchant profile');
+      throw new ForbiddenException(
+        'You can only deactivate your own merchant profile',
+      );
     }
 
     return this.prisma.merchant.update({
@@ -396,10 +470,12 @@ export class MerchantsService {
   // Reactivate merchant
   async reactivate(id: string, userId: string) {
     const merchant = await this.findOne(id);
-    
+
     // Check if user owns this merchant
     if (merchant.email !== userId) {
-      throw new ForbiddenException('You can only reactivate your own merchant profile');
+      throw new ForbiddenException(
+        'You can only reactivate your own merchant profile',
+      );
     }
 
     return this.prisma.merchant.update({
@@ -418,33 +494,29 @@ export class MerchantsService {
     const endOfDay = new Date();
     endOfDay.setHours(23, 59, 59, 999);
 
-    const [
-      todayOrders,
-      todayRevenueAgg,
-      totalRevenueAgg,
-      activeDealsCount,
-    ] = await Promise.all([
-      this.prisma.order.count({
-        where: {
-          deal: { merchantId: id },
-          createdAt: { gte: startOfDay, lte: endOfDay },
-          status: 'PAID',
-        },
-      }),
-      this.prisma.order.aggregate({
-        where: {
-          deal: { merchantId: id },
-          createdAt: { gte: startOfDay, lte: endOfDay },
-          status: 'PAID',
-        },
-        _sum: { totalAmount: true },
-      }),
-      this.prisma.order.aggregate({
-        where: { deal: { merchantId: id }, status: 'PAID' },
-        _sum: { totalAmount: true },
-      }),
-      this.prisma.deal.count({ where: { merchantId: id, status: 'ACTIVE' } }),
-    ]);
+    const [todayOrders, todayRevenueAgg, totalRevenueAgg, activeDealsCount] =
+      await Promise.all([
+        this.prisma.order.count({
+          where: {
+            deal: { merchantId: id },
+            createdAt: { gte: startOfDay, lte: endOfDay },
+            status: 'PAID',
+          },
+        }),
+        this.prisma.order.aggregate({
+          where: {
+            deal: { merchantId: id },
+            createdAt: { gte: startOfDay, lte: endOfDay },
+            status: 'PAID',
+          },
+          _sum: { totalAmount: true },
+        }),
+        this.prisma.order.aggregate({
+          where: { deal: { merchantId: id }, status: 'PAID' },
+          _sum: { totalAmount: true },
+        }),
+        this.prisma.deal.count({ where: { merchantId: id, status: 'ACTIVE' } }),
+      ]);
 
     return {
       merchantId: id,
@@ -497,7 +569,10 @@ export class MerchantsService {
 
     const [ordersCount, revenueAgg] = await Promise.all([
       this.prisma.order.count({ where: whereBase }),
-      this.prisma.order.aggregate({ where: whereBase, _sum: { totalAmount: true } }),
+      this.prisma.order.aggregate({
+        where: whereBase,
+        _sum: { totalAmount: true },
+      }),
     ]);
 
     // Simple payout model: merchant gets 90% of revenue
@@ -516,6 +591,3 @@ export class MerchantsService {
     };
   }
 }
-
-
-

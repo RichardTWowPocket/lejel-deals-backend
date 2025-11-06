@@ -44,23 +44,39 @@ __decorate([
     __metadata("design:type", String)
 ], CouponResponseDto.prototype, "qrCode", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Coupon status', enum: client_1.CouponStatus, example: client_1.CouponStatus.ACTIVE }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Coupon status',
+        enum: client_1.CouponStatus,
+        example: client_1.CouponStatus.ACTIVE,
+    }),
     __metadata("design:type", String)
 ], CouponResponseDto.prototype, "status", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Used date', example: '2024-01-01T12:00:00.000Z' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Used date',
+        example: '2024-01-01T12:00:00.000Z',
+    }),
     __metadata("design:type", Date)
 ], CouponResponseDto.prototype, "usedAt", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Expiration date', example: '2024-02-01T12:00:00.000Z' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Expiration date',
+        example: '2024-02-01T12:00:00.000Z',
+    }),
     __metadata("design:type", Date)
 ], CouponResponseDto.prototype, "expiresAt", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Creation date', example: '2024-01-01T10:00:00.000Z' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Creation date',
+        example: '2024-01-01T10:00:00.000Z',
+    }),
     __metadata("design:type", Date)
 ], CouponResponseDto.prototype, "createdAt", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Last update date', example: '2024-01-01T12:00:00.000Z' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Last update date',
+        example: '2024-01-01T12:00:00.000Z',
+    }),
     __metadata("design:type", Date)
 ], CouponResponseDto.prototype, "updatedAt", void 0);
 __decorate([
@@ -76,7 +92,10 @@ class CouponValidationDto {
 }
 exports.CouponValidationDto = CouponValidationDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'QR Code to validate', example: 'qr_code_string' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'QR Code to validate',
+        example: 'qr_code_string',
+    }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CouponValidationDto.prototype, "qrCode", void 0);
@@ -95,7 +114,10 @@ __decorate([
     __metadata("design:type", CouponResponseDto)
 ], CouponValidationResponseDto.prototype, "coupon", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Error message if invalid', example: 'Coupon has expired' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Error message if invalid',
+        example: 'Coupon has expired',
+    }),
     __metadata("design:type", String)
 ], CouponValidationResponseDto.prototype, "error", void 0);
 class RedeemCouponDto {
@@ -110,13 +132,19 @@ __decorate([
     __metadata("design:type", String)
 ], RedeemCouponDto.prototype, "qrCode", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Staff ID who redeemed the coupon', example: 'staff-123' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Staff ID who redeemed the coupon',
+        example: 'staff-123',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], RedeemCouponDto.prototype, "staffId", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Redemption notes', example: 'Redeemed at counter' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Redemption notes',
+        example: 'Redeemed at counter',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -126,7 +154,10 @@ class CancelCouponDto {
 }
 exports.CancelCouponDto = CancelCouponDto;
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Cancellation reason', example: 'Customer requested cancellation' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Cancellation reason',
+        example: 'Customer requested cancellation',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)

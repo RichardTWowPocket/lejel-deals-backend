@@ -149,8 +149,14 @@ let MerchantsService = class MerchantsService {
     }
     async update(id, updateMerchantDto, userId) {
         const merchant = await this.findOne(id);
-        if (merchant.email !== userId) {
-            throw new common_1.ForbiddenException('You can only update your own merchant profile');
+        const membership = await this.prisma.merchantMembership.findFirst({
+            where: {
+                userId: userId,
+                merchantId: id,
+            },
+        });
+        if (!membership) {
+            throw new common_1.ForbiddenException('You do not have access to update this merchant profile');
         }
         if (updateMerchantDto.email && updateMerchantDto.email !== merchant.email) {
             const existingMerchant = await this.prisma.merchant.findUnique({
@@ -171,8 +177,15 @@ let MerchantsService = class MerchantsService {
     }
     async remove(id, userId) {
         const merchant = await this.findOne(id);
-        if (merchant.email !== userId) {
-            throw new common_1.ForbiddenException('You can only delete your own merchant profile');
+        const membership = await this.prisma.merchantMembership.findFirst({
+            where: {
+                userId: userId,
+                merchantId: id,
+                isOwner: true,
+            },
+        });
+        if (!membership) {
+            throw new common_1.ForbiddenException('You do not have permission to delete this merchant. Only owners can delete merchants.');
         }
         const activeDeals = await this.prisma.deal.count({
             where: {
@@ -201,15 +214,25 @@ let MerchantsService = class MerchantsService {
         const merchant = await this.findOne(id);
         return {
             merchantId: id,
-            status: merchant.isActive ? merchant_verification_dto_1.VerificationStatus.VERIFIED : merchant_verification_dto_1.VerificationStatus.PENDING,
+            status: merchant.isActive
+                ? merchant_verification_dto_1.VerificationStatus.VERIFIED
+                : merchant_verification_dto_1.VerificationStatus.PENDING,
             verifiedAt: merchant.isActive ? merchant.createdAt : null,
-            notes: merchant.isActive ? 'Merchant is active and verified' : 'Verification pending',
+            notes: merchant.isActive
+                ? 'Merchant is active and verified'
+                : 'Verification pending',
         };
     }
     async updateOperatingHours(id, operatingHours, userId) {
         const merchant = await this.findOne(id);
-        if (merchant.email !== userId) {
-            throw new common_1.ForbiddenException('You can only update your own merchant profile');
+        const membership = await this.prisma.merchantMembership.findFirst({
+            where: {
+                userId: userId,
+                merchantId: id,
+            },
+        });
+        if (!membership) {
+            throw new common_1.ForbiddenException('You do not have access to update this merchant profile');
         }
         return {
             ...merchant,
@@ -223,17 +246,32 @@ let MerchantsService = class MerchantsService {
             operatingHours: [
                 { day: 'monday', openTime: '09:00', closeTime: '22:00', isOpen: true },
                 { day: 'tuesday', openTime: '09:00', closeTime: '22:00', isOpen: true },
-                { day: 'wednesday', openTime: '09:00', closeTime: '22:00', isOpen: true },
-                { day: 'thursday', openTime: '09:00', closeTime: '22:00', isOpen: true },
+                {
+                    day: 'wednesday',
+                    openTime: '09:00',
+                    closeTime: '22:00',
+                    isOpen: true,
+                },
+                {
+                    day: 'thursday',
+                    openTime: '09:00',
+                    closeTime: '22:00',
+                    isOpen: true,
+                },
                 { day: 'friday', openTime: '09:00', closeTime: '22:00', isOpen: true },
-                { day: 'saturday', openTime: '10:00', closeTime: '23:00', isOpen: true },
+                {
+                    day: 'saturday',
+                    openTime: '10:00',
+                    closeTime: '23:00',
+                    isOpen: true,
+                },
                 { day: 'sunday', openTime: '10:00', closeTime: '21:00', isOpen: true },
             ],
         };
     }
     async getMerchantStats(id) {
         const merchant = await this.findOne(id);
-        const [totalDeals, activeDeals, totalOrders, totalRevenue, recentOrders,] = await Promise.all([
+        const [totalDeals, activeDeals, totalOrders, totalRevenue, recentOrders] = await Promise.all([
             this.prisma.deal.count({
                 where: { merchantId: id },
             }),
@@ -326,7 +364,7 @@ let MerchantsService = class MerchantsService {
         startOfDay.setHours(0, 0, 0, 0);
         const endOfDay = new Date();
         endOfDay.setHours(23, 59, 59, 999);
-        const [todayOrders, todayRevenueAgg, totalRevenueAgg, activeDealsCount,] = await Promise.all([
+        const [todayOrders, todayRevenueAgg, totalRevenueAgg, activeDealsCount] = await Promise.all([
             this.prisma.order.count({
                 where: {
                     deal: { merchantId: id },
@@ -391,7 +429,10 @@ let MerchantsService = class MerchantsService {
             whereBase.createdAt = { gte };
         const [ordersCount, revenueAgg] = await Promise.all([
             this.prisma.order.count({ where: whereBase }),
-            this.prisma.order.aggregate({ where: whereBase, _sum: { totalAmount: true } }),
+            this.prisma.order.aggregate({
+                where: whereBase,
+                _sum: { totalAmount: true },
+            }),
         ]);
         const grossRevenueRaw = revenueAgg._sum.totalAmount ?? 0;
         const grossRevenue = Number(grossRevenueRaw);

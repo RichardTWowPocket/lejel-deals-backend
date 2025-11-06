@@ -29,38 +29,57 @@ class MerchantVerificationDto {
 }
 exports.MerchantVerificationDto = MerchantVerificationDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Verification status', enum: VerificationStatus, example: VerificationStatus.PENDING }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Verification status',
+        enum: VerificationStatus,
+        example: VerificationStatus.PENDING,
+    }),
     (0, class_validator_1.IsEnum)(VerificationStatus),
     __metadata("design:type", String)
 ], MerchantVerificationDto.prototype, "status", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Verification notes', example: 'Documents verified successfully' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Verification notes',
+        example: 'Documents verified successfully',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], MerchantVerificationDto.prototype, "notes", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Required documents', example: ['business_license', 'tax_id', 'bank_account'] }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Required documents',
+        example: ['business_license', 'tax_id', 'bank_account'],
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsString)({ each: true }),
     __metadata("design:type", Array)
 ], MerchantVerificationDto.prototype, "requiredDocuments", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Submitted documents', example: ['business_license.pdf', 'tax_id.pdf'] }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Submitted documents',
+        example: ['business_license.pdf', 'tax_id.pdf'],
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsString)({ each: true }),
     __metadata("design:type", Array)
 ], MerchantVerificationDto.prototype, "submittedDocuments", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Verification date', example: '2024-01-01T00:00:00.000Z' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Verification date',
+        example: '2024-01-01T00:00:00.000Z',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], MerchantVerificationDto.prototype, "verifiedAt", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Verified by admin ID', example: 'admin-123' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Verified by admin ID',
+        example: 'admin-123',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)

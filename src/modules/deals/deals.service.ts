@@ -1,6 +1,16 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { CreateDealDto, UpdateDealDto, UpdateDealStatusDto, DealFiltersDto } from './dto/create-deal.dto';
+import {
+  CreateDealDto,
+  UpdateDealDto,
+  UpdateDealStatusDto,
+  DealFiltersDto,
+} from './dto/create-deal.dto';
 import { DealResponseDto, DealListResponseDto } from './dto/deal-response.dto';
 import { DealStatus } from '@prisma/client';
 
@@ -11,14 +21,19 @@ export class DealsService {
   /**
    * Create a new deal
    */
-  async create(createDealDto: CreateDealDto, userId?: string): Promise<DealResponseDto> {
+  async create(
+    createDealDto: CreateDealDto,
+    userId?: string,
+  ): Promise<DealResponseDto> {
     // Validate merchant exists
     const merchant = await this.prisma.merchant.findUnique({
       where: { id: createDealDto.merchantId },
     });
 
     if (!merchant) {
-      throw new NotFoundException(`Merchant with ID ${createDealDto.merchantId} not found`);
+      throw new NotFoundException(
+        `Merchant with ID ${createDealDto.merchantId} not found`,
+      );
     }
 
     // Validate category if provided
@@ -28,7 +43,9 @@ export class DealsService {
       });
 
       if (!category) {
-        throw new NotFoundException(`Category with ID ${createDealDto.categoryId} not found`);
+        throw new NotFoundException(
+          `Category with ID ${createDealDto.categoryId} not found`,
+        );
       }
     }
 
@@ -128,7 +145,7 @@ export class DealsService {
     if (filters.sortBy) {
       const sortField = filters.sortBy;
       const sortOrder = filters.sortOrder || 'desc';
-      
+
       // Map frontend sort options to actual database fields
       switch (sortField) {
         case 'discountedPrice':
@@ -298,7 +315,10 @@ export class DealsService {
   /**
    * Get active deals
    */
-  async findActive(page: number = 1, limit: number = 12): Promise<DealListResponseDto> {
+  async findActive(
+    page: number = 1,
+    limit: number = 12,
+  ): Promise<DealListResponseDto> {
     return this.findAll({
       status: DealStatus.ACTIVE,
       page,
@@ -309,7 +329,11 @@ export class DealsService {
   /**
    * Get deals by status
    */
-  async findByStatus(status: DealStatus, page: number = 1, limit: number = 12): Promise<DealListResponseDto> {
+  async findByStatus(
+    status: DealStatus,
+    page: number = 1,
+    limit: number = 12,
+  ): Promise<DealListResponseDto> {
     return this.findAll({
       status,
       page,
@@ -320,7 +344,11 @@ export class DealsService {
   /**
    * Get deals by merchant
    */
-  async findByMerchant(merchantId: string, page: number = 1, limit: number = 12): Promise<DealListResponseDto> {
+  async findByMerchant(
+    merchantId: string,
+    page: number = 1,
+    limit: number = 12,
+  ): Promise<DealListResponseDto> {
     return this.findAll({
       merchantId,
       page,
@@ -331,7 +359,11 @@ export class DealsService {
   /**
    * Get deals by category
    */
-  async findByCategory(categoryId: string, page: number = 1, limit: number = 12): Promise<DealListResponseDto> {
+  async findByCategory(
+    categoryId: string,
+    page: number = 1,
+    limit: number = 12,
+  ): Promise<DealListResponseDto> {
     return this.findAll({
       categoryId,
       page,
@@ -342,7 +374,11 @@ export class DealsService {
   /**
    * Update deal
    */
-  async update(id: string, updateDealDto: UpdateDealDto, userId?: string): Promise<DealResponseDto> {
+  async update(
+    id: string,
+    updateDealDto: UpdateDealDto,
+    userId?: string,
+  ): Promise<DealResponseDto> {
     // Check if deal exists
     const existingDeal = await this.prisma.deal.findUnique({
       where: { id },
@@ -359,14 +395,20 @@ export class DealsService {
       });
 
       if (!category) {
-        throw new NotFoundException(`Category with ID ${updateDealDto.categoryId} not found`);
+        throw new NotFoundException(
+          `Category with ID ${updateDealDto.categoryId} not found`,
+        );
       }
     }
 
     // Validate dates if provided
     if (updateDealDto.validFrom || updateDealDto.validUntil) {
-      const validFrom = updateDealDto.validFrom ? new Date(updateDealDto.validFrom) : existingDeal.validFrom;
-      const validUntil = updateDealDto.validUntil ? new Date(updateDealDto.validUntil) : existingDeal.validUntil;
+      const validFrom = updateDealDto.validFrom
+        ? new Date(updateDealDto.validFrom)
+        : existingDeal.validFrom;
+      const validUntil = updateDealDto.validUntil
+        ? new Date(updateDealDto.validUntil)
+        : existingDeal.validUntil;
 
       if (validFrom >= validUntil) {
         throw new BadRequestException('validFrom must be before validUntil');
@@ -378,16 +420,30 @@ export class DealsService {
       where: { id },
       data: {
         ...(updateDealDto.title && { title: updateDealDto.title }),
-        ...(updateDealDto.description !== undefined && { description: updateDealDto.description }),
+        ...(updateDealDto.description !== undefined && {
+          description: updateDealDto.description,
+        }),
         ...(updateDealDto.dealPrice && { dealPrice: updateDealDto.dealPrice }),
-        ...(updateDealDto.discountPrice && { discountPrice: updateDealDto.discountPrice }),
-        ...(updateDealDto.validFrom && { validFrom: new Date(updateDealDto.validFrom) }),
-        ...(updateDealDto.validUntil && { validUntil: new Date(updateDealDto.validUntil) }),
+        ...(updateDealDto.discountPrice && {
+          discountPrice: updateDealDto.discountPrice,
+        }),
+        ...(updateDealDto.validFrom && {
+          validFrom: new Date(updateDealDto.validFrom),
+        }),
+        ...(updateDealDto.validUntil && {
+          validUntil: new Date(updateDealDto.validUntil),
+        }),
         ...(updateDealDto.status && { status: updateDealDto.status }),
-        ...(updateDealDto.maxQuantity !== undefined && { maxQuantity: updateDealDto.maxQuantity }),
+        ...(updateDealDto.maxQuantity !== undefined && {
+          maxQuantity: updateDealDto.maxQuantity,
+        }),
         ...(updateDealDto.images && { images: updateDealDto.images }),
-        ...(updateDealDto.terms !== undefined && { terms: updateDealDto.terms }),
-        ...(updateDealDto.categoryId !== undefined && { categoryId: updateDealDto.categoryId }),
+        ...(updateDealDto.terms !== undefined && {
+          terms: updateDealDto.terms,
+        }),
+        ...(updateDealDto.categoryId !== undefined && {
+          categoryId: updateDealDto.categoryId,
+        }),
       },
       include: {
         merchant: true,
@@ -401,7 +457,11 @@ export class DealsService {
   /**
    * Update deal status
    */
-  async updateStatus(id: string, updateStatusDto: UpdateDealStatusDto, userId?: string): Promise<DealResponseDto> {
+  async updateStatus(
+    id: string,
+    updateStatusDto: UpdateDealStatusDto,
+    userId?: string,
+  ): Promise<DealResponseDto> {
     const deal = await this.prisma.deal.findUnique({
       where: { id },
     });
@@ -534,10 +594,17 @@ export class DealsService {
   /**
    * Helper: Validate status transition
    */
-  private validateStatusTransition(currentStatus: DealStatus, newStatus: DealStatus): void {
+  private validateStatusTransition(
+    currentStatus: DealStatus,
+    newStatus: DealStatus,
+  ): void {
     const allowedTransitions: Record<DealStatus, DealStatus[]> = {
       [DealStatus.DRAFT]: [DealStatus.ACTIVE],
-      [DealStatus.ACTIVE]: [DealStatus.PAUSED, DealStatus.EXPIRED, DealStatus.SOLD_OUT],
+      [DealStatus.ACTIVE]: [
+        DealStatus.PAUSED,
+        DealStatus.EXPIRED,
+        DealStatus.SOLD_OUT,
+      ],
       [DealStatus.PAUSED]: [DealStatus.ACTIVE, DealStatus.EXPIRED],
       [DealStatus.EXPIRED]: [],
       [DealStatus.SOLD_OUT]: [],
@@ -554,26 +621,35 @@ export class DealsService {
    * Helper: Map Deal entity to response DTO
    */
   private mapDealToResponse(deal: any): DealResponseDto {
-    const quantityAvailable = deal.maxQuantity ? deal.maxQuantity - deal.soldQuantity : 999999;
+    const quantityAvailable = deal.maxQuantity
+      ? deal.maxQuantity - deal.soldQuantity
+      : 999999;
     const dealPriceValue = Number(deal.dealPrice);
     const discountPriceValue = Number(deal.discountPrice);
 
     // Calculate REAL discount percentage from actual prices
-    const realDiscountPercentage = discountPriceValue > 0 
-      ? Math.round(((discountPriceValue - dealPriceValue) / discountPriceValue) * 100)
-      : 0;
+    const realDiscountPercentage =
+      discountPriceValue > 0
+        ? Math.round(
+            ((discountPriceValue - dealPriceValue) / discountPriceValue) * 100,
+          )
+        : 0;
 
     const slug = this.generateSlug(deal.title, deal.id);
-    const firstImage = deal.images && deal.images.length > 0 ? deal.images[0] : '';
-    const shortDescription = deal.description 
-      ? deal.description.substring(0, 150) + (deal.description.length > 150 ? '...' : '')
+    const firstImage =
+      deal.images && deal.images.length > 0 ? deal.images[0] : '';
+    const shortDescription = deal.description
+      ? deal.description.substring(0, 150) +
+        (deal.description.length > 150 ? '...' : '')
       : null;
 
     // Extract highlights from description (if available)
     const highlights: string[] = [];
     if (deal.terms) {
-      const termLines = deal.terms.split('.').filter(t => t.trim().length > 0);
-      termLines.forEach(line => {
+      const termLines = deal.terms
+        .split('.')
+        .filter((t) => t.trim().length > 0);
+      termLines.forEach((line) => {
         if (line.trim().length > 10 && line.trim().length < 100) {
           highlights.push(line.trim());
         }
@@ -647,4 +723,3 @@ export class DealsService {
     return `${slug}-${id.slice(-8)}`;
   }
 }
-

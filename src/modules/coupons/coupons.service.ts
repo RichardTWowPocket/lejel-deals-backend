@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  Logger,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CouponStatus } from '@prisma/client';
 import QRCode from 'qrcode';
@@ -110,7 +115,7 @@ export class CouponsService {
     ]);
 
     return {
-      coupons: coupons.map(coupon => this.mapToCouponResponseDto(coupon)),
+      coupons: coupons.map((coupon) => this.mapToCouponResponseDto(coupon)),
       pagination: {
         page,
         limit,
@@ -249,22 +254,32 @@ export class CouponsService {
       orderBy: { createdAt: 'asc' },
     });
 
-    return coupons.map(coupon => this.mapToCouponResponseDto(coupon));
+    return coupons.map((coupon) => this.mapToCouponResponseDto(coupon));
   }
 
-  async findMine(userId: string, page: number = 1, limit: number = 10, status?: CouponStatus): Promise<{ coupons: CouponResponseDto[]; pagination: any }> {
-    const customer = await this.prisma.customer.findFirst({ where: { userId } });
+  async findMine(
+    userId: string,
+    page: number = 1,
+    limit: number = 10,
+    status?: CouponStatus,
+  ): Promise<{ coupons: CouponResponseDto[]; pagination: any }> {
+    const customer = await this.prisma.customer.findFirst({
+      where: { userId },
+    });
     if (!customer) {
-      return { coupons: [], pagination: { page, limit, total: 0, totalPages: 0 } };
+      return {
+        coupons: [],
+        pagination: { page, limit, total: 0, totalPages: 0 },
+      };
     }
     const skip = (page - 1) * limit;
-    
+
     // Build where clause with optional status filter
     const where: any = { order: { customerId: customer.id } };
     if (status) {
       where.status = status;
     }
-    
+
     const [coupons, total] = await Promise.all([
       this.prisma.coupon.findMany({
         where,
@@ -275,34 +290,36 @@ export class CouponsService {
           order: {
             select: {
               orderNumber: true,
-              customer: { select: { firstName: true, lastName: true, email: true } },
+              customer: {
+                select: { firstName: true, lastName: true, email: true },
+              },
             },
           },
-          deal: { 
-            select: { 
+          deal: {
+            select: {
               id: true,
-              title: true, 
+              title: true,
               description: true,
               dealPrice: true,
               discountPrice: true,
               images: true,
               validUntil: true,
               status: true,
-              merchant: { 
-                select: { 
+              merchant: {
+                select: {
                   id: true,
                   name: true,
                   logo: true,
-                } 
-              } 
-            } 
+                },
+              },
+            },
           },
         },
       }),
       this.prisma.coupon.count({ where }),
     ]);
     return {
-      coupons: coupons.map(c => this.mapToCouponResponseDto(c)),
+      coupons: coupons.map((c) => this.mapToCouponResponseDto(c)),
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
     };
   }
@@ -347,7 +364,11 @@ export class CouponsService {
     }
   }
 
-  async redeemCoupon(qrCode: string, staffId?: string, notes?: string): Promise<CouponResponseDto> {
+  async redeemCoupon(
+    qrCode: string,
+    redeemedByUserId?: string,
+    notes?: string,
+  ): Promise<CouponResponseDto> {
     // Validate coupon first
     const validation = await this.validateCoupon(qrCode);
     if (!validation.isValid) {
@@ -402,7 +423,7 @@ export class CouponsService {
     await this.prisma.redemption.create({
       data: {
         couponId: coupon.id,
-        staffId,
+        redeemedByUserId: redeemedByUserId || null,
         notes,
       },
     });
@@ -465,14 +486,16 @@ export class CouponsService {
       },
     });
 
-    this.logger.log(`Coupon ${id} cancelled: ${reason || 'No reason provided'}`);
+    this.logger.log(
+      `Coupon ${id} cancelled: ${reason || 'No reason provided'}`,
+    );
 
     return this.mapToCouponResponseDto(updatedCoupon);
   }
 
   async expireCoupons(): Promise<number> {
     const now = new Date();
-    
+
     const result = await this.prisma.coupon.updateMany({
       where: {
         status: CouponStatus.ACTIVE,
@@ -507,7 +530,8 @@ export class CouponsService {
       this.prisma.redemption.count(),
     ]);
 
-    const redemptionRate = totalCoupons > 0 ? (usedCoupons / totalCoupons) * 100 : 0;
+    const redemptionRate =
+      totalCoupons > 0 ? (usedCoupons / totalCoupons) * 100 : 0;
 
     return {
       totalCoupons,
@@ -559,7 +583,8 @@ export class CouponsService {
       orderNumber: coupon.order.orderNumber,
       dealTitle: coupon.deal.title,
       merchantName: coupon.deal.merchant.name,
-      customerName: `${coupon.order.customer.firstName || ''} ${coupon.order.customer.lastName || ''}`.trim(),
+      customerName:
+        `${coupon.order.customer.firstName || ''} ${coupon.order.customer.lastName || ''}`.trim(),
       expiresAt: coupon.expiresAt.toISOString(),
       status: coupon.status,
     };
@@ -586,5 +611,3 @@ export class CouponsService {
     };
   }
 }
-
-

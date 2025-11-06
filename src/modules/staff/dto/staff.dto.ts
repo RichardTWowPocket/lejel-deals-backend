@@ -1,6 +1,37 @@
 import { IsString, IsEmail, IsOptional, IsEnum, IsBoolean, IsObject, MinLength, MaxLength, Matches } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { StaffRole } from '@prisma/client';
+import { MerchantRole } from '@prisma/client';
+
+// StaffRole enum (mapped from MerchantRole for API compatibility)
+export enum StaffRole {
+  MANAGER = 'MANAGER',
+  CASHIER = 'CASHIER',
+  SUPERVISOR = 'SUPERVISOR',
+  ADMIN = 'ADMIN',
+}
+
+// Helper function to map MerchantRole to StaffRole
+export function mapMerchantRoleToStaffRole(merchantRole: MerchantRole): StaffRole {
+  const mapping: Record<MerchantRole, StaffRole> = {
+    [MerchantRole.OWNER]: StaffRole.ADMIN, // Owner maps to ADMIN
+    [MerchantRole.ADMIN]: StaffRole.ADMIN,
+    [MerchantRole.MANAGER]: StaffRole.MANAGER,
+    [MerchantRole.SUPERVISOR]: StaffRole.SUPERVISOR,
+    [MerchantRole.CASHIER]: StaffRole.CASHIER,
+  };
+  return mapping[merchantRole] || StaffRole.CASHIER;
+}
+
+// Helper function to map StaffRole to MerchantRole
+export function mapStaffRoleToMerchantRole(staffRole: StaffRole): MerchantRole {
+  const mapping: Record<StaffRole, MerchantRole> = {
+    [StaffRole.ADMIN]: MerchantRole.ADMIN,
+    [StaffRole.MANAGER]: MerchantRole.MANAGER,
+    [StaffRole.SUPERVISOR]: MerchantRole.SUPERVISOR,
+    [StaffRole.CASHIER]: MerchantRole.CASHIER,
+  };
+  return mapping[staffRole] || MerchantRole.CASHIER;
+}
 
 export class CreateStaffDto {
   @ApiProperty({ description: 'Staff first name', example: 'John' })
@@ -125,7 +156,7 @@ export class StaffLoginDto {
 }
 
 export class StaffResponseDto {
-  @ApiProperty({ description: 'Staff ID' })
+  @ApiProperty({ description: 'Staff ID (MerchantMembership ID)' })
   id: string;
 
   @ApiProperty({ description: 'Staff first name' })
@@ -168,8 +199,8 @@ export class StaffResponseDto {
   @ApiProperty({ description: 'Creation timestamp' })
   createdAt: Date;
 
-  @ApiProperty({ description: 'Last update timestamp' })
-  updatedAt: Date;
+  @ApiPropertyOptional({ description: 'Last update timestamp' })
+  updatedAt?: Date;
 }
 
 export class StaffLoginResponseDto {
@@ -252,6 +283,3 @@ export class StaffActivityDto {
   @ApiProperty({ description: 'Activity timestamp' })
   timestamp: Date;
 }
-
-
-

@@ -46,6 +46,11 @@ async function main() {
                 name: 'Food & Beverage',
                 description: 'Restaurants, cafes, and food delivery',
                 icon: '🍽️',
+                color: '#FF6B6B',
+                level: 0,
+                sortOrder: 1,
+                tags: ['food', 'restaurant', 'cafe', 'beverage', 'dining'],
+                isActive: true,
             },
         }),
         prisma.category.upsert({
@@ -55,6 +60,11 @@ async function main() {
                 name: 'Shopping',
                 description: 'Retail stores and online shopping',
                 icon: '🛍️',
+                color: '#4ECDC4',
+                level: 0,
+                sortOrder: 2,
+                tags: ['shopping', 'retail', 'fashion', 'electronics'],
+                isActive: true,
             },
         }),
         prisma.category.upsert({
@@ -64,6 +74,11 @@ async function main() {
                 name: 'Entertainment',
                 description: 'Movies, games, and leisure activities',
                 icon: '🎬',
+                color: '#95E1D3',
+                level: 0,
+                sortOrder: 3,
+                tags: ['entertainment', 'movies', 'games', 'leisure'],
+                isActive: true,
             },
         }),
         prisma.category.upsert({
@@ -73,6 +88,11 @@ async function main() {
                 name: 'Health & Beauty',
                 description: 'Fitness, beauty, and wellness services',
                 icon: '💄',
+                color: '#F38181',
+                level: 0,
+                sortOrder: 4,
+                tags: ['health', 'beauty', 'fitness', 'wellness', 'spa'],
+                isActive: true,
             },
         }),
     ]);
@@ -105,8 +125,8 @@ async function main() {
                 id: 'demo-deal-1',
                 title: 'Pizza Voucher Rp 75.000',
                 description: 'Voucher senilai Rp 75.000 untuk semua menu pizza. Berlaku untuk makan di tempat dan dibawa pulang. Nikmati pizza favorit Anda dengan voucher hemat ini!',
-                dealPrice: 60000,
-                discountPrice: 75000,
+                dealPrice: new client_1.Prisma.Decimal(60000),
+                discountPrice: new client_1.Prisma.Decimal(75000),
                 validFrom: new Date(),
                 validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
                 status: 'ACTIVE',
@@ -127,8 +147,8 @@ async function main() {
                 id: 'demo-deal-2',
                 title: 'Burger Combo Voucher Rp 50.000',
                 description: 'Voucher Rp 50.000 untuk paket burger combo. Termasuk burger, kentang goreng, dan minuman. Hemat dan mengenyangkan!',
-                dealPrice: 40000,
-                discountPrice: 50000,
+                dealPrice: new client_1.Prisma.Decimal(40000),
+                discountPrice: new client_1.Prisma.Decimal(50000),
                 validFrom: new Date(),
                 validUntil: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000),
                 status: 'ACTIVE',
@@ -149,8 +169,8 @@ async function main() {
                 id: 'demo-deal-3',
                 title: 'Voucher Kopi & Pastry Rp 35.000',
                 description: 'Voucher Rp 35.000 untuk kopi dan pastry pilihan. Nikmati waktu santai Anda dengan kopi berkualitas dan pastry lezat.',
-                dealPrice: 28000,
-                discountPrice: 35000,
+                dealPrice: new client_1.Prisma.Decimal(28000),
+                discountPrice: new client_1.Prisma.Decimal(35000),
                 validFrom: new Date(),
                 validUntil: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
                 status: 'ACTIVE',
@@ -171,8 +191,8 @@ async function main() {
                 id: 'demo-deal-4',
                 title: 'Voucher Belanja Fashion Rp 100.000',
                 description: 'Voucher belanja Rp 100.000 untuk semua koleksi fashion. Berlaku untuk baju, celana, aksesoris, dan sepatu. Update gaya Anda!',
-                dealPrice: 80000,
-                discountPrice: 100000,
+                dealPrice: new client_1.Prisma.Decimal(80000),
+                discountPrice: new client_1.Prisma.Decimal(100000),
                 validFrom: new Date(),
                 validUntil: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
                 status: 'ACTIVE',
@@ -193,8 +213,8 @@ async function main() {
                 id: 'demo-deal-5',
                 title: 'Voucher Spa & Massage Rp 150.000',
                 description: 'Voucher Rp 150.000 untuk layanan spa dan massage. Manjakan diri Anda dengan treatment berkualitas dari terapis profesional.',
-                dealPrice: 120000,
-                discountPrice: 150000,
+                dealPrice: new client_1.Prisma.Decimal(120000),
+                discountPrice: new client_1.Prisma.Decimal(150000),
                 validFrom: new Date(),
                 validUntil: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
                 status: 'ACTIVE',
@@ -215,8 +235,8 @@ async function main() {
                 id: 'demo-deal-6',
                 title: 'Voucher Cinema Rp 40.000',
                 description: 'Voucher nonton bioskop Rp 40.000. Berlaku untuk semua film dan semua jadwal. Nonton film favorit jadi lebih hemat!',
-                dealPrice: 32000,
-                discountPrice: 40000,
+                dealPrice: new client_1.Prisma.Decimal(32000),
+                discountPrice: new client_1.Prisma.Decimal(40000),
                 validFrom: new Date(),
                 validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
                 status: 'DRAFT',
@@ -235,18 +255,26 @@ async function main() {
     const customerPasswordHash = await bcrypt.hash('Customer@123456', 10);
     const adminUser = await prisma.user.upsert({
         where: { email: 'admin@lejel.local' },
-        update: {},
+        update: {
+            hashedPassword: adminPasswordHash,
+            role: 'SUPER_ADMIN',
+            isActive: true,
+        },
         create: {
             email: 'admin@lejel.local',
             hashedPassword: adminPasswordHash,
-            role: 'ADMIN',
+            role: 'SUPER_ADMIN',
             isActive: true,
         },
     });
     console.log('✅ Admin user created:', adminUser.email);
     const merchantUser = await prisma.user.upsert({
         where: { email: 'owner@merchant.com' },
-        update: {},
+        update: {
+            hashedPassword: merchantPasswordHash,
+            role: 'MERCHANT',
+            isActive: true,
+        },
         create: {
             email: 'owner@merchant.com',
             hashedPassword: merchantPasswordHash,
@@ -257,7 +285,11 @@ async function main() {
     console.log('✅ Merchant user created:', merchantUser.email);
     const customerUser = await prisma.user.upsert({
         where: { email: 'demo@customer.com' },
-        update: {},
+        update: {
+            hashedPassword: customerPasswordHash,
+            role: 'CUSTOMER',
+            isActive: true,
+        },
         create: {
             email: 'demo@customer.com',
             hashedPassword: customerPasswordHash,
@@ -266,12 +298,21 @@ async function main() {
         },
     });
     console.log('✅ Customer user created:', customerUser.email);
-    await prisma.merchantUser.upsert({
-        where: { userId_merchantId: { userId: merchantUser.id, merchantId: merchant.id } },
-        update: {},
+    await prisma.merchantMembership.upsert({
+        where: {
+            userId_merchantId: {
+                userId: merchantUser.id,
+                merchantId: merchant.id
+            }
+        },
+        update: {
+            merchantRole: 'OWNER',
+            isOwner: true
+        },
         create: {
             userId: merchantUser.id,
             merchantId: merchant.id,
+            merchantRole: 'OWNER',
             isOwner: true,
         },
     });
@@ -300,7 +341,7 @@ async function main() {
             customerId: customer.id,
             dealId: deals[0].id,
             quantity: 2,
-            totalAmount: 150000,
+            totalAmount: new client_1.Prisma.Decimal(150000),
             status: 'PAID',
             paymentMethod: 'midtrans',
             paymentReference: `MID-${Math.floor(Math.random() * 1_000_000)}`,
@@ -312,7 +353,7 @@ async function main() {
             customerId: customer.id,
             dealId: deals[0].id,
             quantity: 1,
-            totalAmount: 75000,
+            totalAmount: new client_1.Prisma.Decimal(75000),
             status: 'PENDING',
         },
     });
@@ -322,7 +363,7 @@ async function main() {
             customerId: customer.id,
             dealId: deals[0].id,
             quantity: 3,
-            totalAmount: 225000,
+            totalAmount: new client_1.Prisma.Decimal(225000),
             status: 'CANCELLED',
         },
     });
@@ -358,8 +399,201 @@ async function main() {
         },
     });
     console.log('✅ Coupons created:', [couponActive.qrCode, couponUsed.qrCode, couponExpired.qrCode]);
+    const redemption1 = await prisma.redemption.create({
+        data: {
+            couponId: couponActive.id,
+            redeemedByUserId: merchantUser.id,
+            notes: 'Redeemed at main branch',
+            location: 'Jakarta Main Branch',
+            status: 'COMPLETED',
+            redeemedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+            metadata: {
+                device: 'mobile',
+                ip: '192.168.1.1',
+            },
+        },
+    });
+    const redemption2 = await prisma.redemption.create({
+        data: {
+            couponId: couponUsed.id,
+            redeemedByUserId: merchantUser.id,
+            notes: 'Redeemed via QR scanner',
+            location: 'Jakarta Main Branch',
+            status: 'COMPLETED',
+            redeemedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+            metadata: {
+                device: 'tablet',
+                ip: '192.168.1.2',
+            },
+        },
+    });
+    console.log('✅ Redemptions created:', [redemption1.id, redemption2.id]);
+    const staff1PasswordHash = await bcrypt.hash('Staff1234', 10);
+    const staff2PasswordHash = await bcrypt.hash('Manager1234', 10);
+    const staff1User = await prisma.user.upsert({
+        where: { email: 'cashier@merchant.com' },
+        update: {
+            hashedPassword: staff1PasswordHash,
+            role: 'MERCHANT',
+            isActive: true,
+        },
+        create: {
+            email: 'cashier@merchant.com',
+            hashedPassword: staff1PasswordHash,
+            role: 'MERCHANT',
+            isActive: true,
+        },
+    });
+    const staff2User = await prisma.user.upsert({
+        where: { email: 'manager@merchant.com' },
+        update: {
+            hashedPassword: staff2PasswordHash,
+            role: 'MERCHANT',
+            isActive: true,
+        },
+        create: {
+            email: 'manager@merchant.com',
+            hashedPassword: staff2PasswordHash,
+            role: 'MERCHANT',
+            isActive: true,
+        },
+    });
+    await prisma.merchantMembership.upsert({
+        where: {
+            userId_merchantId: {
+                userId: staff1User.id,
+                merchantId: merchant.id,
+            },
+        },
+        update: {
+            merchantRole: 'CASHIER',
+            isOwner: false,
+            permissions: {
+                canScanQR: true,
+                canViewRedemptions: true,
+                canViewOrders: false,
+            },
+        },
+        create: {
+            userId: staff1User.id,
+            merchantId: merchant.id,
+            merchantRole: 'CASHIER',
+            isOwner: false,
+            permissions: {
+                canScanQR: true,
+                canViewRedemptions: true,
+                canViewOrders: false,
+            },
+            metadata: {
+                hireDate: new Date().toISOString(),
+                department: 'Operations',
+            },
+        },
+    });
+    await prisma.merchantMembership.upsert({
+        where: {
+            userId_merchantId: {
+                userId: staff2User.id,
+                merchantId: merchant.id,
+            },
+        },
+        update: {
+            merchantRole: 'MANAGER',
+            isOwner: false,
+            permissions: {
+                canScanQR: true,
+                canViewRedemptions: true,
+                canViewOrders: true,
+                canManageDeals: true,
+                canViewReports: true,
+            },
+        },
+        create: {
+            userId: staff2User.id,
+            merchantId: merchant.id,
+            merchantRole: 'MANAGER',
+            isOwner: false,
+            permissions: {
+                canScanQR: true,
+                canViewRedemptions: true,
+                canViewOrders: true,
+                canManageDeals: true,
+                canViewReports: true,
+            },
+            metadata: {
+                hireDate: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString(),
+                department: 'Management',
+            },
+        },
+    });
+    console.log('✅ Staff members created:', [staff1User.email, staff2User.email]);
+    const mediaFiles = await Promise.all([
+        prisma.media.create({
+            data: {
+                filename: 'merchant-logo.png',
+                originalName: 'merchant-logo.png',
+                mimeType: 'image/png',
+                size: 102400,
+                url: 'https://via.placeholder.com/200x200/FF6B6B/FFFFFF?text=Logo',
+                uploadedBy: merchantUser.id,
+            },
+        }),
+        prisma.media.create({
+            data: {
+                filename: 'deal-image-1.jpg',
+                originalName: 'pizza-deal.jpg',
+                mimeType: 'image/jpeg',
+                size: 204800,
+                url: 'https://via.placeholder.com/800x600/FF6B6B/FFFFFF?text=Pizza+Deal',
+                uploadedBy: merchantUser.id,
+            },
+        }),
+        prisma.media.create({
+            data: {
+                filename: 'deal-image-2.jpg',
+                originalName: 'burger-deal.jpg',
+                mimeType: 'image/jpeg',
+                size: 153600,
+                url: 'https://via.placeholder.com/800x600/4ECDC4/FFFFFF?text=Burger+Deal',
+                uploadedBy: merchantUser.id,
+            },
+        }),
+    ]);
+    console.log('✅ Media files created:', mediaFiles.length);
+    const qrActivities = await Promise.all([
+        prisma.qRCodeActivity.create({
+            data: {
+                action: 'GENERATED',
+                couponId: couponActive.id,
+                metadata: {
+                    generatedBy: 'system',
+                    orderNumber: orderPaid.orderNumber,
+                },
+            },
+        }),
+        prisma.qRCodeActivity.create({
+            data: {
+                action: 'VALIDATED',
+                couponId: couponActive.id,
+                metadata: {
+                    validatedBy: merchantUser.id,
+                    timestamp: new Date().toISOString(),
+                },
+            },
+        }),
+        prisma.qRCodeActivity.create({
+            data: {
+                action: 'REDEEMED',
+                couponId: couponUsed.id,
+                metadata: {
+                    redeemedBy: merchantUser.id,
+                    redemptionId: redemption2.id,
+                },
+            },
+        }),
+    ]);
+    console.log('✅ QR code activities created:', qrActivities.length);
     const targetEmail = 'Richard244Tandean@gmail.com';
-    const targetSupabaseId = 'cmh0bor8b0000q4zimm24awx1';
     const richard = await prisma.customer.upsert({
         where: { email: targetEmail },
         update: {},
@@ -389,7 +623,7 @@ async function main() {
                 customerId: richard.id,
                 dealId: deals[0].id,
                 quantity: 1,
-                totalAmount: 75000,
+                totalAmount: new client_1.Prisma.Decimal(75000),
                 status: 'PAID',
                 paymentMethod: 'midtrans',
                 paymentReference: `MID-${Math.floor(Math.random() * 1_000_000)}`,
@@ -401,7 +635,7 @@ async function main() {
                 customerId: richard.id,
                 dealId: deals[0].id,
                 quantity: 2,
-                totalAmount: 150000,
+                totalAmount: new client_1.Prisma.Decimal(150000),
                 status: 'PENDING',
             },
         });
@@ -423,8 +657,19 @@ async function main() {
                 expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
             },
         });
+        const rRedemption = await prisma.redemption.create({
+            data: {
+                couponId: rCouponActive.id,
+                redeemedByUserId: merchantUser.id,
+                notes: 'Redeemed for Richard',
+                location: 'Jakarta Branch',
+                status: 'COMPLETED',
+                redeemedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+            },
+        });
         console.log('✅ Richard orders:', [rPaid.orderNumber, rPending.orderNumber]);
         console.log('✅ Richard coupons:', [rCouponActive.qrCode, rCouponExpired.qrCode]);
+        console.log('✅ Richard redemption:', rRedemption.id);
     }
     else {
         console.log(`ℹ️ Richard already has ${existingRichardOrders} orders; skipping creation.`);

@@ -10,7 +10,10 @@ export class NotificationPreferencesResponseDto {
   @ApiProperty({ description: 'Push notifications enabled', example: true })
   push: boolean;
 
-  @ApiProperty({ description: 'WhatsApp notifications enabled', example: false })
+  @ApiProperty({
+    description: 'WhatsApp notifications enabled',
+    example: false,
+  })
   whatsapp: boolean;
 
   @ApiProperty({ description: 'Deal notifications enabled', example: true })
@@ -19,7 +22,10 @@ export class NotificationPreferencesResponseDto {
   @ApiProperty({ description: 'Order notifications enabled', example: true })
   orders: boolean;
 
-  @ApiProperty({ description: 'Marketing notifications enabled', example: false })
+  @ApiProperty({
+    description: 'Marketing notifications enabled',
+    example: false,
+  })
   marketing: boolean;
 }
 
@@ -27,10 +33,16 @@ export class CustomerResponseDto {
   @ApiProperty({ description: 'Customer ID', example: 'customer-123' })
   id: string;
 
-  @ApiProperty({ description: 'Customer email', example: 'customer@example.com' })
+  @ApiProperty({
+    description: 'Customer email',
+    example: 'customer@example.com',
+  })
   email: string;
 
-  @ApiPropertyOptional({ description: 'Customer phone number', example: '+6281234567890' })
+  @ApiPropertyOptional({
+    description: 'Customer phone number',
+    example: '+6281234567890',
+  })
   phone?: string;
 
   @ApiPropertyOptional({ description: 'First name', example: 'John' })
@@ -39,19 +51,31 @@ export class CustomerResponseDto {
   @ApiPropertyOptional({ description: 'Last name', example: 'Doe' })
   lastName?: string;
 
-  @ApiPropertyOptional({ description: 'Date of birth', example: '1990-01-01T00:00:00.000Z' })
+  @ApiPropertyOptional({
+    description: 'Date of birth',
+    example: '1990-01-01T00:00:00.000Z',
+  })
   dateOfBirth?: Date;
 
-  @ApiPropertyOptional({ description: 'Customer preferences', type: NotificationPreferencesResponseDto })
+  @ApiPropertyOptional({
+    description: 'Customer preferences',
+    type: NotificationPreferencesResponseDto,
+  })
   preferences?: NotificationPreferencesResponseDto;
 
   @ApiProperty({ description: 'Is customer active', example: true })
   isActive: boolean;
 
-  @ApiProperty({ description: 'Creation date', example: '2024-01-01T00:00:00.000Z' })
+  @ApiProperty({
+    description: 'Creation date',
+    example: '2024-01-01T00:00:00.000Z',
+  })
   createdAt: Date;
 
-  @ApiProperty({ description: 'Last update date', example: '2024-01-01T00:00:00.000Z' })
+  @ApiProperty({
+    description: 'Last update date',
+    example: '2024-01-01T00:00:00.000Z',
+  })
   updatedAt: Date;
 
   // Statistics
@@ -61,10 +85,16 @@ export class CustomerResponseDto {
   @ApiPropertyOptional({ description: 'Total spent amount', example: 2500000 })
   totalSpent?: number;
 
-  @ApiPropertyOptional({ description: 'Last order date', example: '2024-01-15T00:00:00.000Z' })
+  @ApiPropertyOptional({
+    description: 'Last order date',
+    example: '2024-01-15T00:00:00.000Z',
+  })
   lastOrderDate?: Date;
 
-  @ApiPropertyOptional({ description: 'Favorite categories', example: ['Food & Beverage', 'Entertainment'] })
+  @ApiPropertyOptional({
+    description: 'Favorite categories',
+    example: ['Food & Beverage', 'Entertainment'],
+  })
   favoriteCategories?: string[];
 
   @ApiPropertyOptional({ description: 'Customer tier', example: 'Gold' })
@@ -73,6 +103,3 @@ export class CustomerResponseDto {
   @ApiPropertyOptional({ description: 'Loyalty points', example: 1500 })
   loyaltyPoints?: number;
 }
-
-
-

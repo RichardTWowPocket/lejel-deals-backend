@@ -45,10 +45,14 @@ exports.PaymentController = PaymentController;
 __decorate([
     (0, common_1.Post)(),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.CUSTOMER, client_1.UserRole.ADMIN),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Create payment for an order' }),
-    (0, swagger_1.ApiResponse)({ status: 201, description: 'Payment created successfully', type: payment_dto_1.PaymentResponseDto }),
+    (0, swagger_1.ApiResponse)({
+        status: 201,
+        description: 'Payment created successfully',
+        type: payment_dto_1.PaymentResponseDto,
+    }),
     (0, swagger_1.ApiResponse)({ status: 400, description: 'Invalid payment data' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Order not found' }),
     __param(0, (0, common_1.Body)()),
@@ -59,10 +63,14 @@ __decorate([
 __decorate([
     (0, common_1.Get)(':orderId/status'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.CUSTOMER, client_1.UserRole.MERCHANT, client_1.UserRole.ADMIN, client_1.UserRole.STAFF),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get payment status for an order' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Payment status retrieved successfully', type: payment_dto_1.PaymentStatusDto }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Payment status retrieved successfully',
+        type: payment_dto_1.PaymentStatusDto,
+    }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Order not found' }),
     __param(0, (0, common_1.Param)('orderId')),
     __metadata("design:type", Function),
@@ -72,7 +80,7 @@ __decorate([
 __decorate([
     (0, common_1.Post)(':orderId/cancel'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.CUSTOMER, client_1.UserRole.ADMIN, client_1.UserRole.STAFF),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Cancel payment for an order' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Payment cancelled successfully' }),

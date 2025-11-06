@@ -54,7 +54,7 @@ let CategoriesController = class CategoriesController {
         return this.categoriesService.searchCategories(query, {
             isActive: isActiveBool,
             parentId: parentIdFilter,
-            level: levelFilter
+            level: levelFilter,
         });
     }
     async test() {
@@ -117,13 +117,38 @@ __decorate([
     (0, auth_decorators_1.Public)(),
     (0, common_1.Get)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get all categories with pagination and filtering' }),
-    (0, swagger_1.ApiQuery)({ name: 'page', required: false, description: 'Page number', example: 1 }),
-    (0, swagger_1.ApiQuery)({ name: 'limit', required: false, description: 'Items per page', example: 10 }),
+    (0, swagger_1.ApiQuery)({
+        name: 'page',
+        required: false,
+        description: 'Page number',
+        example: 1,
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'limit',
+        required: false,
+        description: 'Items per page',
+        example: 10,
+    }),
     (0, swagger_1.ApiQuery)({ name: 'search', required: false, description: 'Search query' }),
-    (0, swagger_1.ApiQuery)({ name: 'isActive', required: false, description: 'Filter by active status' }),
-    (0, swagger_1.ApiQuery)({ name: 'parentId', required: false, description: 'Filter by parent category ID' }),
-    (0, swagger_1.ApiQuery)({ name: 'level', required: false, description: 'Filter by hierarchy level' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Returns paginated categories list' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'isActive',
+        required: false,
+        description: 'Filter by active status',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'parentId',
+        required: false,
+        description: 'Filter by parent category ID',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'level',
+        required: false,
+        description: 'Filter by hierarchy level',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Returns paginated categories list',
+    }),
     __param(0, (0, common_1.Query)('page', new common_1.DefaultValuePipe(1), common_1.ParseIntPipe)),
     __param(1, (0, common_1.Query)('limit', new common_1.DefaultValuePipe(10), common_1.ParseIntPipe)),
     __param(2, (0, common_1.Query)('search')),
@@ -157,7 +182,10 @@ __decorate([
     (0, common_1.Get)('level/:level'),
     (0, swagger_1.ApiOperation)({ summary: 'Get categories by hierarchy level' }),
     (0, swagger_1.ApiParam)({ name: 'level', description: 'Hierarchy level', example: 1 }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Returns categories at specified level' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Returns categories at specified level',
+    }),
     __param(0, (0, common_1.Param)('level', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
@@ -177,9 +205,21 @@ __decorate([
     (0, common_1.Get)('search'),
     (0, swagger_1.ApiOperation)({ summary: 'Search categories' }),
     (0, swagger_1.ApiQuery)({ name: 'q', description: 'Search query', example: 'food' }),
-    (0, swagger_1.ApiQuery)({ name: 'isActive', required: false, description: 'Filter by active status' }),
-    (0, swagger_1.ApiQuery)({ name: 'parentId', required: false, description: 'Filter by parent category ID' }),
-    (0, swagger_1.ApiQuery)({ name: 'level', required: false, description: 'Filter by hierarchy level' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'isActive',
+        required: false,
+        description: 'Filter by active status',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'parentId',
+        required: false,
+        description: 'Filter by parent category ID',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'level',
+        required: false,
+        description: 'Filter by hierarchy level',
+    }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Returns search results' }),
     __param(0, (0, common_1.Query)('q')),
     __param(1, (0, common_1.Query)('isActive')),
@@ -250,7 +290,10 @@ __decorate([
     (0, swagger_1.ApiParam)({ name: 'id', description: 'Category ID' }),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Category updated successfully' }),
-    (0, swagger_1.ApiResponse)({ status: 400, description: 'Invalid input data or circular reference' }),
+    (0, swagger_1.ApiResponse)({
+        status: 400,
+        description: 'Invalid input data or circular reference',
+    }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
     (0, swagger_1.ApiResponse)({ status: 403, description: 'Forbidden - admin role required' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Category not found' }),
@@ -269,7 +312,10 @@ __decorate([
     (0, swagger_1.ApiParam)({ name: 'id', description: 'Category ID' }),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Category deleted successfully' }),
-    (0, swagger_1.ApiResponse)({ status: 400, description: 'Cannot delete category with child categories or active deals' }),
+    (0, swagger_1.ApiResponse)({
+        status: 400,
+        description: 'Cannot delete category with child categories or active deals',
+    }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
     (0, swagger_1.ApiResponse)({ status: 403, description: 'Forbidden - admin role required' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Category not found' }),
@@ -301,8 +347,14 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Deactivate a category' }),
     (0, swagger_1.ApiParam)({ name: 'id', description: 'Category ID' }),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Category deactivated successfully' }),
-    (0, swagger_1.ApiResponse)({ status: 400, description: 'Cannot deactivate category with active deals' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Category deactivated successfully',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 400,
+        description: 'Cannot deactivate category with active deals',
+    }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
     (0, swagger_1.ApiResponse)({ status: 403, description: 'Forbidden - admin role required' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Category not found' }),
@@ -317,7 +369,10 @@ __decorate([
     (0, common_1.Post)('reorder'),
     (0, swagger_1.ApiOperation)({ summary: 'Reorder categories' }),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Categories reordered successfully' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Categories reordered successfully',
+    }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
     (0, swagger_1.ApiResponse)({ status: 403, description: 'Forbidden - admin role required' }),
     __param(0, (0, common_1.Body)()),

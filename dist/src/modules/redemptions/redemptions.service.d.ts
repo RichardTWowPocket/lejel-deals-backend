@@ -7,9 +7,9 @@ export declare class RedemptionService {
     private qrSecurityService;
     private readonly logger;
     constructor(prisma: PrismaService, qrSecurityService: QRCodeSecurityService);
-    processRedemption(qrToken: string, staffId: string, notes?: string, location?: string): Promise<RedemptionResponseDto>;
+    processRedemption(qrToken: string, redeemedByUserId: string, notes?: string, location?: string): Promise<RedemptionResponseDto>;
     findOne(id: string): Promise<RedemptionResponseDto>;
-    findAll(page?: number, limit?: number, merchantId?: string, staffId?: string, status?: RedemptionStatus, startDate?: Date, endDate?: Date): Promise<{
+    findAll(page?: number, limit?: number, merchantId?: string, redeemedByUserId?: string, status?: RedemptionStatus, startDate?: Date, endDate?: Date): Promise<{
         redemptions: RedemptionResponseDto[];
         pagination: any;
     }>;

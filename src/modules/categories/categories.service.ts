@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -30,16 +35,23 @@ export class CategoriesService {
       }
 
       if (!parentCategory.isActive) {
-        throw new BadRequestException('Cannot create subcategory under inactive parent category');
+        throw new BadRequestException(
+          'Cannot create subcategory under inactive parent category',
+        );
       }
     }
 
     // Calculate hierarchy information
     const level = parentCategory ? parentCategory.level + 1 : 0;
-    const path = await this.generateCategoryPath(createCategoryDto.parentId || null, createCategoryDto.name);
-    
+    const path = await this.generateCategoryPath(
+      createCategoryDto.parentId || null,
+      createCategoryDto.name,
+    );
+
     // Get next sort order for this level
-    const nextSortOrder = await this.getNextSortOrder(createCategoryDto.parentId || null);
+    const nextSortOrder = await this.getNextSortOrder(
+      createCategoryDto.parentId || null,
+    );
 
     const { tags, metadata, ...categoryData } = createCategoryDto;
 
@@ -57,18 +69,25 @@ export class CategoriesService {
     return this.findOne(category.id);
   }
 
-  async findAll(page: number = 1, limit: number = 10, search?: string, isActive?: boolean, parentId?: string | null, level?: number) {
+  async findAll(
+    page: number = 1,
+    limit: number = 10,
+    search?: string,
+    isActive?: boolean,
+    parentId?: string | null,
+    level?: number,
+  ) {
     const skip = (page - 1) * limit;
-    
+
     const where: any = {};
-    
+
     if (search) {
       where.OR = [
         { name: { contains: search, mode: 'insensitive' } },
         { description: { contains: search, mode: 'insensitive' } },
       ];
     }
-    
+
     if (isActive !== undefined) {
       where.isActive = isActive;
     }
@@ -78,9 +97,7 @@ export class CategoriesService {
         where,
         skip,
         take: limit,
-        orderBy: [
-          { name: 'asc' },
-        ],
+        orderBy: [{ name: 'asc' }],
       }),
       this.prisma.category.count({ where }),
     ]);
@@ -171,7 +188,10 @@ export class CategoriesService {
     }
 
     // Validate parent category if being changed
-    if (updateCategoryDto.parentId !== undefined && updateCategoryDto.parentId !== category.parentId) {
+    if (
+      updateCategoryDto.parentId !== undefined &&
+      updateCategoryDto.parentId !== category.parentId
+    ) {
       if (updateCategoryDto.parentId) {
         const parentCategory = await this.prisma.category.findUnique({
           where: { id: updateCategoryDto.parentId },
@@ -182,7 +202,9 @@ export class CategoriesService {
         }
 
         if (!parentCategory.isActive) {
-          throw new BadRequestException('Cannot set inactive category as parent');
+          throw new BadRequestException(
+            'Cannot set inactive category as parent',
+          );
         }
 
         // Check for circular reference
@@ -191,9 +213,14 @@ export class CategoriesService {
         }
 
         // Check if the new parent is a descendant of this category
-        const isDescendant = await this.isDescendant(id, updateCategoryDto.parentId);
+        const isDescendant = await this.isDescendant(
+          id,
+          updateCategoryDto.parentId,
+        );
         if (isDescendant) {
-          throw new BadRequestException('Cannot set descendant category as parent');
+          throw new BadRequestException(
+            'Cannot set descendant category as parent',
+          );
         }
       }
     }
@@ -203,11 +230,17 @@ export class CategoriesService {
     // Recalculate hierarchy if parent is changing
     let updateData = { ...categoryData };
     if (updateCategoryDto.parentId !== undefined) {
-      const parent = updateCategoryDto.parentId ? 
-        await this.prisma.category.findUnique({ where: { id: updateCategoryDto.parentId } }) : null;
+      const parent = updateCategoryDto.parentId
+        ? await this.prisma.category.findUnique({
+            where: { id: updateCategoryDto.parentId },
+          })
+        : null;
       const newLevel = parent ? parent.level + 1 : 0;
-      const newPath = await this.generateCategoryPath(updateCategoryDto.parentId || null, updateCategoryDto.name || category.name);
-      
+      const newPath = await this.generateCategoryPath(
+        updateCategoryDto.parentId || null,
+        updateCategoryDto.name || category.name,
+      );
+
       updateData = {
         ...updateData,
         level: newLevel,
@@ -236,7 +269,9 @@ export class CategoriesService {
     });
 
     if (childCategories > 0) {
-      throw new BadRequestException('Cannot delete category with child categories. Please delete or move child categories first.');
+      throw new BadRequestException(
+        'Cannot delete category with child categories. Please delete or move child categories first.',
+      );
     }
 
     // Check if category has active deals
@@ -248,7 +283,9 @@ export class CategoriesService {
     });
 
     if (activeDeals > 0) {
-      throw new BadRequestException('Cannot delete category with active deals. Please deactivate or move deals first.');
+      throw new BadRequestException(
+        'Cannot delete category with active deals. Please deactivate or move deals first.',
+      );
     }
 
     return this.prisma.category.delete({
@@ -263,20 +300,20 @@ export class CategoriesService {
         parentId: null,
         isActive: true,
       },
-      orderBy: [
-        { sortOrder: 'asc' },
-        { name: 'asc' },
-      ],
+      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
     });
 
     const tree = await Promise.all(
-      rootCategories.map(category => this.buildCategoryTreeNode(category.id))
+      rootCategories.map((category) => this.buildCategoryTreeNode(category.id)),
     );
 
     return tree;
   }
 
-  private async buildCategoryTreeNode(categoryId: string, level: number = 0): Promise<CategoryTreeNodeDto> {
+  private async buildCategoryTreeNode(
+    categoryId: string,
+    level: number = 0,
+  ): Promise<CategoryTreeNodeDto> {
     const category = await this.prisma.category.findUnique({
       where: { id: categoryId },
       include: {
@@ -299,14 +336,11 @@ export class CategoriesService {
         parentId: categoryId,
         isActive: true,
       },
-      orderBy: [
-        { sortOrder: 'asc' },
-        { name: 'asc' },
-      ],
+      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
     });
 
     const childNodes = await Promise.all(
-      children.map(child => this.buildCategoryTreeNode(child.id, level + 1))
+      children.map((child) => this.buildCategoryTreeNode(child.id, level + 1)),
     );
 
     return {
@@ -329,10 +363,7 @@ export class CategoriesService {
   async getChildCategories(parentId: string) {
     const children = await this.prisma.category.findMany({
       where: { parentId },
-      orderBy: [
-        { sortOrder: 'asc' },
-        { name: 'asc' },
-      ],
+      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
       include: {
         parent: {
           select: {
@@ -356,7 +387,7 @@ export class CategoriesService {
           ...child,
           ...stats,
         };
-      })
+      }),
     );
   }
 
@@ -370,30 +401,28 @@ export class CategoriesService {
 
   // Category statistics
   private async calculateCategoryStats(categoryId: string) {
-    const [
-      totalDeals,
-      activeDeals,
-      totalMerchants,
-      childCategoriesCount,
-    ] = await Promise.all([
-      this.prisma.deal.count({
-        where: { categoryId },
-      }),
-      this.prisma.deal.count({
-        where: {
-          categoryId,
-          status: 'ACTIVE',
-        },
-      }),
-      this.prisma.deal.groupBy({
-        by: ['merchantId'],
-        where: { categoryId },
-        _count: { merchantId: true },
-      }).then(result => result.length),
-      this.prisma.category.count({
-        where: { parentId: categoryId },
-      }),
-    ]);
+    const [totalDeals, activeDeals, totalMerchants, childCategoriesCount] =
+      await Promise.all([
+        this.prisma.deal.count({
+          where: { categoryId },
+        }),
+        this.prisma.deal.count({
+          where: {
+            categoryId,
+            status: 'ACTIVE',
+          },
+        }),
+        this.prisma.deal
+          .groupBy({
+            by: ['merchantId'],
+            where: { categoryId },
+            _count: { merchantId: true },
+          })
+          .then((result) => result.length),
+        this.prisma.category.count({
+          where: { parentId: categoryId },
+        }),
+      ]);
 
     return {
       totalDeals,
@@ -403,7 +432,10 @@ export class CategoriesService {
     };
   }
 
-  private async generateCategoryPath(parentId: string | null, categoryName: string): Promise<string> {
+  private async generateCategoryPath(
+    parentId: string | null,
+    categoryName: string,
+  ): Promise<string> {
     if (!parentId) {
       return categoryName.toLowerCase().replace(/\s+/g, '-');
     }
@@ -419,7 +451,7 @@ export class CategoriesService {
 
     const parentPath = parent.path || '';
     const categorySlug = categoryName.toLowerCase().replace(/\s+/g, '-');
-    
+
     return parentPath ? `${parentPath}/${categorySlug}` : categorySlug;
   }
 
@@ -433,7 +465,10 @@ export class CategoriesService {
     return (lastCategory?.sortOrder || 0) + 1;
   }
 
-  private async isDescendant(categoryId: string, potentialParentId: string): Promise<boolean> {
+  private async isDescendant(
+    categoryId: string,
+    potentialParentId: string,
+  ): Promise<boolean> {
     let currentId = potentialParentId;
 
     while (currentId) {
@@ -492,9 +527,7 @@ export class CategoriesService {
           },
         },
       },
-      orderBy: [
-        { name: 'asc' },
-      ],
+      orderBy: [{ name: 'asc' }],
     });
   }
 
@@ -520,7 +553,9 @@ export class CategoriesService {
     });
 
     if (activeDeals > 0) {
-      throw new BadRequestException('Cannot deactivate category with active deals. Please deactivate deals first.');
+      throw new BadRequestException(
+        'Cannot deactivate category with active deals. Please deactivate deals first.',
+      );
     }
 
     return this.prisma.category.update({
@@ -534,7 +569,7 @@ export class CategoriesService {
       this.prisma.category.update({
         where: { id },
         data: { sortOrder },
-      })
+      }),
     );
 
     await Promise.all(updates);
@@ -593,11 +628,11 @@ export class CategoriesService {
       activeCategories,
       rootCategories,
       categoriesWithDeals,
-      levelDistribution: levelDistribution.map(item => ({
+      levelDistribution: levelDistribution.map((item) => ({
         level: item.level,
         count: item._count.level,
       })),
-      topCategories: topCategories.map(category => ({
+      topCategories: topCategories.map((category) => ({
         id: category.id,
         name: category.name,
         level: category.level,
@@ -610,9 +645,7 @@ export class CategoriesService {
   async getAllCategories() {
     return this.prisma.category.findMany({
       where: { isActive: true },
-      orderBy: [
-        { name: 'asc' },
-      ],
+      orderBy: [{ name: 'asc' }],
       include: {
         parent: {
           select: {

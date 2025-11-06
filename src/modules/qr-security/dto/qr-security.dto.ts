@@ -2,32 +2,50 @@ import { IsString, IsOptional, IsObject, IsDateString } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class GenerateQRCodeDto {
-  @ApiProperty({ description: 'Coupon ID to generate QR code for', example: 'coupon-123' })
+  @ApiProperty({
+    description: 'Coupon ID to generate QR code for',
+    example: 'coupon-123',
+  })
   @IsString()
   couponId: string;
 }
 
 export class ValidateQRCodeDto {
-  @ApiProperty({ description: 'QR code token to validate', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' })
+  @ApiProperty({
+    description: 'QR code token to validate',
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+  })
   @IsString()
   qrToken: string;
 
-  @ApiPropertyOptional({ description: 'Staff ID performing the validation', example: 'staff-123' })
+  @ApiPropertyOptional({
+    description: 'Staff ID performing the validation',
+    example: 'staff-123',
+  })
   @IsOptional()
   @IsString()
   staffId?: string;
 }
 
 export class RedeemQRCodeDto {
-  @ApiProperty({ description: 'QR code token to redeem', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' })
+  @ApiProperty({
+    description: 'QR code token to redeem',
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+  })
   @IsString()
   qrToken: string;
 
-  @ApiProperty({ description: 'Staff ID performing the redemption', example: 'staff-123' })
+  @ApiProperty({
+    description: 'Staff ID performing the redemption',
+    example: 'staff-123',
+  })
   @IsString()
   staffId: string;
 
-  @ApiPropertyOptional({ description: 'Redemption notes', example: 'Redeemed at counter' })
+  @ApiPropertyOptional({
+    description: 'Redemption notes',
+    example: 'Redeemed at counter',
+  })
   @IsOptional()
   @IsString()
   notes?: string;
@@ -38,7 +56,10 @@ export class RevokeQRCodeDto {
   @IsString()
   couponId: string;
 
-  @ApiProperty({ description: 'Reason for revocation', example: 'Customer requested cancellation' })
+  @ApiProperty({
+    description: 'Reason for revocation',
+    example: 'Customer requested cancellation',
+  })
   @IsString()
   reason: string;
 }
@@ -209,6 +230,3 @@ export class QRCodeHistoryDto {
   @ApiProperty({ description: 'Total activities count' })
   total: number;
 }
-
-
-

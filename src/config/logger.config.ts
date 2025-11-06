@@ -30,7 +30,7 @@ export class CustomLogger implements LoggerService {
     const timestamp = new Date().toISOString();
     const contextStr = context ? `[${context}]` : '';
     const levelStr = level.toUpperCase().padEnd(7);
-    
+
     console.log(`${timestamp} ${levelStr} ${contextStr} ${message}`);
   }
 }

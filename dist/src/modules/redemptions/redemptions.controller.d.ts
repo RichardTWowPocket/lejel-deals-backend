@@ -7,9 +7,9 @@ export declare class RedemptionController {
     processRedemption(createRedemptionDto: CreateRedemptionDto): Promise<RedemptionResponseDto>;
     validateRedemption(body: {
         qrToken: string;
-        staffId: string;
+        redeemedByUserId: string;
     }): Promise<RedemptionValidationDto>;
-    findAll(page?: number, limit?: number, merchantId?: string, staffId?: string, status?: RedemptionStatus, startDate?: Date, endDate?: Date): Promise<{
+    findAll(page?: number, limit?: number, merchantId?: string, redeemedByUserId?: string, status?: RedemptionStatus, startDate?: Date, endDate?: Date): Promise<{
         redemptions: RedemptionResponseDto[];
         pagination: any;
     }>;
@@ -20,7 +20,7 @@ export declare class RedemptionController {
         status: RedemptionStatus;
         notes?: string;
     }): Promise<RedemptionResponseDto>;
-    getStaffRedemptions(staffId: string, page?: number, limit?: number, status?: RedemptionStatus): Promise<{
+    getStaffRedemptions(userId: string, page?: number, limit?: number, status?: RedemptionStatus): Promise<{
         redemptions: RedemptionResponseDto[];
         pagination: any;
     }>;

@@ -15,41 +15,47 @@ const passport_1 = require("@nestjs/passport");
 const passport_jwt_1 = require("passport-jwt");
 let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy) {
     constructor() {
-        const jwtSecret = process.env.NEXTAUTH_SECRET || process.env.SUPABASE_JWT_SECRET;
+        const jwtSecret = process.env.NEXTAUTH_SECRET;
         if (!jwtSecret) {
-            throw new Error('NEXTAUTH_SECRET or SUPABASE_JWT_SECRET environment variable is required');
+            throw new Error('NEXTAUTH_SECRET environment variable is required');
         }
         super({
             jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
             secretOrKey: jwtSecret,
-            passReqToCallback: true,
         });
     }
-    async validate(req, payload) {
-        console.log('[JwtStrategy] Payload received:', payload);
-        if (payload.sub && payload.email) {
-            const user = {
-                id: payload.sub,
-                email: payload.email,
-                role: payload.role || 'customer',
-                user_metadata: payload.user_metadata || {},
-            };
-            console.log('[JwtStrategy] NextAuth user:', user);
-            return user;
-        }
-        const rawRole = payload?.role || payload?.app_metadata?.role || payload?.user_metadata?.role;
-        const normalizedRole = (rawRole === 'authenticated' || !rawRole) ? 'customer' : String(rawRole).toLowerCase();
-        const user = {
-            id: payload.sub || payload.id,
+    async validate(payload) {
+        console.warn('🔐 JWT Token Payload:', {
+            sub: payload.sub,
             email: payload.email,
-            role: normalizedRole,
-            user_metadata: payload.user_metadata || {},
+            role: payload.role,
+            merchantIds: payload.merchantIds,
+            customerId: payload.customerId,
+            iss: payload.iss,
+            aud: payload.aud,
+            iat: payload.iat,
+            exp: payload.exp,
+            fullPayload: payload,
+        });
+        if (payload.iss !== 'lejel-auth' || payload.aud !== 'lejel-api') {
+            throw new common_1.UnauthorizedException('Invalid token issuer or audience');
+        }
+        const user = {
+            id: payload.sub,
+            email: payload.email,
+            role: payload.role || 'customer',
+            merchantIds: payload.merchantIds || [],
         };
         if (!user.id || !user.email) {
             throw new common_1.UnauthorizedException('Invalid token payload');
         }
-        console.log('[JwtStrategy] Supabase user:', user);
+        console.warn('✅ Validated AuthUser:', {
+            id: user.id,
+            email: user.email,
+            role: user.role,
+            merchantIds: user.merchantIds,
+        });
         return user;
     }
 };

@@ -121,10 +121,14 @@ exports.QRCodeSecurityController = QRCodeSecurityController;
 __decorate([
     (0, common_1.Post)('generate'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.CUSTOMER, client_1.UserRole.ADMIN, client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.CUSTOMER, client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Generate secure QR code for coupon' }),
-    (0, swagger_1.ApiResponse)({ status: 201, description: 'QR code generated successfully', type: qr_security_dto_1.QRCodeResponseDto }),
+    (0, swagger_1.ApiResponse)({
+        status: 201,
+        description: 'QR code generated successfully',
+        type: qr_security_dto_1.QRCodeResponseDto,
+    }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [qr_security_dto_1.GenerateQRCodeDto]),
@@ -133,10 +137,14 @@ __decorate([
 __decorate([
     (0, common_1.Post)('validate'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.ADMIN, client_1.UserRole.MERCHANT, client_1.UserRole.STAFF),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Validate QR code' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'QR code validation result', type: qr_security_dto_1.QRCodeValidationResponseDto }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'QR code validation result',
+        type: qr_security_dto_1.QRCodeValidationResponseDto,
+    }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [qr_security_dto_1.ValidateQRCodeDto]),
@@ -145,7 +153,7 @@ __decorate([
 __decorate([
     (0, common_1.Post)('redeem'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.ADMIN, client_1.UserRole.MERCHANT, client_1.UserRole.STAFF),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Redeem QR code (mark as used)' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'QR code redeemed successfully' }),
@@ -157,7 +165,7 @@ __decorate([
 __decorate([
     (0, common_1.Post)('revoke'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.ADMIN, client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Revoke QR code (invalidate it)' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'QR code revoked successfully' }),
@@ -169,10 +177,14 @@ __decorate([
 __decorate([
     (0, common_1.Get)('stats'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.ADMIN, client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get QR code security statistics' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'QR code statistics retrieved successfully', type: qr_security_dto_1.QRCodeStatsDto }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'QR code statistics retrieved successfully',
+        type: qr_security_dto_1.QRCodeStatsDto,
+    }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
@@ -180,10 +192,14 @@ __decorate([
 __decorate([
     (0, common_1.Get)('history/:couponId'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.ADMIN, client_1.UserRole.MERCHANT, client_1.UserRole.STAFF),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get QR code activity history for a coupon' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'QR code history retrieved successfully', type: qr_security_dto_1.QRCodeHistoryDto }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'QR code history retrieved successfully',
+        type: qr_security_dto_1.QRCodeHistoryDto,
+    }),
     __param(0, (0, common_1.Param)('couponId')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -192,10 +208,13 @@ __decorate([
 __decorate([
     (0, common_1.Post)('cleanup'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.ADMIN),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Clean up expired QR codes (admin only)' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Expired QR codes cleaned up successfully' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Expired QR codes cleaned up successfully',
+    }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
@@ -203,10 +222,14 @@ __decorate([
 __decorate([
     (0, common_1.Get)('validate/:qrToken'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.ADMIN, client_1.UserRole.MERCHANT, client_1.UserRole.STAFF),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Validate QR code via URL parameter' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'QR code validation result', type: qr_security_dto_1.QRCodeValidationResponseDto }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'QR code validation result',
+        type: qr_security_dto_1.QRCodeValidationResponseDto,
+    }),
     __param(0, (0, common_1.Param)('qrToken')),
     __param(1, (0, common_1.Query)('staffId')),
     __metadata("design:type", Function),

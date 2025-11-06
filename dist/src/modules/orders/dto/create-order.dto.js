@@ -32,20 +32,31 @@ __decorate([
     __metadata("design:type", String)
 ], CreateOrderDto.prototype, "dealId", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Quantity of deals to order', example: 2, minimum: 1, maximum: 10 }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Quantity of deals to order',
+        example: 2,
+        minimum: 1,
+        maximum: 10,
+    }),
     (0, class_validator_1.IsInt)(),
     (0, class_validator_1.Min)(1),
     (0, class_validator_1.Max)(10),
     __metadata("design:type", Number)
 ], CreateOrderDto.prototype, "quantity", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Payment method', example: 'credit_card' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Payment method',
+        example: 'credit_card',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateOrderDto.prototype, "paymentMethod", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Payment reference from payment gateway', example: 'midtrans_ref_123' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Payment reference from payment gateway',
+        example: 'midtrans_ref_123',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -57,19 +68,29 @@ class UpdateOrderDto {
 }
 exports.UpdateOrderDto = UpdateOrderDto;
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Order status', enum: client_1.OrderStatus, example: client_1.OrderStatus.PAID }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Order status',
+        enum: client_1.OrderStatus,
+        example: client_1.OrderStatus.PAID,
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsEnum)(client_1.OrderStatus),
     __metadata("design:type", String)
 ], UpdateOrderDto.prototype, "status", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Payment method', example: 'credit_card' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Payment method',
+        example: 'credit_card',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], UpdateOrderDto.prototype, "paymentMethod", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Payment reference from payment gateway', example: 'midtrans_ref_123' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Payment reference from payment gateway',
+        example: 'midtrans_ref_123',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -80,12 +101,19 @@ class UpdateOrderStatusDto {
 }
 exports.UpdateOrderStatusDto = UpdateOrderStatusDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'New order status', enum: client_1.OrderStatus, example: client_1.OrderStatus.PAID }),
+    (0, swagger_1.ApiProperty)({
+        description: 'New order status',
+        enum: client_1.OrderStatus,
+        example: client_1.OrderStatus.PAID,
+    }),
     (0, class_validator_1.IsEnum)(client_1.OrderStatus),
     __metadata("design:type", String)
 ], UpdateOrderStatusDto.prototype, "status", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Payment reference if status is PAID', example: 'midtrans_ref_123' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Payment reference if status is PAID',
+        example: 'midtrans_ref_123',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -132,23 +160,39 @@ __decorate([
     __metadata("design:type", Number)
 ], OrderResponseDto.prototype, "totalAmount", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Order status', enum: client_1.OrderStatus, example: client_1.OrderStatus.PENDING }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Order status',
+        enum: client_1.OrderStatus,
+        example: client_1.OrderStatus.PENDING,
+    }),
     __metadata("design:type", String)
 ], OrderResponseDto.prototype, "status", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Payment method used', example: 'credit_card' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Payment method used',
+        example: 'credit_card',
+    }),
     __metadata("design:type", String)
 ], OrderResponseDto.prototype, "paymentMethod", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Payment reference from gateway', example: 'midtrans_ref_123' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Payment reference from gateway',
+        example: 'midtrans_ref_123',
+    }),
     __metadata("design:type", String)
 ], OrderResponseDto.prototype, "paymentReference", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Order creation date', example: '2024-01-01T00:00:00.000Z' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Order creation date',
+        example: '2024-01-01T00:00:00.000Z',
+    }),
     __metadata("design:type", Date)
 ], OrderResponseDto.prototype, "createdAt", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Order last update date', example: '2024-01-01T00:00:00.000Z' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Order last update date',
+        example: '2024-01-01T00:00:00.000Z',
+    }),
     __metadata("design:type", Date)
 ], OrderResponseDto.prototype, "updatedAt", void 0);
 __decorate([
@@ -216,11 +260,17 @@ class OrderAnalyticsDto {
 }
 exports.OrderAnalyticsDto = OrderAnalyticsDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Orders count by period', example: { '2024-01': 25, '2024-02': 30 } }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Orders count by period',
+        example: { '2024-01': 25, '2024-02': 30 },
+    }),
     __metadata("design:type", Object)
 ], OrderAnalyticsDto.prototype, "ordersByPeriod", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Revenue by period', example: { '2024-01': 1000000, '2024-02': 1200000 } }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Revenue by period',
+        example: { '2024-01': 1000000, '2024-02': 1200000 },
+    }),
     __metadata("design:type", Object)
 ], OrderAnalyticsDto.prototype, "revenueByPeriod", void 0);
 __decorate([
@@ -232,11 +282,17 @@ __decorate([
     __metadata("design:type", Array)
 ], OrderAnalyticsDto.prototype, "topDeals", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Order completion rate percentage', example: 85.5 }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Order completion rate percentage',
+        example: 85.5,
+    }),
     __metadata("design:type", Number)
 ], OrderAnalyticsDto.prototype, "completionRate", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Average time to payment in hours', example: 2.5 }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Average time to payment in hours',
+        example: 2.5,
+    }),
     __metadata("design:type", Number)
 ], OrderAnalyticsDto.prototype, "averageTimeToPayment", void 0);
 //# sourceMappingURL=create-order.dto.js.map

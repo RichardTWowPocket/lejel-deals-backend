@@ -45,11 +45,17 @@ __decorate([
     __metadata("design:type", Number)
 ], CustomerStatsDto.prototype, "averageOrderValue", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Last order date', example: '2024-01-15T00:00:00.000Z' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Last order date',
+        example: '2024-01-15T00:00:00.000Z',
+    }),
     __metadata("design:type", Date)
 ], CustomerStatsDto.prototype, "lastOrderDate", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'First order date', example: '2023-06-01T00:00:00.000Z' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'First order date',
+        example: '2023-06-01T00:00:00.000Z',
+    }),
     __metadata("design:type", Date)
 ], CustomerStatsDto.prototype, "firstOrderDate", void 0);
 __decorate([
@@ -61,7 +67,10 @@ __decorate([
     __metadata("design:type", Number)
 ], CustomerStatsDto.prototype, "usedDeals", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Favorite categories', example: ['Food & Beverage', 'Entertainment'] }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Favorite categories',
+        example: ['Food & Beverage', 'Entertainment'],
+    }),
     __metadata("design:type", Array)
 ], CustomerStatsDto.prototype, "favoriteCategories", void 0);
 __decorate([
@@ -73,7 +82,10 @@ __decorate([
     __metadata("design:type", Number)
 ], CustomerStatsDto.prototype, "loyaltyPoints", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Registration date', example: '2023-06-01T00:00:00.000Z' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Registration date',
+        example: '2023-06-01T00:00:00.000Z',
+    }),
     __metadata("design:type", Date)
 ], CustomerStatsDto.prototype, "registrationDate", void 0);
 __decorate([

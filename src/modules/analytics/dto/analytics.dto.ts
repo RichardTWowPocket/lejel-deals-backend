@@ -49,7 +49,10 @@ export class CustomerAnalyticsDto {
   @ApiProperty({ description: 'Customer growth percentage', example: 12.5 })
   customerGrowth: number;
 
-  @ApiProperty({ description: 'Average spending per customer', example: 250000 })
+  @ApiProperty({
+    description: 'Average spending per customer',
+    example: 250000,
+  })
   averageSpendingPerCustomer: number;
 
   @ApiProperty({ description: 'Customer retention rate', example: 85.5 })
@@ -175,10 +178,16 @@ export class OrderAnalyticsDto {
     refunded: number;
   };
 
-  @ApiProperty({ description: 'Average order processing time in hours', example: 2.5 })
+  @ApiProperty({
+    description: 'Average order processing time in hours',
+    example: 2.5,
+  })
   averageOrderProcessingTime: number;
 
-  @ApiProperty({ description: 'Order completion rate percentage', example: 90.0 })
+  @ApiProperty({
+    description: 'Order completion rate percentage',
+    example: 90.0,
+  })
   orderCompletionRate: number;
 }
 
@@ -196,10 +205,16 @@ export class DashboardAnalyticsDto {
   @ApiProperty({ description: 'Revenue analytics', type: RevenueAnalyticsDto })
   revenue: RevenueAnalyticsDto;
 
-  @ApiProperty({ description: 'Customer analytics', type: CustomerAnalyticsDto })
+  @ApiProperty({
+    description: 'Customer analytics',
+    type: CustomerAnalyticsDto,
+  })
   customers: CustomerAnalyticsDto;
 
-  @ApiProperty({ description: 'Merchant analytics', type: MerchantAnalyticsDto })
+  @ApiProperty({
+    description: 'Merchant analytics',
+    type: MerchantAnalyticsDto,
+  })
   merchants: MerchantAnalyticsDto;
 
   @ApiProperty({ description: 'Deal analytics', type: DealAnalyticsDto })
@@ -208,17 +223,26 @@ export class DashboardAnalyticsDto {
   @ApiProperty({ description: 'Order analytics', type: OrderAnalyticsDto })
   orders: OrderAnalyticsDto;
 
-  @ApiProperty({ description: 'Last updated timestamp', example: '2024-01-01T00:00:00.000Z' })
+  @ApiProperty({
+    description: 'Last updated timestamp',
+    example: '2024-01-01T00:00:00.000Z',
+  })
   lastUpdated: Date;
 }
 
 export class AnalyticsQueryDto {
-  @ApiPropertyOptional({ description: 'Start date for analytics', example: '2024-01-01' })
+  @ApiPropertyOptional({
+    description: 'Start date for analytics',
+    example: '2024-01-01',
+  })
   @IsOptional()
   @IsDateString()
   startDate?: string;
 
-  @ApiPropertyOptional({ description: 'End date for analytics', example: '2024-12-31' })
+  @ApiPropertyOptional({
+    description: 'End date for analytics',
+    example: '2024-12-31',
+  })
   @IsOptional()
   @IsDateString()
   endDate?: string;

@@ -129,7 +129,7 @@ let QRCodeSecurityService = QRCodeSecurityService_1 = class QRCodeSecurityServic
             throw error;
         }
     }
-    async validateQRCode(qrToken, staffId) {
+    async validateQRCode(qrToken, redeemedByUserId) {
         try {
             let payload;
             try {
@@ -139,14 +139,18 @@ let QRCodeSecurityService = QRCodeSecurityService_1 = class QRCodeSecurityServic
                 });
             }
             catch (jwtError) {
-                await this.logQRActivity('INVALID_SIGNATURE', null, { error: jwtError.message });
+                await this.logQRActivity('INVALID_SIGNATURE', null, {
+                    error: jwtError.message,
+                });
                 return {
                     isValid: false,
                     error: 'Invalid QR code signature',
                 };
             }
             if (new Date() > payload.expiresAt) {
-                await this.logQRActivity('EXPIRED', payload.couponId, { expiresAt: payload.expiresAt });
+                await this.logQRActivity('EXPIRED', payload.couponId, {
+                    expiresAt: payload.expiresAt,
+                });
                 return {
                     isValid: false,
                     error: 'QR code has expired',
@@ -188,14 +192,18 @@ let QRCodeSecurityService = QRCodeSecurityService_1 = class QRCodeSecurityServic
                 };
             }
             if (coupon.status !== 'ACTIVE') {
-                await this.logQRActivity('INVALID_STATUS', payload.couponId, { status: coupon.status });
+                await this.logQRActivity('INVALID_STATUS', payload.couponId, {
+                    status: coupon.status,
+                });
                 return {
                     isValid: false,
                     error: `Coupon is ${coupon.status.toLowerCase()}`,
                 };
             }
             if (coupon.usedAt) {
-                await this.logQRActivity('ALREADY_USED', payload.couponId, { usedAt: coupon.usedAt });
+                await this.logQRActivity('ALREADY_USED', payload.couponId, {
+                    usedAt: coupon.usedAt,
+                });
                 return {
                     isValid: false,
                     error: 'Coupon has already been used',
@@ -204,7 +212,7 @@ let QRCodeSecurityService = QRCodeSecurityService_1 = class QRCodeSecurityServic
             if (payload.nonce !== coupon.qrCode) {
                 await this.logQRActivity('INVALID_NONCE', payload.couponId, {
                     expected: coupon.qrCode,
-                    received: payload.nonce
+                    received: payload.nonce,
                 });
                 return {
                     isValid: false,
@@ -212,7 +220,7 @@ let QRCodeSecurityService = QRCodeSecurityService_1 = class QRCodeSecurityServic
                 };
             }
             await this.logQRActivity('VALIDATED', payload.couponId, {
-                staffId,
+                redeemedByUserId,
                 orderId: payload.orderId,
                 dealId: payload.dealId,
             });
@@ -234,7 +242,7 @@ let QRCodeSecurityService = QRCodeSecurityService_1 = class QRCodeSecurityServic
             };
         }
     }
-    async markQRCodeAsUsed(couponId, staffId, notes) {
+    async markQRCodeAsUsed(couponId, redeemedByUserId, notes) {
         try {
             await this.prisma.coupon.update({
                 where: { id: couponId },
@@ -246,17 +254,17 @@ let QRCodeSecurityService = QRCodeSecurityService_1 = class QRCodeSecurityServic
             await this.prisma.redemption.create({
                 data: {
                     couponId,
-                    staffId,
+                    redeemedByUserId,
                     notes,
                     redeemedAt: new Date(),
                 },
             });
             await this.logQRActivity('REDEEMED', couponId, {
-                staffId,
+                redeemedByUserId,
                 notes,
                 redeemedAt: new Date(),
             });
-            this.logger.log(`QR code redeemed for coupon ${couponId} by staff ${staffId}`);
+            this.logger.log(`QR code redeemed for coupon ${couponId} by user ${redeemedByUserId}`);
         }
         catch (error) {
             this.logger.error(`Failed to mark QR code as used for coupon ${couponId}:`, error);

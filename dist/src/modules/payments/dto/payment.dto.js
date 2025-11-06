@@ -52,7 +52,10 @@ __decorate([
     __metadata("design:type", String)
 ], PaymentResponseDto.prototype, "token", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Payment redirect URL', example: 'https://app.midtrans.com/snap/v2/vtweb/...' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Payment redirect URL',
+        example: 'https://app.midtrans.com/snap/v2/vtweb/...',
+    }),
     __metadata("design:type", String)
 ], PaymentResponseDto.prototype, "redirect_url", void 0);
 __decorate([
@@ -91,7 +94,10 @@ __decorate([
     __metadata("design:type", String)
 ], PaymentStatusDto.prototype, "gross_amount", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Transaction time', example: '2024-01-01 12:00:00' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Transaction time',
+        example: '2024-01-01 12:00:00',
+    }),
     __metadata("design:type", String)
 ], PaymentStatusDto.prototype, "transaction_time", void 0);
 __decorate([
@@ -103,7 +109,10 @@ __decorate([
     __metadata("design:type", String)
 ], PaymentStatusDto.prototype, "fraud_status", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Settlement time', example: '2024-01-01 12:05:00' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Settlement time',
+        example: '2024-01-01 12:05:00',
+    }),
     __metadata("design:type", String)
 ], PaymentStatusDto.prototype, "settlement_time", void 0);
 class WebhookPayloadDto {
@@ -145,7 +154,10 @@ __decorate([
     __metadata("design:type", String)
 ], WebhookPayloadDto.prototype, "transaction_status", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Transaction time', example: '2024-01-01 12:00:00' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Transaction time',
+        example: '2024-01-01 12:00:00',
+    }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], WebhookPayloadDto.prototype, "transaction_time", void 0);
@@ -161,13 +173,19 @@ __decorate([
     __metadata("design:type", String)
 ], WebhookPayloadDto.prototype, "fraud_status", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Settlement time', example: '2024-01-01 12:05:00' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Settlement time',
+        example: '2024-01-01 12:05:00',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], WebhookPayloadDto.prototype, "settlement_time", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Signature key for verification', example: 'signature_hash' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Signature key for verification',
+        example: 'signature_hash',
+    }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], WebhookPayloadDto.prototype, "signature_key", void 0);
@@ -176,7 +194,10 @@ class CancelPaymentDto {
 }
 exports.CancelPaymentDto = CancelPaymentDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Cancellation reason', example: 'Customer requested cancellation' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Cancellation reason',
+        example: 'Customer requested cancellation',
+    }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CancelPaymentDto.prototype, "reason", void 0);

@@ -1,4 +1,12 @@
-import { StaffRole } from '@prisma/client';
+import { MerchantRole } from '@prisma/client';
+export declare enum StaffRole {
+    MANAGER = "MANAGER",
+    CASHIER = "CASHIER",
+    SUPERVISOR = "SUPERVISOR",
+    ADMIN = "ADMIN"
+}
+export declare function mapMerchantRoleToStaffRole(merchantRole: MerchantRole): StaffRole;
+export declare function mapStaffRoleToMerchantRole(staffRole: StaffRole): MerchantRole;
 export declare class CreateStaffDto {
     firstName: string;
     lastName: string;
@@ -44,7 +52,7 @@ export declare class StaffResponseDto {
     permissions?: any;
     metadata?: any;
     createdAt: Date;
-    updatedAt: Date;
+    updatedAt?: Date;
 }
 export declare class StaffLoginResponseDto {
     staff: StaffResponseDto;

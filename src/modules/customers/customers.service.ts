@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
@@ -33,18 +38,24 @@ export class CustomersService {
     const customer = await this.prisma.customer.create({
       data: {
         ...customerData,
-        preferences: (createCustomerDto.preferences || defaultPreferences) as any,
+        preferences: (createCustomerDto.preferences ||
+          defaultPreferences) as any,
       },
     });
 
     return this.findOne(customer.id);
   }
 
-  async findAll(page: number = 1, limit: number = 10, search?: string, isActive?: boolean) {
+  async findAll(
+    page: number = 1,
+    limit: number = 10,
+    search?: string,
+    isActive?: boolean,
+  ) {
     const skip = (page - 1) * limit;
-    
+
     const where: any = {};
-    
+
     if (search) {
       where.OR = [
         { firstName: { contains: search, mode: 'insensitive' } },
@@ -53,7 +64,7 @@ export class CustomersService {
         { phone: { contains: search, mode: 'insensitive' } },
       ];
     }
-    
+
     if (isActive !== undefined) {
       where.isActive = isActive;
     }
@@ -83,7 +94,7 @@ export class CustomersService {
           ...customer,
           ...stats,
         };
-      })
+      }),
     );
 
     return {
@@ -140,12 +151,18 @@ export class CustomersService {
     return this.findOne(customer.id);
   }
 
-  async update(id: string, updateCustomerDto: UpdateCustomerDto, userId: string) {
+  async update(
+    id: string,
+    updateCustomerDto: UpdateCustomerDto,
+    userId: string,
+  ) {
     const customer = await this.findOne(id);
-    
+
     // Check if user owns this customer profile (in a real app, you'd have proper ownership logic)
     if (customer.email !== userId) {
-      throw new ForbiddenException('You can only update your own customer profile');
+      throw new ForbiddenException(
+        'You can only update your own customer profile',
+      );
     }
 
     // Check if email is being changed and if it's already taken
@@ -155,7 +172,9 @@ export class CustomersService {
       });
 
       if (existingCustomer) {
-        throw new BadRequestException('Email is already taken by another customer');
+        throw new BadRequestException(
+          'Email is already taken by another customer',
+        );
       }
     }
 
@@ -173,10 +192,12 @@ export class CustomersService {
 
   async remove(id: string, userId: string) {
     const customer = await this.findOne(id);
-    
+
     // Check if user owns this customer profile
     if (customer.email !== userId) {
-      throw new ForbiddenException('You can only delete your own customer profile');
+      throw new ForbiddenException(
+        'You can only delete your own customer profile',
+      );
     }
 
     // Check if customer has active orders
@@ -188,7 +209,9 @@ export class CustomersService {
     });
 
     if (activeOrders > 0) {
-      throw new BadRequestException('Cannot delete customer with active orders. Please complete or cancel all pending orders first.');
+      throw new BadRequestException(
+        'Cannot delete customer with active orders. Please complete or cancel all pending orders first.',
+      );
     }
 
     return this.prisma.customer.delete({
@@ -206,7 +229,9 @@ export class CustomersService {
     } as CustomerStatsDto;
   }
 
-  private async calculateCustomerStats(customerId: string): Promise<Partial<CustomerStatsDto>> {
+  private async calculateCustomerStats(
+    customerId: string,
+  ): Promise<Partial<CustomerStatsDto>> {
     const [
       totalOrders,
       totalSpent,
@@ -250,9 +275,13 @@ export class CustomersService {
     ]);
 
     const totalSpentAmount = Number(totalSpent._sum.totalAmount || 0);
-    const averageOrderValue = totalOrders > 0 ? totalSpentAmount / totalOrders : 0;
-    const daysSinceLastOrder = lastOrder ? 
-      Math.floor((Date.now() - lastOrder.createdAt.getTime()) / (1000 * 60 * 60 * 24)) : 0;
+    const averageOrderValue =
+      totalOrders > 0 ? totalSpentAmount / totalOrders : 0;
+    const daysSinceLastOrder = lastOrder
+      ? Math.floor(
+          (Date.now() - lastOrder.createdAt.getTime()) / (1000 * 60 * 60 * 24),
+        )
+      : 0;
 
     // Calculate customer tier based on total spent
     const tier = this.calculateCustomerTier(totalSpentAmount);
@@ -291,7 +320,7 @@ export class CustomersService {
     });
 
     const categoryCount: Record<string, number> = {};
-    orderCategories.forEach(order => {
+    orderCategories.forEach((order) => {
       if (order.deal.category) {
         const categoryName = order.deal.category.name;
         categoryCount[categoryName] = (categoryCount[categoryName] || 0) + 1;
@@ -350,7 +379,7 @@ export class CustomersService {
   // Customer preferences management
   async updatePreferences(id: string, preferences: any, userId: string) {
     const customer = await this.findOne(id);
-    
+
     // Check if user owns this customer profile
     if (customer.email !== userId) {
       throw new ForbiddenException('You can only update your own preferences');
@@ -358,7 +387,7 @@ export class CustomersService {
 
     return this.prisma.customer.update({
       where: { id },
-      data: { preferences: preferences as any },
+      data: { preferences: preferences },
     });
   }
 
@@ -373,10 +402,12 @@ export class CustomersService {
   // Customer activation/deactivation
   async deactivate(id: string, userId: string) {
     const customer = await this.findOne(id);
-    
+
     // Check if user owns this customer profile
     if (customer.email !== userId) {
-      throw new ForbiddenException('You can only deactivate your own customer profile');
+      throw new ForbiddenException(
+        'You can only deactivate your own customer profile',
+      );
     }
 
     return this.prisma.customer.update({
@@ -387,10 +418,12 @@ export class CustomersService {
 
   async reactivate(id: string, userId: string) {
     const customer = await this.findOne(id);
-    
+
     // Check if user owns this customer profile
     if (customer.email !== userId) {
-      throw new ForbiddenException('You can only reactivate your own customer profile');
+      throw new ForbiddenException(
+        'You can only reactivate your own customer profile',
+      );
     }
 
     return this.prisma.customer.update({
@@ -437,7 +470,9 @@ export class CustomersService {
     return {
       customer: {
         id: customer.id,
-        name: `${customer.firstName || ''} ${customer.lastName || ''}`.trim() || 'Unknown',
+        name:
+          `${customer.firstName || ''} ${customer.lastName || ''}`.trim() ||
+          'Unknown',
         email: customer.email,
         tier: stats.tier,
         loyaltyPoints: stats.loyaltyPoints,
@@ -458,8 +493,11 @@ export class CustomersService {
       },
     });
 
-    const customersWithSpending = customers.map(customer => {
-      const totalSpent = customer.orders.reduce((sum, order) => sum + Number(order.totalAmount), 0);
+    const customersWithSpending = customers.map((customer) => {
+      const totalSpent = customer.orders.reduce(
+        (sum, order) => sum + Number(order.totalAmount),
+        0,
+      );
       return {
         ...customer,
         totalSpent,

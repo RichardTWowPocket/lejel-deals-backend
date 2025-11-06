@@ -1,4 +1,14 @@
-import { IsString, IsNumber, IsArray, IsObject, IsOptional, IsEmail, IsPhoneNumber, Min, Max } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsArray,
+  IsObject,
+  IsOptional,
+  IsEmail,
+  IsPhoneNumber,
+  Min,
+  Max,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreatePaymentDto {
@@ -34,7 +44,10 @@ export class PaymentResponseDto {
   @ApiProperty({ description: 'Payment token', example: 'midtrans_token_123' })
   token: string;
 
-  @ApiProperty({ description: 'Payment redirect URL', example: 'https://app.midtrans.com/snap/v2/vtweb/...' })
+  @ApiProperty({
+    description: 'Payment redirect URL',
+    example: 'https://app.midtrans.com/snap/v2/vtweb/...',
+  })
   redirect_url: string;
 
   @ApiProperty({ description: 'Status code', example: '201' })
@@ -57,7 +70,10 @@ export class PaymentStatusDto {
   @ApiProperty({ description: 'Gross amount', example: '150000.00' })
   gross_amount: string;
 
-  @ApiProperty({ description: 'Transaction time', example: '2024-01-01 12:00:00' })
+  @ApiProperty({
+    description: 'Transaction time',
+    example: '2024-01-01 12:00:00',
+  })
   transaction_time: string;
 
   @ApiProperty({ description: 'Transaction ID', example: 'txn_123456' })
@@ -66,7 +82,10 @@ export class PaymentStatusDto {
   @ApiPropertyOptional({ description: 'Fraud status', example: 'accept' })
   fraud_status?: string;
 
-  @ApiPropertyOptional({ description: 'Settlement time', example: '2024-01-01 12:05:00' })
+  @ApiPropertyOptional({
+    description: 'Settlement time',
+    example: '2024-01-01 12:05:00',
+  })
   settlement_time?: string;
 }
 
@@ -91,7 +110,10 @@ export class WebhookPayloadDto {
   @IsString()
   transaction_status: string;
 
-  @ApiProperty({ description: 'Transaction time', example: '2024-01-01 12:00:00' })
+  @ApiProperty({
+    description: 'Transaction time',
+    example: '2024-01-01 12:00:00',
+  })
   @IsString()
   transaction_time: string;
 
@@ -104,21 +126,27 @@ export class WebhookPayloadDto {
   @IsString()
   fraud_status?: string;
 
-  @ApiPropertyOptional({ description: 'Settlement time', example: '2024-01-01 12:05:00' })
+  @ApiPropertyOptional({
+    description: 'Settlement time',
+    example: '2024-01-01 12:05:00',
+  })
   @IsOptional()
   @IsString()
   settlement_time?: string;
 
-  @ApiProperty({ description: 'Signature key for verification', example: 'signature_hash' })
+  @ApiProperty({
+    description: 'Signature key for verification',
+    example: 'signature_hash',
+  })
   @IsString()
   signature_key: string;
 }
 
 export class CancelPaymentDto {
-  @ApiProperty({ description: 'Cancellation reason', example: 'Customer requested cancellation' })
+  @ApiProperty({
+    description: 'Cancellation reason',
+    example: 'Customer requested cancellation',
+  })
   @IsString()
   reason: string;
 }
-
-
-

@@ -23,32 +23,11 @@ let RedemptionService = RedemptionService_1 = class RedemptionService {
         this.prisma = prisma;
         this.qrSecurityService = qrSecurityService;
     }
-    async processRedemption(qrToken, staffId, notes, location) {
+    async processRedemption(qrToken, redeemedByUserId, notes, location) {
         try {
-            const qrValidation = await this.qrSecurityService.validateQRCode(qrToken, staffId);
+            const qrValidation = await this.qrSecurityService.validateQRCode(qrToken, redeemedByUserId);
             if (!qrValidation.isValid) {
                 throw new common_1.BadRequestException(qrValidation.error || 'Invalid QR code');
-            }
-            const staff = await this.prisma.staff.findUnique({
-                where: { id: staffId },
-                include: {
-                    merchant: {
-                        select: {
-                            id: true,
-                            name: true,
-                            email: true,
-                        },
-                    },
-                },
-            });
-            if (!staff) {
-                throw new common_1.NotFoundException('Staff member not found');
-            }
-            if (!staff.isActive) {
-                throw new common_1.ForbiddenException('Staff member is not active');
-            }
-            if (staff.merchantId && staff.merchantId !== qrValidation.merchant.id) {
-                throw new common_1.ForbiddenException('Staff can only redeem coupons for their assigned merchant');
             }
             const existingRedemption = await this.prisma.redemption.findFirst({
                 where: { couponId: qrValidation.payload.couponId },
@@ -59,7 +38,7 @@ let RedemptionService = RedemptionService_1 = class RedemptionService {
             const redemption = await this.prisma.redemption.create({
                 data: {
                     couponId: qrValidation.payload.couponId,
-                    staffId: staffId,
+                    redeemedByUserId: redeemedByUserId,
                     notes: notes || null,
                     location: location || null,
                     status: client_1.RedemptionStatus.COMPLETED,
@@ -67,8 +46,7 @@ let RedemptionService = RedemptionService_1 = class RedemptionService {
                     metadata: {
                         qrToken: qrToken.substring(0, 20) + '...',
                         validationTimestamp: new Date(),
-                        staffRole: staff.role,
-                        merchantId: staff.merchantId,
+                        redeemedByUserId,
                     },
                 },
                 include: {
@@ -99,18 +77,9 @@ let RedemptionService = RedemptionService_1 = class RedemptionService {
                             },
                         },
                     },
-                    staff: {
-                        select: {
-                            id: true,
-                            firstName: true,
-                            lastName: true,
-                            email: true,
-                            role: true,
-                        },
-                    },
                 },
             });
-            await this.qrSecurityService.markQRCodeAsUsed(qrValidation.payload.couponId, staffId, notes);
+            await this.qrSecurityService.markQRCodeAsUsed(qrValidation.payload.couponId, redeemedByUserId, notes);
             await this.prisma.coupon.update({
                 where: { id: qrValidation.payload.couponId },
                 data: {
@@ -118,7 +87,7 @@ let RedemptionService = RedemptionService_1 = class RedemptionService {
                     usedAt: new Date(),
                 },
             });
-            this.logger.log(`Redemption processed: ${redemption.id} by staff ${staffId}`);
+            this.logger.log(`Redemption processed: ${redemption.id} by user ${redeemedByUserId}`);
             return this.mapToResponseDto(redemption);
         }
         catch (error) {
@@ -158,15 +127,6 @@ let RedemptionService = RedemptionService_1 = class RedemptionService {
                             },
                         },
                     },
-                    staff: {
-                        select: {
-                            id: true,
-                            firstName: true,
-                            lastName: true,
-                            email: true,
-                            role: true,
-                        },
-                    },
                 },
             });
             if (!redemption) {
@@ -179,7 +139,7 @@ let RedemptionService = RedemptionService_1 = class RedemptionService {
             throw error;
         }
     }
-    async findAll(page = 1, limit = 10, merchantId, staffId, status, startDate, endDate) {
+    async findAll(page = 1, limit = 10, merchantId, redeemedByUserId, status, startDate, endDate) {
         try {
             const skip = (page - 1) * limit;
             const where = {};
@@ -192,8 +152,8 @@ let RedemptionService = RedemptionService_1 = class RedemptionService {
                     },
                 };
             }
-            if (staffId) {
-                where.staffId = staffId;
+            if (redeemedByUserId) {
+                where.redeemedByUserId = redeemedByUserId;
             }
             if (status) {
                 where.status = status;
@@ -238,15 +198,6 @@ let RedemptionService = RedemptionService_1 = class RedemptionService {
                                 },
                             },
                         },
-                        staff: {
-                            select: {
-                                id: true,
-                                firstName: true,
-                                lastName: true,
-                                email: true,
-                                role: true,
-                            },
-                        },
                     },
                     orderBy: {
                         redeemedAt: 'desc',
@@ -254,7 +205,7 @@ let RedemptionService = RedemptionService_1 = class RedemptionService {
                 }),
                 this.prisma.redemption.count({ where }),
             ]);
-            const redemptionsResponse = redemptions.map(r => this.mapToResponseDto(r));
+            const redemptionsResponse = redemptions.map((r) => this.mapToResponseDto(r));
             return {
                 redemptions: redemptionsResponse,
                 pagination: {
@@ -313,15 +264,6 @@ let RedemptionService = RedemptionService_1 = class RedemptionService {
                             },
                         },
                     },
-                    staff: {
-                        select: {
-                            id: true,
-                            firstName: true,
-                            lastName: true,
-                            email: true,
-                            role: true,
-                        },
-                    },
                 },
             });
             this.logger.log(`Redemption status updated: ${id} to ${status}`);
@@ -346,11 +288,17 @@ let RedemptionService = RedemptionService_1 = class RedemptionService {
             }
             const [totalRedemptions, completedRedemptions, pendingRedemptions, cancelledRedemptions, redemptionsByStaff, redemptionsByMerchant, recentRedemptions,] = await Promise.all([
                 this.prisma.redemption.count({ where }),
-                this.prisma.redemption.count({ where: { ...where, status: client_1.RedemptionStatus.COMPLETED } }),
-                this.prisma.redemption.count({ where: { ...where, status: client_1.RedemptionStatus.PENDING } }),
-                this.prisma.redemption.count({ where: { ...where, status: client_1.RedemptionStatus.CANCELLED } }),
+                this.prisma.redemption.count({
+                    where: { ...where, status: client_1.RedemptionStatus.COMPLETED },
+                }),
+                this.prisma.redemption.count({
+                    where: { ...where, status: client_1.RedemptionStatus.PENDING },
+                }),
+                this.prisma.redemption.count({
+                    where: { ...where, status: client_1.RedemptionStatus.CANCELLED },
+                }),
                 this.prisma.redemption.groupBy({
-                    by: ['staffId'],
+                    by: ['redeemedByUserId'],
                     _count: { id: true },
                     where,
                 }),
@@ -368,13 +316,15 @@ let RedemptionService = RedemptionService_1 = class RedemptionService {
                     },
                 }),
             ]);
-            const staffIds = redemptionsByStaff.map(r => r.staffId).filter((id) => id !== null);
-            const staffMembers = await this.prisma.staff.findMany({
-                where: { id: { in: staffIds } },
-                select: { id: true, firstName: true, lastName: true, role: true },
+            const userIds = redemptionsByStaff
+                .map((r) => r.redeemedByUserId)
+                .filter((id) => id !== null);
+            const users = await this.prisma.user.findMany({
+                where: { id: { in: userIds } },
+                select: { id: true, email: true },
             });
-            const staffMap = staffMembers.reduce((acc, staff) => {
-                acc[staff.id] = `${staff.firstName} ${staff.lastName} (${staff.role})`;
+            const userMap = users.reduce((acc, u) => {
+                acc[u.id] = u.email;
                 return acc;
             }, {});
             return {
@@ -382,10 +332,12 @@ let RedemptionService = RedemptionService_1 = class RedemptionService {
                 completedRedemptions,
                 pendingRedemptions,
                 cancelledRedemptions,
-                completionRate: totalRedemptions > 0 ? (completedRedemptions / totalRedemptions) * 100 : 0,
-                redemptionsByStaff: redemptionsByStaff.map(stat => ({
-                    staffId: stat.staffId,
-                    staffName: staffMap[stat.staffId] || 'Unknown Staff',
+                completionRate: totalRedemptions > 0
+                    ? (completedRedemptions / totalRedemptions) * 100
+                    : 0,
+                redemptionsByStaff: redemptionsByStaff.map((stat) => ({
+                    userId: stat.redeemedByUserId,
+                    userEmail: userMap[stat.redeemedByUserId] || 'Unknown User',
                     redemptionCount: stat._count.id,
                 })),
                 recentRedemptions,
@@ -436,8 +388,13 @@ let RedemptionService = RedemptionService_1 = class RedemptionService {
                 customerRedemptions,
                 summary: {
                     totalRedemptions: dailyRedemptions.reduce((sum, day) => sum + day.count, 0),
-                    averageDailyRedemptions: dailyRedemptions.length > 0 ? dailyRedemptions.reduce((sum, day) => sum + day.count, 0) / dailyRedemptions.length : 0,
-                    peakHour: hourlyRedemptions.length > 0 ? hourlyRedemptions.reduce((max, hour) => hour.count > max.count ? hour : max) : null,
+                    averageDailyRedemptions: dailyRedemptions.length > 0
+                        ? dailyRedemptions.reduce((sum, day) => sum + day.count, 0) /
+                            dailyRedemptions.length
+                        : 0,
+                    peakHour: hourlyRedemptions.length > 0
+                        ? hourlyRedemptions.reduce((max, hour) => hour.count > max.count ? hour : max)
+                        : null,
                     topStaff: topPerformingStaff.length > 0 ? topPerformingStaff[0] : null,
                 },
             };
@@ -457,17 +414,7 @@ let RedemptionService = RedemptionService_1 = class RedemptionService {
                     canRedeem: false,
                 };
             }
-            const staff = await this.prisma.staff.findUnique({
-                where: { id: staffId },
-            });
-            if (!staff || !staff.isActive) {
-                return {
-                    isValid: false,
-                    error: 'Staff member not found or inactive',
-                    canRedeem: false,
-                };
-            }
-            const canRedeem = !staff.merchantId || staff.merchantId === qrValidation.merchant.id;
+            const canRedeem = true;
             return {
                 isValid: true,
                 canRedeem,
@@ -476,7 +423,6 @@ let RedemptionService = RedemptionService_1 = class RedemptionService {
                 deal: qrValidation.deal,
                 customer: qrValidation.customer,
                 merchant: qrValidation.merchant,
-                staff: staff,
                 validationTimestamp: new Date(),
             };
         }
@@ -524,8 +470,8 @@ let RedemptionService = RedemptionService_1 = class RedemptionService {
         }));
     }
     async getTopPerformingStaff(where) {
-        const staffStats = await this.prisma.redemption.groupBy({
-            by: ['staffId'],
+        const stats = await this.prisma.redemption.groupBy({
+            by: ['redeemedByUserId'],
             _count: { id: true },
             where,
             orderBy: {
@@ -535,19 +481,21 @@ let RedemptionService = RedemptionService_1 = class RedemptionService {
             },
             take: 10,
         });
-        const staffIds = staffStats.map(s => s.staffId).filter((id) => id !== null);
-        const staffMembers = await this.prisma.staff.findMany({
-            where: { id: { in: staffIds } },
-            select: { id: true, firstName: true, lastName: true, role: true },
+        const userIds = stats
+            .map((s) => s.redeemedByUserId)
+            .filter((id) => id !== null);
+        const users = await this.prisma.user.findMany({
+            where: { id: { in: userIds } },
+            select: { id: true, email: true },
         });
-        const staffMap = staffMembers.reduce((acc, staff) => {
-            acc[staff.id] = `${staff.firstName} ${staff.lastName}`;
+        const userMap = users.reduce((acc, u) => {
+            acc[u.id] = u.email;
             return acc;
         }, {});
-        return staffStats.map(stat => ({
-            staffId: stat.staffId,
-            staffName: staffMap[stat.staffId] || 'Unknown Staff',
-            redemptionCount: stat._count.id,
+        return stats.map((stat) => ({
+            userId: stat.redeemedByUserId,
+            userEmail: userMap[stat.redeemedByUserId] || 'Unknown User',
+            redemptionCount: stat._count?.id ?? 0,
         }));
     }
     async getRedemptionTrends(where) {
@@ -560,7 +508,7 @@ let RedemptionService = RedemptionService_1 = class RedemptionService {
                 redeemedAt: 'asc',
             },
         });
-        return redemptions.map(redemption => ({
+        return redemptions.map((redemption) => ({
             date: redemption.redeemedAt,
             status: 'COMPLETED',
         }));
@@ -571,7 +519,7 @@ let RedemptionService = RedemptionService_1 = class RedemptionService {
             _count: { id: true },
             where,
         });
-        const couponIds = customerStats.map(c => c.couponId);
+        const couponIds = customerStats.map((c) => c.couponId);
         const coupons = await this.prisma.coupon.findMany({
             where: { id: { in: couponIds } },
             include: {
@@ -607,7 +555,7 @@ let RedemptionService = RedemptionService_1 = class RedemptionService {
         return {
             id: redemption.id,
             couponId: redemption.couponId,
-            staffId: redemption.staffId,
+            redeemedByUserId: redemption.redeemedByUserId,
             notes: redemption.notes,
             location: redemption.location,
             status: redemption.status,
@@ -647,13 +595,6 @@ let RedemptionService = RedemptionService_1 = class RedemptionService {
                 id: redemption.coupon.order.deal.merchant.id,
                 name: redemption.coupon.order.deal.merchant.name,
                 email: redemption.coupon.order.deal.merchant.email,
-            },
-            staff: {
-                id: redemption.staff.id,
-                firstName: redemption.staff.firstName,
-                lastName: redemption.staff.lastName,
-                email: redemption.staff.email,
-                role: redemption.staff.role,
             },
         };
     }

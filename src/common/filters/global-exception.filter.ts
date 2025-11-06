@@ -35,7 +35,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     if (exception instanceof HttpException) {
       status = exception.getStatus();
       const exceptionResponse = exception.getResponse();
-      
+
       if (typeof exceptionResponse === 'string') {
         message = exceptionResponse;
         error = exception.name;
@@ -49,7 +49,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       status = HttpStatus.INTERNAL_SERVER_ERROR;
       message = 'Internal server error';
       error = 'InternalServerError';
-      
+
       // Log the actual error for debugging
       this.logger.error('Unexpected error occurred:', exception);
     }

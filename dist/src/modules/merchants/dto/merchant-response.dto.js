@@ -65,7 +65,10 @@ __decorate([
     __metadata("design:type", String)
 ], MerchantResponseDto.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Merchant description', example: 'A sample restaurant for testing' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Merchant description',
+        example: 'A sample restaurant for testing',
+    }),
     __metadata("design:type", String)
 ], MerchantResponseDto.prototype, "description", void 0);
 __decorate([
@@ -73,11 +76,17 @@ __decorate([
     __metadata("design:type", String)
 ], MerchantResponseDto.prototype, "email", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Merchant phone number', example: '+6281234567890' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Merchant phone number',
+        example: '+6281234567890',
+    }),
     __metadata("design:type", String)
 ], MerchantResponseDto.prototype, "phone", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Merchant address', example: 'Jl. Demo No. 123' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Merchant address',
+        example: 'Jl. Demo No. 123',
+    }),
     __metadata("design:type", String)
 ], MerchantResponseDto.prototype, "address", void 0);
 __decorate([
@@ -93,19 +102,31 @@ __decorate([
     __metadata("design:type", String)
 ], MerchantResponseDto.prototype, "postalCode", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Website URL', example: 'https://demo-restaurant.com' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Website URL',
+        example: 'https://demo-restaurant.com',
+    }),
     __metadata("design:type", String)
 ], MerchantResponseDto.prototype, "website", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Logo URL', example: 'https://via.placeholder.com/200x200' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Logo URL',
+        example: 'https://via.placeholder.com/200x200',
+    }),
     __metadata("design:type", String)
 ], MerchantResponseDto.prototype, "logo", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Merchant images URLs', example: ['https://via.placeholder.com/400x300'] }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Merchant images URLs',
+        example: ['https://via.placeholder.com/400x300'],
+    }),
     __metadata("design:type", Array)
 ], MerchantResponseDto.prototype, "images", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Operating hours', type: [OperatingHoursResponseDto] }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Operating hours',
+        type: [OperatingHoursResponseDto],
+    }),
     __metadata("design:type", Array)
 ], MerchantResponseDto.prototype, "operatingHours", void 0);
 __decorate([
@@ -113,11 +134,17 @@ __decorate([
     __metadata("design:type", Boolean)
 ], MerchantResponseDto.prototype, "isActive", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Creation date', example: '2024-01-01T00:00:00.000Z' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Creation date',
+        example: '2024-01-01T00:00:00.000Z',
+    }),
     __metadata("design:type", Date)
 ], MerchantResponseDto.prototype, "createdAt", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Last update date', example: '2024-01-01T00:00:00.000Z' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Last update date',
+        example: '2024-01-01T00:00:00.000Z',
+    }),
     __metadata("design:type", Date)
 ], MerchantResponseDto.prototype, "updatedAt", void 0);
 __decorate([

@@ -142,23 +142,20 @@ export class AnalyticsService {
 
   constructor(private prisma: PrismaService) {}
 
-  async getDashboardAnalytics(userRole: UserRole, userId?: string): Promise<DashboardAnalytics> {
+  async getDashboardAnalytics(
+    userRole: UserRole,
+    userId?: string,
+  ): Promise<DashboardAnalytics> {
     try {
-      const [
-        overview,
-        revenue,
-        customers,
-        merchants,
-        deals,
-        orders,
-      ] = await Promise.all([
-        this.getOverviewMetrics(userRole, userId),
-        this.getRevenueAnalytics(userRole, userId),
-        this.getCustomerAnalytics(userRole, userId),
-        this.getMerchantAnalytics(userRole, userId),
-        this.getDealAnalytics(userRole, userId),
-        this.getOrderAnalytics(userRole, userId),
-      ]);
+      const [overview, revenue, customers, merchants, deals, orders] =
+        await Promise.all([
+          this.getOverviewMetrics(userRole, userId),
+          this.getRevenueAnalytics(userRole, userId),
+          this.getCustomerAnalytics(userRole, userId),
+          this.getMerchantAnalytics(userRole, userId),
+          this.getDealAnalytics(userRole, userId),
+          this.getOrderAnalytics(userRole, userId),
+        ]);
 
       return {
         overview,
@@ -175,7 +172,10 @@ export class AnalyticsService {
     }
   }
 
-  async getRevenueAnalytics(userRole: UserRole, userId?: string): Promise<RevenueAnalytics> {
+  async getRevenueAnalytics(
+    userRole: UserRole,
+    userId?: string,
+  ): Promise<RevenueAnalytics> {
     try {
       const whereClause = this.buildWhereClause(userRole, userId);
 
@@ -208,7 +208,8 @@ export class AnalyticsService {
       // Calculate growth (comparing last 30 days with previous 30 days)
       const revenueGrowth = await this.calculateRevenueGrowth(whereClause);
 
-      const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+      const averageOrderValue =
+        totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
       return {
         totalRevenue,
@@ -224,7 +225,10 @@ export class AnalyticsService {
     }
   }
 
-  async getCustomerAnalytics(userRole: UserRole, userId?: string): Promise<CustomerAnalytics> {
+  async getCustomerAnalytics(
+    userRole: UserRole,
+    userId?: string,
+  ): Promise<CustomerAnalytics> {
     try {
       const whereClause = this.buildWhereClause(userRole, userId);
 
@@ -273,9 +277,10 @@ export class AnalyticsService {
         },
       });
 
-      const averageSpendingPerCustomer = totalCustomers > 0 
-        ? Number(totalRevenue._sum.totalAmount || 0) / totalCustomers 
-        : 0;
+      const averageSpendingPerCustomer =
+        totalCustomers > 0
+          ? Number(totalRevenue._sum.totalAmount || 0) / totalCustomers
+          : 0;
 
       // Calculate customer retention rate
       const customerRetentionRate = await this.calculateCustomerRetentionRate();
@@ -299,7 +304,10 @@ export class AnalyticsService {
     }
   }
 
-  async getMerchantAnalytics(userRole: UserRole, userId?: string): Promise<MerchantAnalytics> {
+  async getMerchantAnalytics(
+    userRole: UserRole,
+    userId?: string,
+  ): Promise<MerchantAnalytics> {
     try {
       const whereClause = this.buildWhereClause(userRole, userId);
 
@@ -318,7 +326,8 @@ export class AnalyticsService {
       });
 
       // Get top performing merchants
-      const topPerformingMerchants = await this.getTopPerformingMerchants(whereClause);
+      const topPerformingMerchants =
+        await this.getTopPerformingMerchants(whereClause);
 
       // Calculate merchant growth
       const merchantGrowth = await this.calculateMerchantGrowth();
@@ -334,12 +343,14 @@ export class AnalyticsService {
         },
       });
 
-      const averageRevenuePerMerchant = totalMerchants > 0 
-        ? Number(totalRevenue._sum.totalAmount || 0) / totalMerchants 
-        : 0;
+      const averageRevenuePerMerchant =
+        totalMerchants > 0
+          ? Number(totalRevenue._sum.totalAmount || 0) / totalMerchants
+          : 0;
 
       // Get merchant performance metrics
-      const merchantPerformance = await this.getMerchantPerformanceMetrics(whereClause);
+      const merchantPerformance =
+        await this.getMerchantPerformanceMetrics(whereClause);
 
       return {
         totalMerchants,
@@ -355,7 +366,10 @@ export class AnalyticsService {
     }
   }
 
-  async getDealAnalytics(userRole: UserRole, userId?: string): Promise<DealAnalytics> {
+  async getDealAnalytics(
+    userRole: UserRole,
+    userId?: string,
+  ): Promise<DealAnalytics> {
     try {
       const whereClause = this.buildWhereClause(userRole, userId);
 
@@ -380,7 +394,8 @@ export class AnalyticsService {
       const dealPerformance = await this.getDealPerformanceMetrics(whereClause);
 
       // Get category performance
-      const categoryPerformance = await this.getCategoryPerformanceMetrics(whereClause);
+      const categoryPerformance =
+        await this.getCategoryPerformanceMetrics(whereClause);
 
       // Get deal trends
       const dealTrends = await this.getDealTrends();
@@ -399,7 +414,10 @@ export class AnalyticsService {
     }
   }
 
-  async getOrderAnalytics(userRole: UserRole, userId?: string): Promise<OrderAnalytics> {
+  async getOrderAnalytics(
+    userRole: UserRole,
+    userId?: string,
+  ): Promise<OrderAnalytics> {
     try {
       const whereClause = this.buildWhereClause(userRole, userId);
 
@@ -419,7 +437,7 @@ export class AnalyticsService {
         refunded: 0,
       };
 
-      orderCounts.forEach(count => {
+      orderCounts.forEach((count) => {
         switch (count.status) {
           case 'PENDING':
             orderStatusDistribution.pending = count._count.id;
@@ -436,7 +454,10 @@ export class AnalyticsService {
         }
       });
 
-      const totalOrders = orderCounts.reduce((sum, count) => sum + count._count.id, 0);
+      const totalOrders = orderCounts.reduce(
+        (sum, count) => sum + count._count.id,
+        0,
+      );
       const completedOrders = orderStatusDistribution.paid;
       const cancelledOrders = orderStatusDistribution.cancelled;
       const refundedOrders = orderStatusDistribution.refunded;
@@ -445,10 +466,12 @@ export class AnalyticsService {
       const orderTrends = await this.getOrderTrends(whereClause);
 
       // Calculate average order processing time
-      const averageOrderProcessingTime = await this.calculateAverageOrderProcessingTime(whereClause);
+      const averageOrderProcessingTime =
+        await this.calculateAverageOrderProcessingTime(whereClause);
 
       // Calculate order completion rate
-      const orderCompletionRate = totalOrders > 0 ? (completedOrders / totalOrders) * 100 : 0;
+      const orderCompletionRate =
+        totalOrders > 0 ? (completedOrders / totalOrders) * 100 : 0;
 
       return {
         totalOrders,
@@ -534,9 +557,11 @@ export class AnalyticsService {
     });
 
     // Group by month and aggregate
-    const monthlyRevenue: { [key: string]: { revenue: number; orders: number } } = {};
+    const monthlyRevenue: {
+      [key: string]: { revenue: number; orders: number };
+    } = {};
 
-    monthlyData.forEach(data => {
+    monthlyData.forEach((data) => {
       const month = data.createdAt.toISOString().substring(0, 7); // YYYY-MM
       if (!monthlyRevenue[month]) {
         monthlyRevenue[month] = { revenue: 0, orders: 0 };
@@ -574,9 +599,10 @@ export class AnalyticsService {
     });
 
     // Group by date and aggregate
-    const dailyRevenue: { [key: string]: { revenue: number; orders: number } } = {};
+    const dailyRevenue: { [key: string]: { revenue: number; orders: number } } =
+      {};
 
-    dailyData.forEach(data => {
+    dailyData.forEach((data) => {
       const date = data.createdAt.toISOString().substring(0, 10); // YYYY-MM-DD
       if (!dailyRevenue[date]) {
         dailyRevenue[date] = { revenue: 0, orders: 0 };
@@ -607,7 +633,7 @@ export class AnalyticsService {
       },
     });
 
-    const dealIds = dealPerformance.map(d => d.dealId);
+    const dealIds = dealPerformance.map((d) => d.dealId);
     const deals = await this.prisma.deal.findMany({
       where: {
         id: { in: dealIds },
@@ -622,8 +648,8 @@ export class AnalyticsService {
     });
 
     return dealPerformance
-      .map(perf => {
-        const deal = deals.find(d => d.id === perf.dealId);
+      .map((perf) => {
+        const deal = deals.find((d) => d.id === perf.dealId);
         return {
           dealId: perf.dealId,
           dealTitle: deal?.title || 'Unknown Deal',
@@ -700,7 +726,9 @@ export class AnalyticsService {
       }),
     ]);
 
-    return previousCustomers > 0 ? ((recentCustomers - previousCustomers) / previousCustomers) * 100 : 0;
+    return previousCustomers > 0
+      ? ((recentCustomers - previousCustomers) / previousCustomers) * 100
+      : 0;
   }
 
   private async getTopCustomers(whereClause: any) {
@@ -721,7 +749,7 @@ export class AnalyticsService {
       },
     });
 
-    const customerIds = customerPerformance.map(c => c.customerId);
+    const customerIds = customerPerformance.map((c) => c.customerId);
     const customers = await this.prisma.customer.findMany({
       where: {
         id: { in: customerIds },
@@ -734,12 +762,13 @@ export class AnalyticsService {
     });
 
     return customerPerformance
-      .map(perf => {
-        const customer = customers.find(c => c.id === perf.customerId);
+      .map((perf) => {
+        const customer = customers.find((c) => c.id === perf.customerId);
         return {
           customerId: perf.customerId,
-          customerName: customer 
-            ? `${customer.firstName || ''} ${customer.lastName || ''}`.trim() || 'Unknown Customer'
+          customerName: customer
+            ? `${customer.firstName || ''} ${customer.lastName || ''}`.trim() ||
+              'Unknown Customer'
             : 'Unknown Customer',
           totalSpent: Number(perf._sum.totalAmount || 0),
           orders: perf._count.id,
@@ -761,7 +790,9 @@ export class AnalyticsService {
       },
     });
 
-    return totalCustomers > 0 ? (customersWithMultipleOrders / totalCustomers) * 100 : 0;
+    return totalCustomers > 0
+      ? (customersWithMultipleOrders / totalCustomers) * 100
+      : 0;
   }
 
   private async getCustomerSegments() {
@@ -775,12 +806,22 @@ export class AnalyticsService {
       },
     });
 
-    const spendingAmounts = customerSpending.map(c => Number(c._sum.totalAmount || 0));
-    const avgSpending = spendingAmounts.reduce((sum, amount) => sum + amount, 0) / spendingAmounts.length;
+    const spendingAmounts = customerSpending.map((c) =>
+      Number(c._sum.totalAmount || 0),
+    );
+    const avgSpending =
+      spendingAmounts.reduce((sum, amount) => sum + amount, 0) /
+      spendingAmounts.length;
 
-    const highValue = spendingAmounts.filter(amount => amount > avgSpending * 2).length;
-    const mediumValue = spendingAmounts.filter(amount => amount > avgSpending && amount <= avgSpending * 2).length;
-    const lowValue = spendingAmounts.filter(amount => amount <= avgSpending).length;
+    const highValue = spendingAmounts.filter(
+      (amount) => amount > avgSpending * 2,
+    ).length;
+    const mediumValue = spendingAmounts.filter(
+      (amount) => amount > avgSpending && amount <= avgSpending * 2,
+    ).length;
+    const lowValue = spendingAmounts.filter(
+      (amount) => amount <= avgSpending,
+    ).length;
 
     return {
       highValue,
@@ -804,7 +845,7 @@ export class AnalyticsService {
       },
     });
 
-    const dealIds = merchantPerformance.map(d => d.dealId);
+    const dealIds = merchantPerformance.map((d) => d.dealId);
     const deals = await this.prisma.deal.findMany({
       where: {
         id: { in: dealIds },
@@ -819,10 +860,12 @@ export class AnalyticsService {
       },
     });
 
-    const merchantStats: { [key: string]: { revenue: number; orders: number; deals: number } } = {};
+    const merchantStats: {
+      [key: string]: { revenue: number; orders: number; deals: number };
+    } = {};
 
-    merchantPerformance.forEach(perf => {
-      const deal = deals.find(d => d.id === perf.dealId);
+    merchantPerformance.forEach((perf) => {
+      const deal = deals.find((d) => d.id === perf.dealId);
       if (deal) {
         const merchantId = deal.merchant.id;
         if (!merchantStats[merchantId]) {
@@ -836,7 +879,9 @@ export class AnalyticsService {
 
     return Object.entries(merchantStats)
       .map(([merchantId, stats]) => {
-        const merchant = deals.find(d => d.merchant.id === merchantId)?.merchant;
+        const merchant = deals.find(
+          (d) => d.merchant.id === merchantId,
+        )?.merchant;
         return {
           merchantId,
           merchantName: merchant?.name || 'Unknown Merchant',
@@ -873,7 +918,9 @@ export class AnalyticsService {
       }),
     ]);
 
-    return previousMerchants > 0 ? ((recentMerchants - previousMerchants) / previousMerchants) * 100 : 0;
+    return previousMerchants > 0
+      ? ((recentMerchants - previousMerchants) / previousMerchants) * 100
+      : 0;
   }
 
   private async getMerchantPerformanceMetrics(whereClause: any) {
@@ -897,7 +944,7 @@ export class AnalyticsService {
       },
     });
 
-    const dealIds = dealPerformance.map(d => d.dealId);
+    const dealIds = dealPerformance.map((d) => d.dealId);
     const deals = await this.prisma.deal.findMany({
       where: {
         id: { in: dealIds },
@@ -917,8 +964,8 @@ export class AnalyticsService {
     });
 
     return dealPerformance
-      .map(perf => {
-        const deal = deals.find(d => d.id === perf.dealId);
+      .map((perf) => {
+        const deal = deals.find((d) => d.id === perf.dealId);
         return {
           dealId: perf.dealId,
           dealTitle: deal?.title || 'Unknown Deal',
@@ -949,7 +996,7 @@ export class AnalyticsService {
       },
     });
 
-    const dealIds = dealPerformance.map(d => d.dealId);
+    const dealIds = dealPerformance.map((d) => d.dealId);
     const deals = await this.prisma.deal.findMany({
       where: {
         id: { in: dealIds },
@@ -964,14 +1011,26 @@ export class AnalyticsService {
       },
     });
 
-    const categoryStats: { [key: string]: { deals: number; revenue: number; orders: number; name: string } } = {};
+    const categoryStats: {
+      [key: string]: {
+        deals: number;
+        revenue: number;
+        orders: number;
+        name: string;
+      };
+    } = {};
 
-    dealPerformance.forEach(perf => {
-      const deal = deals.find(d => d.id === perf.dealId);
+    dealPerformance.forEach((perf) => {
+      const deal = deals.find((d) => d.id === perf.dealId);
       if (deal?.category) {
         const categoryId = deal.category.id;
         if (!categoryStats[categoryId]) {
-          categoryStats[categoryId] = { deals: 0, revenue: 0, orders: 0, name: deal.category.name };
+          categoryStats[categoryId] = {
+            deals: 0,
+            revenue: 0,
+            orders: 0,
+            name: deal.category.name,
+          };
         }
         categoryStats[categoryId].revenue += Number(perf._sum.totalAmount || 0);
         categoryStats[categoryId].orders += perf._count.id;
@@ -1016,9 +1075,15 @@ export class AnalyticsService {
       },
     });
 
-    const dailyTrends: { [key: string]: { orders: number; revenue: number; averageOrderValue: number } } = {};
+    const dailyTrends: {
+      [key: string]: {
+        orders: number;
+        revenue: number;
+        averageOrderValue: number;
+      };
+    } = {};
 
-    dailyData.forEach(data => {
+    dailyData.forEach((data) => {
       const date = data.createdAt.toISOString().substring(0, 10);
       if (!dailyTrends[date]) {
         dailyTrends[date] = { orders: 0, revenue: 0, averageOrderValue: 0 };
@@ -1041,6 +1106,3 @@ export class AnalyticsService {
     return 0;
   }
 }
-
-
-

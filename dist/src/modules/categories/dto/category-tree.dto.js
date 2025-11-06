@@ -36,7 +36,10 @@ __decorate([
     __metadata("design:type", String)
 ], CategoryTreeNodeDto.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Category description', example: 'Restaurants, cafes, and food delivery' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Category description',
+        example: 'Restaurants, cafes, and food delivery',
+    }),
     __metadata("design:type", String)
 ], CategoryTreeNodeDto.prototype, "description", void 0);
 __decorate([
@@ -48,7 +51,10 @@ __decorate([
     __metadata("design:type", String)
 ], CategoryTreeNodeDto.prototype, "color", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Parent category ID', example: 'parent-category-123' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Parent category ID',
+        example: 'parent-category-123',
+    }),
     __metadata("design:type", String)
 ], CategoryTreeNodeDto.prototype, "parentId", void 0);
 __decorate([

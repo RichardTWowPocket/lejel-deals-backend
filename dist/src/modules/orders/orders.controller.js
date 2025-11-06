@@ -73,7 +73,7 @@ let OrdersController = class OrdersController {
 exports.OrdersController = OrdersController;
 __decorate([
     (0, common_1.Post)(),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.CUSTOMER, client_1.UserRole.ADMIN),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN),
     (0, swagger_1.ApiOperation)({ summary: 'Create a new order' }),
     (0, swagger_1.ApiResponse)({ status: 201, description: 'Order created successfully' }),
     (0, swagger_1.ApiResponse)({ status: 400, description: 'Invalid order data' }),
@@ -85,14 +85,44 @@ __decorate([
 ], OrdersController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.ADMIN, client_1.UserRole.STAFF),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiOperation)({ summary: 'Get all orders with pagination and filtering' }),
-    (0, swagger_1.ApiQuery)({ name: 'page', required: false, type: Number, description: 'Page number' }),
-    (0, swagger_1.ApiQuery)({ name: 'limit', required: false, type: Number, description: 'Items per page' }),
-    (0, swagger_1.ApiQuery)({ name: 'status', required: false, enum: client_1.OrderStatus, description: 'Filter by order status' }),
-    (0, swagger_1.ApiQuery)({ name: 'customerId', required: false, type: String, description: 'Filter by customer ID' }),
-    (0, swagger_1.ApiQuery)({ name: 'dealId', required: false, type: String, description: 'Filter by deal ID' }),
-    (0, swagger_1.ApiQuery)({ name: 'merchantId', required: false, type: String, description: 'Filter by merchant ID' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'page',
+        required: false,
+        type: Number,
+        description: 'Page number',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'limit',
+        required: false,
+        type: Number,
+        description: 'Items per page',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'status',
+        required: false,
+        enum: client_1.OrderStatus,
+        description: 'Filter by order status',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'customerId',
+        required: false,
+        type: String,
+        description: 'Filter by customer ID',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'dealId',
+        required: false,
+        type: String,
+        description: 'Filter by deal ID',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'merchantId',
+        required: false,
+        type: String,
+        description: 'Filter by merchant ID',
+    }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Orders retrieved successfully' }),
     __param(0, (0, common_1.Query)('page', new common_1.DefaultValuePipe(1), common_1.ParseIntPipe)),
     __param(1, (0, common_1.Query)('limit', new common_1.DefaultValuePipe(10), common_1.ParseIntPipe)),
@@ -106,19 +136,30 @@ __decorate([
 ], OrdersController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)('stats'),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.ADMIN, client_1.UserRole.STAFF),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiOperation)({ summary: 'Get order statistics' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Order statistics retrieved successfully' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Order statistics retrieved successfully',
+    }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "getStats", null);
 __decorate([
     (0, common_1.Get)('analytics'),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.ADMIN, client_1.UserRole.STAFF),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiOperation)({ summary: 'Get order analytics' }),
-    (0, swagger_1.ApiQuery)({ name: 'period', required: false, type: String, description: 'Analytics period (week, month, year)' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Order analytics retrieved successfully' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'period',
+        required: false,
+        type: String,
+        description: 'Analytics period (week, month, year)',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Order analytics retrieved successfully',
+    }),
     __param(0, (0, common_1.Query)('period')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -126,11 +167,24 @@ __decorate([
 ], OrdersController.prototype, "getAnalytics", null);
 __decorate([
     (0, common_1.Get)('customer/:customerId'),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.CUSTOMER, client_1.UserRole.ADMIN, client_1.UserRole.STAFF),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiOperation)({ summary: 'Get orders for a specific customer' }),
-    (0, swagger_1.ApiQuery)({ name: 'page', required: false, type: Number, description: 'Page number' }),
-    (0, swagger_1.ApiQuery)({ name: 'limit', required: false, type: Number, description: 'Items per page' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Customer orders retrieved successfully' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'page',
+        required: false,
+        type: Number,
+        description: 'Page number',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'limit',
+        required: false,
+        type: Number,
+        description: 'Items per page',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Customer orders retrieved successfully',
+    }),
     __param(0, (0, common_1.Param)('customerId')),
     __param(1, (0, common_1.Query)('page', new common_1.DefaultValuePipe(1), common_1.ParseIntPipe)),
     __param(2, (0, common_1.Query)('limit', new common_1.DefaultValuePipe(10), common_1.ParseIntPipe)),
@@ -140,11 +194,24 @@ __decorate([
 ], OrdersController.prototype, "findByCustomer", null);
 __decorate([
     (0, common_1.Get)('me'),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.CUSTOMER, client_1.UserRole.ADMIN),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.CUSTOMER, client_1.UserRole.SUPER_ADMIN),
     (0, swagger_1.ApiOperation)({ summary: 'Get orders for current authenticated customer' }),
-    (0, swagger_1.ApiQuery)({ name: 'page', required: false, type: Number, description: 'Page number' }),
-    (0, swagger_1.ApiQuery)({ name: 'limit', required: false, type: Number, description: 'Items per page' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Current customer orders retrieved successfully' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'page',
+        required: false,
+        type: Number,
+        description: 'Page number',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'limit',
+        required: false,
+        type: Number,
+        description: 'Items per page',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Current customer orders retrieved successfully',
+    }),
     __param(0, (0, auth_decorators_1.CurrentUser)()),
     __param(1, (0, common_1.Query)('page', new common_1.DefaultValuePipe(1), common_1.ParseIntPipe)),
     __param(2, (0, common_1.Query)('limit', new common_1.DefaultValuePipe(10), common_1.ParseIntPipe)),
@@ -154,11 +221,24 @@ __decorate([
 ], OrdersController.prototype, "findMine", null);
 __decorate([
     (0, common_1.Get)('merchant/:merchantId'),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT, client_1.UserRole.ADMIN, client_1.UserRole.STAFF),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiOperation)({ summary: 'Get orders for a specific merchant' }),
-    (0, swagger_1.ApiQuery)({ name: 'page', required: false, type: Number, description: 'Page number' }),
-    (0, swagger_1.ApiQuery)({ name: 'limit', required: false, type: Number, description: 'Items per page' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Merchant orders retrieved successfully' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'page',
+        required: false,
+        type: Number,
+        description: 'Page number',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'limit',
+        required: false,
+        type: Number,
+        description: 'Items per page',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Merchant orders retrieved successfully',
+    }),
     __param(0, (0, common_1.Param)('merchantId')),
     __param(1, (0, common_1.Query)('page', new common_1.DefaultValuePipe(1), common_1.ParseIntPipe)),
     __param(2, (0, common_1.Query)('limit', new common_1.DefaultValuePipe(10), common_1.ParseIntPipe)),
@@ -168,7 +248,7 @@ __decorate([
 ], OrdersController.prototype, "findByMerchant", null);
 __decorate([
     (0, common_1.Get)('number/:orderNumber'),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.CUSTOMER, client_1.UserRole.MERCHANT, client_1.UserRole.ADMIN, client_1.UserRole.STAFF),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiOperation)({ summary: 'Get order by order number' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Order retrieved successfully' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Order not found' }),
@@ -179,7 +259,7 @@ __decorate([
 ], OrdersController.prototype, "findByOrderNumber", null);
 __decorate([
     (0, common_1.Get)(':id'),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.CUSTOMER, client_1.UserRole.MERCHANT, client_1.UserRole.ADMIN, client_1.UserRole.STAFF),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiOperation)({ summary: 'Get order by ID' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Order retrieved successfully' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Order not found' }),
@@ -190,7 +270,7 @@ __decorate([
 ], OrdersController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Patch)(':id'),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.ADMIN, client_1.UserRole.STAFF),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiOperation)({ summary: 'Update order' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Order updated successfully' }),
     (0, swagger_1.ApiResponse)({ status: 400, description: 'Invalid update data' }),
@@ -203,9 +283,12 @@ __decorate([
 ], OrdersController.prototype, "update", null);
 __decorate([
     (0, common_1.Patch)(':id/status'),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.ADMIN, client_1.UserRole.STAFF),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiOperation)({ summary: 'Update order status' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Order status updated successfully' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Order status updated successfully',
+    }),
     (0, swagger_1.ApiResponse)({ status: 400, description: 'Invalid status transition' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Order not found' }),
     __param(0, (0, common_1.Param)('id')),
@@ -216,7 +299,7 @@ __decorate([
 ], OrdersController.prototype, "updateStatus", null);
 __decorate([
     (0, common_1.Patch)(':id/cancel'),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.CUSTOMER, client_1.UserRole.ADMIN, client_1.UserRole.STAFF),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiOperation)({ summary: 'Cancel order' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Order cancelled successfully' }),
     (0, swagger_1.ApiResponse)({ status: 400, description: 'Order cannot be cancelled' }),
@@ -229,7 +312,7 @@ __decorate([
 ], OrdersController.prototype, "cancel", null);
 __decorate([
     (0, common_1.Patch)(':id/refund'),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.ADMIN, client_1.UserRole.STAFF),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiOperation)({ summary: 'Refund order' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Order refunded successfully' }),
     (0, swagger_1.ApiResponse)({ status: 400, description: 'Order cannot be refunded' }),
@@ -242,7 +325,7 @@ __decorate([
 ], OrdersController.prototype, "refund", null);
 __decorate([
     (0, common_1.Delete)(':id'),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.ADMIN),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN),
     (0, swagger_1.ApiOperation)({ summary: 'Delete order' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Order deleted successfully' }),
     (0, swagger_1.ApiResponse)({ status: 400, description: 'Order cannot be deleted' }),

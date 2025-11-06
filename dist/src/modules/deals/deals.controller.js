@@ -96,19 +96,83 @@ __decorate([
     (0, auth_decorators_1.Public)(),
     (0, common_1.Get)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get all deals with pagination and filters' }),
-    (0, swagger_1.ApiQuery)({ name: 'page', required: false, type: Number, description: 'Page number' }),
-    (0, swagger_1.ApiQuery)({ name: 'limit', required: false, type: Number, description: 'Items per page' }),
-    (0, swagger_1.ApiQuery)({ name: 'status', required: false, enum: client_1.DealStatus, description: 'Filter by status' }),
-    (0, swagger_1.ApiQuery)({ name: 'merchantId', required: false, type: String, description: 'Filter by merchant' }),
-    (0, swagger_1.ApiQuery)({ name: 'categoryId', required: false, type: String, description: 'Filter by category' }),
-    (0, swagger_1.ApiQuery)({ name: 'search', required: false, type: String, description: 'Search in title/description' }),
-    (0, swagger_1.ApiQuery)({ name: 'featured', required: false, type: Boolean, description: 'Filter featured deals' }),
-    (0, swagger_1.ApiQuery)({ name: 'city', required: false, type: String, description: 'Filter by merchant city' }),
-    (0, swagger_1.ApiQuery)({ name: 'priceMin', required: false, type: Number, description: 'Minimum deal price (IDR)' }),
-    (0, swagger_1.ApiQuery)({ name: 'priceMax', required: false, type: Number, description: 'Maximum deal price (IDR)' }),
-    (0, swagger_1.ApiQuery)({ name: 'sortBy', required: false, type: String, description: 'Sort by field' }),
-    (0, swagger_1.ApiQuery)({ name: 'sortOrder', required: false, enum: ['asc', 'desc'], description: 'Sort order' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Deals retrieved successfully', type: deal_response_dto_1.DealListResponseDto }),
+    (0, swagger_1.ApiQuery)({
+        name: 'page',
+        required: false,
+        type: Number,
+        description: 'Page number',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'limit',
+        required: false,
+        type: Number,
+        description: 'Items per page',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'status',
+        required: false,
+        enum: client_1.DealStatus,
+        description: 'Filter by status',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'merchantId',
+        required: false,
+        type: String,
+        description: 'Filter by merchant',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'categoryId',
+        required: false,
+        type: String,
+        description: 'Filter by category',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'search',
+        required: false,
+        type: String,
+        description: 'Search in title/description',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'featured',
+        required: false,
+        type: Boolean,
+        description: 'Filter featured deals',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'city',
+        required: false,
+        type: String,
+        description: 'Filter by merchant city',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'priceMin',
+        required: false,
+        type: Number,
+        description: 'Minimum deal price (IDR)',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'priceMax',
+        required: false,
+        type: Number,
+        description: 'Maximum deal price (IDR)',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'sortBy',
+        required: false,
+        type: String,
+        description: 'Sort by field',
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'sortOrder',
+        required: false,
+        enum: ['asc', 'desc'],
+        description: 'Sort order',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Deals retrieved successfully',
+        type: deal_response_dto_1.DealListResponseDto,
+    }),
     __param(0, (0, common_1.Query)('page', new common_1.DefaultValuePipe(1), common_1.ParseIntPipe)),
     __param(1, (0, common_1.Query)('limit', new common_1.DefaultValuePipe(12), common_1.ParseIntPipe)),
     __param(2, (0, common_1.Query)('status')),
@@ -131,7 +195,10 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Get all active deals' }),
     (0, swagger_1.ApiQuery)({ name: 'page', required: false, type: Number }),
     (0, swagger_1.ApiQuery)({ name: 'limit', required: false, type: Number }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Active deals retrieved successfully' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Active deals retrieved successfully',
+    }),
     __param(0, (0, common_1.Query)('page', new common_1.DefaultValuePipe(1), common_1.ParseIntPipe)),
     __param(1, (0, common_1.Query)('limit', new common_1.DefaultValuePipe(12), common_1.ParseIntPipe)),
     __metadata("design:type", Function),
@@ -158,7 +225,10 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Get deals by merchant' }),
     (0, swagger_1.ApiQuery)({ name: 'page', required: false, type: Number }),
     (0, swagger_1.ApiQuery)({ name: 'limit', required: false, type: Number }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Merchant deals retrieved successfully' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Merchant deals retrieved successfully',
+    }),
     __param(0, (0, common_1.Param)('merchantId')),
     __param(1, (0, common_1.Query)('page', new common_1.DefaultValuePipe(1), common_1.ParseIntPipe)),
     __param(2, (0, common_1.Query)('limit', new common_1.DefaultValuePipe(12), common_1.ParseIntPipe)),
@@ -172,7 +242,10 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Get deals by category' }),
     (0, swagger_1.ApiQuery)({ name: 'page', required: false, type: Number }),
     (0, swagger_1.ApiQuery)({ name: 'limit', required: false, type: Number }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Category deals retrieved successfully' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Category deals retrieved successfully',
+    }),
     __param(0, (0, common_1.Param)('categoryId')),
     __param(1, (0, common_1.Query)('page', new common_1.DefaultValuePipe(1), common_1.ParseIntPipe)),
     __param(2, (0, common_1.Query)('limit', new common_1.DefaultValuePipe(12), common_1.ParseIntPipe)),
@@ -184,7 +257,10 @@ __decorate([
     (0, auth_decorators_1.Public)(),
     (0, common_1.Get)('stats'),
     (0, swagger_1.ApiOperation)({ summary: 'Get deal statistics' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Deal statistics retrieved successfully' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Deal statistics retrieved successfully',
+    }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
@@ -193,7 +269,11 @@ __decorate([
     (0, auth_decorators_1.Public)(),
     (0, common_1.Get)(':id'),
     (0, swagger_1.ApiOperation)({ summary: 'Get deal by ID or slug' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Deal retrieved successfully', type: deal_response_dto_1.DealResponseDto }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Deal retrieved successfully',
+        type: deal_response_dto_1.DealResponseDto,
+    }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Deal not found' }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
@@ -202,11 +282,15 @@ __decorate([
 ], DealsController.prototype, "findOne", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT, client_1.UserRole.ADMIN),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT, client_1.UserRole.SUPER_ADMIN),
     (0, common_1.Post)(),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiOperation)({ summary: 'Create a new deal' }),
-    (0, swagger_1.ApiResponse)({ status: 201, description: 'Deal created successfully', type: deal_response_dto_1.DealResponseDto }),
+    (0, swagger_1.ApiResponse)({
+        status: 201,
+        description: 'Deal created successfully',
+        type: deal_response_dto_1.DealResponseDto,
+    }),
     (0, swagger_1.ApiResponse)({ status: 400, description: 'Invalid deal data' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Merchant or category not found' }),
     __param(0, (0, common_1.Body)()),
@@ -217,11 +301,15 @@ __decorate([
 ], DealsController.prototype, "create", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT, client_1.UserRole.ADMIN),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT, client_1.UserRole.SUPER_ADMIN),
     (0, common_1.Patch)(':id'),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiOperation)({ summary: 'Update deal' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Deal updated successfully', type: deal_response_dto_1.DealResponseDto }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Deal updated successfully',
+        type: deal_response_dto_1.DealResponseDto,
+    }),
     (0, swagger_1.ApiResponse)({ status: 400, description: 'Invalid update data' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Deal not found' }),
     __param(0, (0, common_1.Param)('id')),
@@ -233,7 +321,7 @@ __decorate([
 ], DealsController.prototype, "update", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT, client_1.UserRole.ADMIN),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT, client_1.UserRole.SUPER_ADMIN),
     (0, common_1.Patch)(':id/status'),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiOperation)({ summary: 'Update deal status' }),
@@ -249,7 +337,7 @@ __decorate([
 ], DealsController.prototype, "updateStatus", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT, client_1.UserRole.ADMIN),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT, client_1.UserRole.SUPER_ADMIN),
     (0, common_1.Post)(':id/publish'),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiOperation)({ summary: 'Publish deal (DRAFT -> ACTIVE)' }),
@@ -264,7 +352,7 @@ __decorate([
 ], DealsController.prototype, "publish", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT, client_1.UserRole.ADMIN),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT, client_1.UserRole.SUPER_ADMIN),
     (0, common_1.Post)(':id/pause'),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiOperation)({ summary: 'Pause deal (ACTIVE -> PAUSED)' }),
@@ -279,7 +367,7 @@ __decorate([
 ], DealsController.prototype, "pause", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.ADMIN),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN),
     (0, common_1.Post)('expired/check'),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiOperation)({ summary: 'Check and update expired deals (Admin only)' }),
@@ -290,7 +378,7 @@ __decorate([
 ], DealsController.prototype, "checkExpiredDeals", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.ADMIN),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN),
     (0, common_1.Post)('sold-out/check'),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiOperation)({ summary: 'Check and update sold out deals (Admin only)' }),
@@ -301,7 +389,7 @@ __decorate([
 ], DealsController.prototype, "checkSoldOutDeals", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.ADMIN),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN),
     (0, common_1.Delete)(':id'),
     (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),

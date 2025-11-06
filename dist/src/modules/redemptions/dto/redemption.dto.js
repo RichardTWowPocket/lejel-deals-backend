@@ -15,29 +15,41 @@ const swagger_1 = require("@nestjs/swagger");
 const client_1 = require("@prisma/client");
 class CreateRedemptionDto {
     qrToken;
-    staffId;
+    redeemedByUserId;
     notes;
     location;
 }
 exports.CreateRedemptionDto = CreateRedemptionDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'QR code token to redeem', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'QR code token to redeem',
+        example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+    }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateRedemptionDto.prototype, "qrToken", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Staff ID performing the redemption', example: 'staff-123' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'User ID performing the redemption',
+        example: 'user-123',
+    }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], CreateRedemptionDto.prototype, "staffId", void 0);
+], CreateRedemptionDto.prototype, "redeemedByUserId", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Redemption notes', example: 'Redeemed at counter' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Redemption notes',
+        example: 'Redeemed at counter',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateRedemptionDto.prototype, "notes", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Redemption location', example: 'Main Counter' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Redemption location',
+        example: 'Main Counter',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -49,19 +61,28 @@ class UpdateRedemptionDto {
 }
 exports.UpdateRedemptionDto = UpdateRedemptionDto;
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Redemption status', enum: client_1.RedemptionStatus }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Redemption status',
+        enum: client_1.RedemptionStatus,
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsEnum)(client_1.RedemptionStatus),
     __metadata("design:type", String)
 ], UpdateRedemptionDto.prototype, "status", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Redemption notes', example: 'Updated notes' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Redemption notes',
+        example: 'Updated notes',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], UpdateRedemptionDto.prototype, "notes", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Redemption location', example: 'Main Counter' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Redemption location',
+        example: 'Main Counter',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -69,7 +90,7 @@ __decorate([
 class RedemptionResponseDto {
     id;
     couponId;
-    staffId;
+    redeemedByUserId;
     notes;
     location;
     status;
@@ -82,7 +103,6 @@ class RedemptionResponseDto {
     deal;
     customer;
     merchant;
-    staff;
 }
 exports.RedemptionResponseDto = RedemptionResponseDto;
 __decorate([
@@ -94,9 +114,9 @@ __decorate([
     __metadata("design:type", String)
 ], RedemptionResponseDto.prototype, "couponId", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Staff ID' }),
+    (0, swagger_1.ApiProperty)({ description: 'Redeemed by user ID' }),
     __metadata("design:type", String)
-], RedemptionResponseDto.prototype, "staffId", void 0);
+], RedemptionResponseDto.prototype, "redeemedByUserId", void 0);
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({ description: 'Redemption notes' }),
     __metadata("design:type", String)
@@ -145,10 +165,6 @@ __decorate([
     (0, swagger_1.ApiProperty)({ description: 'Merchant information' }),
     __metadata("design:type", Object)
 ], RedemptionResponseDto.prototype, "merchant", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Staff information' }),
-    __metadata("design:type", Object)
-], RedemptionResponseDto.prototype, "staff", void 0);
 class RedemptionStatsDto {
     totalRedemptions;
     completedRedemptions;
@@ -182,7 +198,7 @@ __decorate([
     __metadata("design:type", Number)
 ], RedemptionStatsDto.prototype, "completionRate", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Redemptions by staff member' }),
+    (0, swagger_1.ApiProperty)({ description: 'Redemptions by user' }),
     __metadata("design:type", Array)
 ], RedemptionStatsDto.prototype, "redemptionsByStaff", void 0);
 __decorate([
@@ -215,7 +231,7 @@ __decorate([
     __metadata("design:type", Array)
 ], RedemptionAnalyticsDto.prototype, "hourlyRedemptions", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Top performing staff members' }),
+    (0, swagger_1.ApiProperty)({ description: 'Top performing users' }),
     __metadata("design:type", Array)
 ], RedemptionAnalyticsDto.prototype, "topPerformingStaff", void 0);
 __decorate([
@@ -239,7 +255,6 @@ class RedemptionValidationDto {
     deal;
     customer;
     merchant;
-    staff;
     validationTimestamp;
 }
 exports.RedemptionValidationDto = RedemptionValidationDto;
@@ -252,7 +267,7 @@ __decorate([
     __metadata("design:type", String)
 ], RedemptionValidationDto.prototype, "error", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Whether the staff can redeem this coupon' }),
+    (0, swagger_1.ApiProperty)({ description: 'Whether the user can redeem this coupon' }),
     __metadata("design:type", Boolean)
 ], RedemptionValidationDto.prototype, "canRedeem", void 0);
 __decorate([
@@ -276,10 +291,6 @@ __decorate([
     __metadata("design:type", Object)
 ], RedemptionValidationDto.prototype, "merchant", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Staff information' }),
-    __metadata("design:type", Object)
-], RedemptionValidationDto.prototype, "staff", void 0);
-__decorate([
     (0, swagger_1.ApiPropertyOptional)({ description: 'Validation timestamp' }),
     __metadata("design:type", Date)
 ], RedemptionValidationDto.prototype, "validationTimestamp", void 0);
@@ -287,7 +298,7 @@ class RedemptionFiltersDto {
     page;
     limit;
     merchantId;
-    staffId;
+    redeemedByUserId;
     status;
     startDate;
     endDate;
@@ -306,19 +317,28 @@ __decorate([
     __metadata("design:type", String)
 ], RedemptionFiltersDto.prototype, "merchantId", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Filter by staff ID' }),
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Filter by user ID who redeemed' }),
     __metadata("design:type", String)
-], RedemptionFiltersDto.prototype, "staffId", void 0);
+], RedemptionFiltersDto.prototype, "redeemedByUserId", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Filter by redemption status', enum: client_1.RedemptionStatus }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Filter by redemption status',
+        enum: client_1.RedemptionStatus,
+    }),
     __metadata("design:type", String)
 ], RedemptionFiltersDto.prototype, "status", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Filter by start date', example: '2024-01-01' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Filter by start date',
+        example: '2024-01-01',
+    }),
     __metadata("design:type", Date)
 ], RedemptionFiltersDto.prototype, "startDate", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Filter by end date', example: '2024-12-31' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Filter by end date',
+        example: '2024-12-31',
+    }),
     __metadata("design:type", Date)
 ], RedemptionFiltersDto.prototype, "endDate", void 0);
 //# sourceMappingURL=redemption.dto.js.map

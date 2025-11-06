@@ -63,10 +63,14 @@ export class DealResponseDto {
   @ApiProperty({ description: 'Coupon face value (IDR)' })
   discountPrice: number;
 
-  @ApiProperty({ description: 'For frontend compatibility - same as discountPrice' })
+  @ApiProperty({
+    description: 'For frontend compatibility - same as discountPrice',
+  })
   discountedPrice: number;
 
-  @ApiProperty({ description: 'For frontend compatibility - same as discountPrice' })
+  @ApiProperty({
+    description: 'For frontend compatibility - same as discountPrice',
+  })
   originalPrice: number;
 
   @ApiProperty({ description: 'Real calculated percentage discount' })
@@ -105,7 +109,9 @@ export class DealResponseDto {
   @ApiProperty()
   quantity: number;
 
-  @ApiProperty({ description: 'Available quantity (maxQuantity - soldQuantity)' })
+  @ApiProperty({
+    description: 'Available quantity (maxQuantity - soldQuantity)',
+  })
   quantityAvailable: number;
 
   @ApiPropertyOptional()
@@ -158,4 +164,3 @@ export class DealListResponseDto {
     totalPages: number;
   };
 }
-

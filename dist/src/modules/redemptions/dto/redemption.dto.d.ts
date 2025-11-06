@@ -1,7 +1,7 @@
 import { RedemptionStatus } from '@prisma/client';
 export declare class CreateRedemptionDto {
     qrToken: string;
-    staffId: string;
+    redeemedByUserId: string;
     notes?: string;
     location?: string;
 }
@@ -13,7 +13,7 @@ export declare class UpdateRedemptionDto {
 export declare class RedemptionResponseDto {
     id: string;
     couponId: string;
-    staffId: string;
+    redeemedByUserId: string;
     notes?: string;
     location?: string;
     status: RedemptionStatus;
@@ -54,13 +54,6 @@ export declare class RedemptionResponseDto {
         name: string;
         email: string;
     };
-    staff: {
-        id: string;
-        firstName: string;
-        lastName: string;
-        email: string;
-        role: string;
-    };
 }
 export declare class RedemptionStatsDto {
     totalRedemptions: number;
@@ -69,8 +62,8 @@ export declare class RedemptionStatsDto {
     cancelledRedemptions: number;
     completionRate: number;
     redemptionsByStaff: Array<{
-        staffId: string;
-        staffName: string;
+        userId: string;
+        userEmail: string;
         redemptionCount: number;
     }>;
     recentRedemptions: number;
@@ -91,8 +84,8 @@ export declare class RedemptionAnalyticsDto {
         count: number;
     }>;
     topPerformingStaff: Array<{
-        staffId: string;
-        staffName: string;
+        userId: string;
+        userEmail: string;
         redemptionCount: number;
     }>;
     redemptionTrends: Array<{
@@ -112,8 +105,8 @@ export declare class RedemptionAnalyticsDto {
             count: number;
         };
         topStaff?: {
-            staffId: string;
-            staffName: string;
+            userId: string;
+            userEmail: string;
             redemptionCount: number;
         };
     };
@@ -154,20 +147,13 @@ export declare class RedemptionValidationDto {
         name: string;
         email: string;
     };
-    staff?: {
-        id: string;
-        firstName: string;
-        lastName: string;
-        email: string;
-        role: string;
-    };
     validationTimestamp?: Date;
 }
 export declare class RedemptionFiltersDto {
     page?: number;
     limit?: number;
     merchantId?: string;
-    staffId?: string;
+    redeemedByUserId?: string;
     status?: RedemptionStatus;
     startDate?: Date;
     endDate?: Date;

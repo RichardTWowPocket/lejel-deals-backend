@@ -27,6 +27,20 @@ let JwtAuthGuard = class JwtAuthGuard extends (0, passport_1.AuthGuard)('jwt') {
         if (isPublic) {
             return true;
         }
+        const request = context.switchToHttp().getRequest();
+        const authHeader = request.headers.authorization;
+        if (authHeader) {
+            const token = authHeader.replace('Bearer ', '');
+            console.warn('🔑 Raw JWT Token received:', {
+                token: token.substring(0, 50) + '...',
+                fullToken: token,
+                tokenLength: token.length,
+                endpoint: `${request.method} ${request.url}`,
+            });
+        }
+        else {
+            console.warn('⚠️ No Authorization header found in request');
+        }
         return super.canActivate(context);
     }
 };

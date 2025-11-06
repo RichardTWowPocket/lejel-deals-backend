@@ -79,7 +79,7 @@ exports.StaffController = StaffController;
 __decorate([
     (0, common_1.Post)(),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.ADMIN),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Create new staff member' }),
     (0, swagger_1.ApiResponse)({ status: 201, description: 'Staff created successfully', type: staff_dto_1.StaffResponseDto }),
@@ -91,14 +91,14 @@ __decorate([
 __decorate([
     (0, common_1.Get)(),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.ADMIN, client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get paginated list of staff members' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Staff list retrieved successfully' }),
     (0, swagger_1.ApiQuery)({ name: 'page', required: false, type: Number, description: 'Page number' }),
     (0, swagger_1.ApiQuery)({ name: 'limit', required: false, type: Number, description: 'Items per page' }),
     (0, swagger_1.ApiQuery)({ name: 'merchantId', required: false, type: String, description: 'Filter by merchant ID' }),
-    (0, swagger_1.ApiQuery)({ name: 'role', required: false, enum: client_1.StaffRole, description: 'Filter by staff role' }),
+    (0, swagger_1.ApiQuery)({ name: 'role', required: false, enum: staff_dto_1.StaffRole, description: 'Filter by staff role' }),
     (0, swagger_1.ApiQuery)({ name: 'isActive', required: false, type: Boolean, description: 'Filter by active status' }),
     __param(0, (0, common_1.Query)('page')),
     __param(1, (0, common_1.Query)('limit')),
@@ -112,7 +112,7 @@ __decorate([
 __decorate([
     (0, common_1.Get)('stats'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.ADMIN),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get staff statistics and analytics' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Staff statistics retrieved successfully', type: staff_dto_1.StaffStatsDto }),
@@ -123,7 +123,7 @@ __decorate([
 __decorate([
     (0, common_1.Get)(':id'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.ADMIN, client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get staff member by ID' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Staff retrieved successfully', type: staff_dto_1.StaffResponseDto }),
@@ -135,7 +135,7 @@ __decorate([
 __decorate([
     (0, common_1.Get)('email/:email'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.ADMIN, client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get staff member by email' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Staff retrieved successfully', type: staff_dto_1.StaffResponseDto }),
@@ -147,7 +147,7 @@ __decorate([
 __decorate([
     (0, common_1.Patch)(':id'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.ADMIN, client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Update staff member' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Staff updated successfully', type: staff_dto_1.StaffResponseDto }),
@@ -160,7 +160,7 @@ __decorate([
 __decorate([
     (0, common_1.Delete)(':id'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.ADMIN),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.SUPER_ADMIN),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Delete staff member' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Staff deleted successfully' }),
@@ -181,7 +181,7 @@ __decorate([
 __decorate([
     (0, common_1.Post)(':id/change-pin'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.ADMIN, client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Change staff PIN' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'PIN changed successfully' }),
@@ -194,7 +194,7 @@ __decorate([
 __decorate([
     (0, common_1.Patch)(':id/deactivate'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.ADMIN, client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Deactivate staff member' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Staff deactivated successfully', type: staff_dto_1.StaffResponseDto }),
@@ -206,7 +206,7 @@ __decorate([
 __decorate([
     (0, common_1.Patch)(':id/activate'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.ADMIN, client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Activate staff member' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Staff activated successfully', type: staff_dto_1.StaffResponseDto }),
@@ -218,7 +218,7 @@ __decorate([
 __decorate([
     (0, common_1.Get)(':id/activity'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, auth_decorators_1.Roles)(client_1.UserRole.ADMIN, client_1.UserRole.MERCHANT),
+    (0, auth_decorators_1.Roles)(client_1.UserRole.MERCHANT),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get staff activity history' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Staff activity retrieved successfully', type: [staff_dto_1.StaffActivityDto] }),

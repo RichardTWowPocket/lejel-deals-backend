@@ -1,23 +1,23 @@
-import { 
-  Controller, 
-  Get, 
-  Post, 
-  Body, 
-  Patch, 
-  Param, 
-  Delete, 
-  UseGuards, 
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
   Query,
   ParseIntPipe,
-  DefaultValuePipe
+  DefaultValuePipe,
 } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiResponse, 
-  ApiBearerAuth, 
-  ApiParam, 
-  ApiQuery 
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -42,20 +42,48 @@ export class CategoriesController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - admin role required' })
   @ApiResponse({ status: 409, description: 'Category name already exists' })
-  create(@Body() createCategoryDto: CreateCategoryDto, @CurrentUser() user: AuthUser) {
+  create(
+    @Body() createCategoryDto: CreateCategoryDto,
+    @CurrentUser() user: AuthUser,
+  ) {
     return this.categoriesService.create(createCategoryDto);
   }
 
   @Public()
   @Get()
   @ApiOperation({ summary: 'Get all categories with pagination and filtering' })
-  @ApiQuery({ name: 'page', required: false, description: 'Page number', example: 1 })
-  @ApiQuery({ name: 'limit', required: false, description: 'Items per page', example: 10 })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Page number',
+    example: 1,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'Items per page',
+    example: 10,
+  })
   @ApiQuery({ name: 'search', required: false, description: 'Search query' })
-  @ApiQuery({ name: 'isActive', required: false, description: 'Filter by active status' })
-  @ApiQuery({ name: 'parentId', required: false, description: 'Filter by parent category ID' })
-  @ApiQuery({ name: 'level', required: false, description: 'Filter by hierarchy level' })
-  @ApiResponse({ status: 200, description: 'Returns paginated categories list' })
+  @ApiQuery({
+    name: 'isActive',
+    required: false,
+    description: 'Filter by active status',
+  })
+  @ApiQuery({
+    name: 'parentId',
+    required: false,
+    description: 'Filter by parent category ID',
+  })
+  @ApiQuery({
+    name: 'level',
+    required: false,
+    description: 'Filter by hierarchy level',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns paginated categories list',
+  })
   findAll(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
@@ -67,7 +95,14 @@ export class CategoriesController {
     const isActiveBool = isActive ? isActive === 'true' : undefined;
     const parentIdFilter = parentId === 'null' ? null : parentId;
     const levelFilter = level ? parseInt(level) : undefined;
-    return this.categoriesService.findAll(page, limit, search, isActiveBool, parentIdFilter, levelFilter);
+    return this.categoriesService.findAll(
+      page,
+      limit,
+      search,
+      isActiveBool,
+      parentIdFilter,
+      levelFilter,
+    );
   }
 
   @Public()
@@ -90,7 +125,10 @@ export class CategoriesController {
   @Get('level/:level')
   @ApiOperation({ summary: 'Get categories by hierarchy level' })
   @ApiParam({ name: 'level', description: 'Hierarchy level', example: 1 })
-  @ApiResponse({ status: 200, description: 'Returns categories at specified level' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns categories at specified level',
+  })
   getCategoriesByLevel(@Param('level', ParseIntPipe) level: number) {
     return this.categoriesService.getCategoriesByLevel(level);
   }
@@ -107,9 +145,21 @@ export class CategoriesController {
   @Get('search')
   @ApiOperation({ summary: 'Search categories' })
   @ApiQuery({ name: 'q', description: 'Search query', example: 'food' })
-  @ApiQuery({ name: 'isActive', required: false, description: 'Filter by active status' })
-  @ApiQuery({ name: 'parentId', required: false, description: 'Filter by parent category ID' })
-  @ApiQuery({ name: 'level', required: false, description: 'Filter by hierarchy level' })
+  @ApiQuery({
+    name: 'isActive',
+    required: false,
+    description: 'Filter by active status',
+  })
+  @ApiQuery({
+    name: 'parentId',
+    required: false,
+    description: 'Filter by parent category ID',
+  })
+  @ApiQuery({
+    name: 'level',
+    required: false,
+    description: 'Filter by hierarchy level',
+  })
   @ApiResponse({ status: 200, description: 'Returns search results' })
   search(
     @Query('q') query: string,
@@ -120,10 +170,10 @@ export class CategoriesController {
     const isActiveBool = isActive ? isActive === 'true' : undefined;
     const parentIdFilter = parentId === 'null' ? null : parentId;
     const levelFilter = level ? parseInt(level) : undefined;
-    return this.categoriesService.searchCategories(query, { 
-      isActive: isActiveBool, 
+    return this.categoriesService.searchCategories(query, {
+      isActive: isActiveBool,
       parentId: parentIdFilter,
-      level: levelFilter 
+      level: levelFilter,
     });
   }
 
@@ -133,7 +183,9 @@ export class CategoriesController {
   @ApiResponse({ status: 200, description: 'Returns test data' })
   async test() {
     try {
-      const categories = await this.categoriesService['prisma'].category.findMany({
+      const categories = await this.categoriesService[
+        'prisma'
+      ].category.findMany({
         take: 1,
       });
       return { success: true, data: categories };
@@ -180,22 +232,24 @@ export class CategoriesController {
     return this.categoriesService.getChildCategories(id);
   }
 
-
   @Roles('admin')
   @Patch(':id')
   @ApiOperation({ summary: 'Update a category' })
   @ApiParam({ name: 'id', description: 'Category ID' })
   @ApiBearerAuth('JWT-auth')
   @ApiResponse({ status: 200, description: 'Category updated successfully' })
-  @ApiResponse({ status: 400, description: 'Invalid input data or circular reference' })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid input data or circular reference',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - admin role required' })
   @ApiResponse({ status: 404, description: 'Category not found' })
   @ApiResponse({ status: 409, description: 'Category name already taken' })
   update(
-    @Param('id') id: string, 
-    @Body() updateCategoryDto: UpdateCategoryDto, 
-    @CurrentUser() user: AuthUser
+    @Param('id') id: string,
+    @Body() updateCategoryDto: UpdateCategoryDto,
+    @CurrentUser() user: AuthUser,
   ) {
     return this.categoriesService.update(id, updateCategoryDto);
   }
@@ -206,7 +260,10 @@ export class CategoriesController {
   @ApiParam({ name: 'id', description: 'Category ID' })
   @ApiBearerAuth('JWT-auth')
   @ApiResponse({ status: 200, description: 'Category deleted successfully' })
-  @ApiResponse({ status: 400, description: 'Cannot delete category with child categories or active deals' })
+  @ApiResponse({
+    status: 400,
+    description: 'Cannot delete category with child categories or active deals',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - admin role required' })
   @ApiResponse({ status: 404, description: 'Category not found' })
@@ -233,8 +290,14 @@ export class CategoriesController {
   @ApiOperation({ summary: 'Deactivate a category' })
   @ApiParam({ name: 'id', description: 'Category ID' })
   @ApiBearerAuth('JWT-auth')
-  @ApiResponse({ status: 200, description: 'Category deactivated successfully' })
-  @ApiResponse({ status: 400, description: 'Cannot deactivate category with active deals' })
+  @ApiResponse({
+    status: 200,
+    description: 'Category deactivated successfully',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Cannot deactivate category with active deals',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - admin role required' })
   @ApiResponse({ status: 404, description: 'Category not found' })
@@ -246,14 +309,16 @@ export class CategoriesController {
   @Post('reorder')
   @ApiOperation({ summary: 'Reorder categories' })
   @ApiBearerAuth('JWT-auth')
-  @ApiResponse({ status: 200, description: 'Categories reordered successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Categories reordered successfully',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - admin role required' })
   reorderCategories(
     @Body() categoryOrders: { id: string; sortOrder: number }[],
-    @CurrentUser() user: AuthUser
+    @CurrentUser() user: AuthUser,
   ) {
     return this.categoriesService.reorderCategories(categoryOrders);
   }
-
 }

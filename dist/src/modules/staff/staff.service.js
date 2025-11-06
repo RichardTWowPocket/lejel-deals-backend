@@ -46,6 +46,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.StaffService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../prisma/prisma.service");
+const staff_dto_1 = require("./dto/staff.dto");
 const client_1 = require("@prisma/client");
 const bcrypt = __importStar(require("bcrypt"));
 const jwt = __importStar(require("jsonwebtoken"));
@@ -59,20 +60,58 @@ let StaffService = StaffService_1 = class StaffService {
     }
     async create(createStaffDto) {
         try {
-            const existingStaff = await this.prisma.staff.findUnique({
+            const merchantId = createStaffDto.merchantId;
+            if (!merchantId) {
+                throw new common_1.BadRequestException('Merchant ID is required');
+            }
+            const existingUser = await this.prisma.user.findUnique({
                 where: { email: createStaffDto.email },
+                include: {
+                    merchants: {
+                        where: { merchantId },
+                    },
+                },
             });
-            if (existingStaff) {
-                throw new common_1.ConflictException('Staff with this email already exists');
+            if (existingUser) {
+                const existingMembership = existingUser.merchants.find(m => m.merchantId === merchantId);
+                if (existingMembership) {
+                    throw new common_1.ConflictException('Staff with this email already exists for this merchant');
+                }
             }
             const hashedPin = await bcrypt.hash(createStaffDto.pin, 10);
-            const staff = await this.prisma.staff.create({
+            const metadata = {
+                pin: hashedPin,
+                firstName: createStaffDto.firstName,
+                lastName: createStaffDto.lastName,
+                phone: createStaffDto.phone,
+                lastLoginAt: null,
+            };
+            const merchantRole = createStaffDto.role
+                ? (0, staff_dto_1.mapStaffRoleToMerchantRole)(createStaffDto.role)
+                : client_1.MerchantRole.CASHIER;
+            let user;
+            if (existingUser) {
+                user = existingUser;
+            }
+            else {
+                user = await this.prisma.user.create({
+                    data: {
+                        email: createStaffDto.email,
+                        role: 'MERCHANT',
+                        isActive: true,
+                    },
+                });
+            }
+            const membership = await this.prisma.merchantMembership.create({
                 data: {
-                    ...createStaffDto,
-                    pin: hashedPin,
-                    role: createStaffDto.role || client_1.StaffRole.CASHIER,
+                    userId: user.id,
+                    merchantId,
+                    merchantRole,
+                    permissions: createStaffDto.permissions,
+                    metadata,
                 },
                 include: {
+                    user: true,
                     merchant: {
                         select: {
                             id: true,
@@ -82,8 +121,8 @@ let StaffService = StaffService_1 = class StaffService {
                     },
                 },
             });
-            this.logger.log(`Staff created: ${staff.email} (${staff.role})`);
-            return this.mapToResponseDto(staff);
+            this.logger.log(`Staff created: ${createStaffDto.email} (${merchantRole})`);
+            return this.mapToResponseDto(membership, user);
         }
         catch (error) {
             this.logger.error('Failed to create staff:', error);
@@ -98,17 +137,16 @@ let StaffService = StaffService_1 = class StaffService {
                 where.merchantId = merchantId;
             }
             if (role) {
-                where.role = role;
+                const merchantRole = (0, staff_dto_1.mapStaffRoleToMerchantRole)(role);
+                where.merchantRole = merchantRole;
             }
-            if (isActive !== undefined) {
-                where.isActive = isActive;
-            }
-            const [staff, total] = await Promise.all([
-                this.prisma.staff.findMany({
+            const [memberships, total] = await Promise.all([
+                this.prisma.merchantMembership.findMany({
                     where,
                     skip,
                     take: limit,
                     include: {
+                        user: true,
                         merchant: {
                             select: {
                                 id: true,
@@ -121,9 +159,13 @@ let StaffService = StaffService_1 = class StaffService {
                         createdAt: 'desc',
                     },
                 }),
-                this.prisma.staff.count({ where }),
+                this.prisma.merchantMembership.count({ where }),
             ]);
-            const staffResponse = staff.map(s => this.mapToResponseDto(s));
+            let filteredMemberships = memberships;
+            if (isActive !== undefined) {
+                filteredMemberships = memberships.filter(m => m.user.isActive === isActive);
+            }
+            const staffResponse = filteredMemberships.map(m => this.mapToResponseDto(m, m.user));
             return {
                 staff: staffResponse,
                 pagination: {
@@ -141,9 +183,10 @@ let StaffService = StaffService_1 = class StaffService {
     }
     async findOne(id) {
         try {
-            const staff = await this.prisma.staff.findUnique({
+            const membership = await this.prisma.merchantMembership.findUnique({
                 where: { id },
                 include: {
+                    user: true,
                     merchant: {
                         select: {
                             id: true,
@@ -153,10 +196,10 @@ let StaffService = StaffService_1 = class StaffService {
                     },
                 },
             });
-            if (!staff) {
+            if (!membership) {
                 throw new common_1.NotFoundException('Staff not found');
             }
-            return this.mapToResponseDto(staff);
+            return this.mapToResponseDto(membership, membership.user);
         }
         catch (error) {
             this.logger.error(`Failed to find staff ${id}:`, error);
@@ -165,22 +208,27 @@ let StaffService = StaffService_1 = class StaffService {
     }
     async findByEmail(email) {
         try {
-            const staff = await this.prisma.staff.findUnique({
+            const user = await this.prisma.user.findUnique({
                 where: { email },
                 include: {
-                    merchant: {
-                        select: {
-                            id: true,
-                            name: true,
-                            email: true,
+                    merchants: {
+                        include: {
+                            merchant: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    email: true,
+                                },
+                            },
                         },
                     },
                 },
             });
-            if (!staff) {
+            if (!user || user.merchants.length === 0) {
                 throw new common_1.NotFoundException('Staff not found');
             }
-            return this.mapToResponseDto(staff);
+            const membership = user.merchants[0];
+            return this.mapToResponseDto(membership, user);
         }
         catch (error) {
             this.logger.error(`Failed to find staff by email ${email}:`, error);
@@ -189,28 +237,58 @@ let StaffService = StaffService_1 = class StaffService {
     }
     async update(id, updateStaffDto) {
         try {
-            const existingStaff = await this.prisma.staff.findUnique({
+            const membership = await this.prisma.merchantMembership.findUnique({
                 where: { id },
+                include: { user: true },
             });
-            if (!existingStaff) {
+            if (!membership) {
                 throw new common_1.NotFoundException('Staff not found');
             }
-            if (updateStaffDto.email && updateStaffDto.email !== existingStaff.email) {
-                const emailExists = await this.prisma.staff.findUnique({
+            if (updateStaffDto.email && updateStaffDto.email !== membership.user.email) {
+                const emailExists = await this.prisma.user.findUnique({
                     where: { email: updateStaffDto.email },
                 });
                 if (emailExists) {
-                    throw new common_1.ConflictException('Staff with this email already exists');
+                    throw new common_1.ConflictException('User with this email already exists');
                 }
             }
-            const updateData = { ...updateStaffDto };
-            if (updateStaffDto.pin) {
-                updateData.pin = await bcrypt.hash(updateStaffDto.pin, 10);
+            const userUpdateData = {};
+            if (updateStaffDto.email) {
+                userUpdateData.email = updateStaffDto.email;
             }
-            const staff = await this.prisma.staff.update({
+            if (updateStaffDto.isActive !== undefined) {
+                userUpdateData.isActive = updateStaffDto.isActive;
+            }
+            if (Object.keys(userUpdateData).length > 0) {
+                await this.prisma.user.update({
+                    where: { id: membership.userId },
+                    data: userUpdateData,
+                });
+            }
+            const currentMetadata = membership.metadata || {};
+            const updatedMetadata = {
+                ...currentMetadata,
+                firstName: updateStaffDto.firstName ?? currentMetadata.firstName,
+                lastName: updateStaffDto.lastName ?? currentMetadata.lastName,
+                phone: updateStaffDto.phone ?? currentMetadata.phone,
+            };
+            if (updateStaffDto.pin) {
+                updatedMetadata.pin = await bcrypt.hash(updateStaffDto.pin, 10);
+            }
+            const membershipUpdateData = {
+                metadata: updatedMetadata,
+            };
+            if (updateStaffDto.role) {
+                membershipUpdateData.merchantRole = (0, staff_dto_1.mapStaffRoleToMerchantRole)(updateStaffDto.role);
+            }
+            if (updateStaffDto.permissions !== undefined) {
+                membershipUpdateData.permissions = updateStaffDto.permissions;
+            }
+            const updatedMembership = await this.prisma.merchantMembership.update({
                 where: { id },
-                data: updateData,
+                data: membershipUpdateData,
                 include: {
+                    user: true,
                     merchant: {
                         select: {
                             id: true,
@@ -220,8 +298,8 @@ let StaffService = StaffService_1 = class StaffService {
                     },
                 },
             });
-            this.logger.log(`Staff updated: ${staff.email}`);
-            return this.mapToResponseDto(staff);
+            this.logger.log(`Staff updated: ${updatedMembership.user.email}`);
+            return this.mapToResponseDto(updatedMembership, updatedMembership.user);
         }
         catch (error) {
             this.logger.error(`Failed to update staff ${id}:`, error);
@@ -230,16 +308,17 @@ let StaffService = StaffService_1 = class StaffService {
     }
     async remove(id) {
         try {
-            const staff = await this.prisma.staff.findUnique({
+            const membership = await this.prisma.merchantMembership.findUnique({
                 where: { id },
+                include: { user: true },
             });
-            if (!staff) {
+            if (!membership) {
                 throw new common_1.NotFoundException('Staff not found');
             }
-            await this.prisma.staff.delete({
+            await this.prisma.merchantMembership.delete({
                 where: { id },
             });
-            this.logger.log(`Staff deleted: ${staff.email}`);
+            this.logger.log(`Staff deleted: ${membership.user.email}`);
         }
         catch (error) {
             this.logger.error(`Failed to delete staff ${id}:`, error);
@@ -248,48 +327,59 @@ let StaffService = StaffService_1 = class StaffService {
     }
     async login(loginDto) {
         try {
-            const staff = await this.prisma.staff.findFirst({
-                where: {
-                    OR: [
-                        { email: loginDto.identifier },
-                        { pin: loginDto.identifier },
-                    ],
-                    isActive: true,
-                },
+            const user = await this.prisma.user.findUnique({
+                where: { email: loginDto.identifier },
                 include: {
-                    merchant: {
-                        select: {
-                            id: true,
-                            name: true,
-                            email: true,
+                    merchants: {
+                        include: {
+                            merchant: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    email: true,
+                                },
+                            },
                         },
                     },
                 },
             });
-            if (!staff) {
+            if (!user || !user.isActive || user.merchants.length === 0) {
                 throw new common_1.UnauthorizedException('Invalid credentials');
             }
-            const isPinValid = await bcrypt.compare(loginDto.pin, staff.pin);
-            if (!isPinValid) {
+            let validMembership = null;
+            for (const membership of user.merchants) {
+                const metadata = membership.metadata || {};
+                const hashedPin = metadata.pin;
+                if (hashedPin) {
+                    const isPinValid = await bcrypt.compare(loginDto.pin, hashedPin);
+                    if (isPinValid) {
+                        validMembership = membership;
+                        break;
+                    }
+                }
+            }
+            if (!validMembership) {
                 throw new common_1.UnauthorizedException('Invalid credentials');
             }
-            await this.prisma.staff.update({
-                where: { id: staff.id },
-                data: { lastLoginAt: new Date() },
+            const metadata = validMembership.metadata || {};
+            metadata.lastLoginAt = new Date().toISOString();
+            await this.prisma.merchantMembership.update({
+                where: { id: validMembership.id },
+                data: { metadata },
             });
             const payload = {
-                sub: staff.id,
-                email: staff.email,
-                role: staff.role,
-                merchantId: staff.merchantId,
+                sub: validMembership.id,
+                email: user.email,
+                role: (0, staff_dto_1.mapMerchantRoleToStaffRole)(validMembership.merchantRole),
+                merchantId: validMembership.merchantId,
                 type: 'staff',
             };
             const accessToken = jwt.sign(payload, this.jwtSecret, {
                 expiresIn: this.jwtExpiresIn,
             });
-            this.logger.log(`Staff logged in: ${staff.email}`);
+            this.logger.log(`Staff logged in: ${user.email}`);
             return {
-                staff: this.mapToResponseDto(staff),
+                staff: this.mapToResponseDto(validMembership, user),
                 accessToken,
                 expiresIn: 8 * 60 * 60,
             };
@@ -301,22 +391,28 @@ let StaffService = StaffService_1 = class StaffService {
     }
     async changePin(id, changePinDto) {
         try {
-            const staff = await this.prisma.staff.findUnique({
+            const membership = await this.prisma.merchantMembership.findUnique({
                 where: { id },
             });
-            if (!staff) {
+            if (!membership) {
                 throw new common_1.NotFoundException('Staff not found');
             }
-            const isCurrentPinValid = await bcrypt.compare(changePinDto.currentPin, staff.pin);
+            const metadata = membership.metadata || {};
+            const currentPin = metadata.pin;
+            if (!currentPin) {
+                throw new common_1.BadRequestException('No PIN set for this staff member');
+            }
+            const isCurrentPinValid = await bcrypt.compare(changePinDto.currentPin, currentPin);
             if (!isCurrentPinValid) {
                 throw new common_1.BadRequestException('Current PIN is incorrect');
             }
             const hashedNewPin = await bcrypt.hash(changePinDto.newPin, 10);
-            await this.prisma.staff.update({
+            metadata.pin = hashedNewPin;
+            await this.prisma.merchantMembership.update({
                 where: { id },
-                data: { pin: hashedNewPin },
+                data: { metadata },
             });
-            this.logger.log(`Staff PIN changed: ${staff.email}`);
+            this.logger.log(`Staff PIN changed: ${id}`);
         }
         catch (error) {
             this.logger.error(`Failed to change PIN for staff ${id}:`, error);
@@ -325,10 +421,10 @@ let StaffService = StaffService_1 = class StaffService {
     }
     async deactivate(id) {
         try {
-            const staff = await this.prisma.staff.update({
+            const membership = await this.prisma.merchantMembership.findUnique({
                 where: { id },
-                data: { isActive: false },
                 include: {
+                    user: true,
                     merchant: {
                         select: {
                             id: true,
@@ -338,8 +434,31 @@ let StaffService = StaffService_1 = class StaffService {
                     },
                 },
             });
-            this.logger.log(`Staff deactivated: ${staff.email}`);
-            return this.mapToResponseDto(staff);
+            if (!membership) {
+                throw new common_1.NotFoundException('Staff not found');
+            }
+            await this.prisma.user.update({
+                where: { id: membership.userId },
+                data: { isActive: false },
+            });
+            const updatedMembership = await this.prisma.merchantMembership.findUnique({
+                where: { id },
+                include: {
+                    user: true,
+                    merchant: {
+                        select: {
+                            id: true,
+                            name: true,
+                            email: true,
+                        },
+                    },
+                },
+            });
+            if (!updatedMembership) {
+                throw new common_1.NotFoundException('Staff not found');
+            }
+            this.logger.log(`Staff deactivated: ${membership.user.email}`);
+            return this.mapToResponseDto(updatedMembership, updatedMembership.user);
         }
         catch (error) {
             this.logger.error(`Failed to deactivate staff ${id}:`, error);
@@ -348,10 +467,10 @@ let StaffService = StaffService_1 = class StaffService {
     }
     async activate(id) {
         try {
-            const staff = await this.prisma.staff.update({
+            const membership = await this.prisma.merchantMembership.findUnique({
                 where: { id },
-                data: { isActive: true },
                 include: {
+                    user: true,
                     merchant: {
                         select: {
                             id: true,
@@ -361,8 +480,31 @@ let StaffService = StaffService_1 = class StaffService {
                     },
                 },
             });
-            this.logger.log(`Staff activated: ${staff.email}`);
-            return this.mapToResponseDto(staff);
+            if (!membership) {
+                throw new common_1.NotFoundException('Staff not found');
+            }
+            await this.prisma.user.update({
+                where: { id: membership.userId },
+                data: { isActive: true },
+            });
+            const updatedMembership = await this.prisma.merchantMembership.findUnique({
+                where: { id },
+                include: {
+                    user: true,
+                    merchant: {
+                        select: {
+                            id: true,
+                            name: true,
+                            email: true,
+                        },
+                    },
+                },
+            });
+            if (!updatedMembership) {
+                throw new common_1.NotFoundException('Staff not found');
+            }
+            this.logger.log(`Staff activated: ${membership.user.email}`);
+            return this.mapToResponseDto(updatedMembership, updatedMembership.user);
         }
         catch (error) {
             this.logger.error(`Failed to activate staff ${id}:`, error);
@@ -371,31 +513,25 @@ let StaffService = StaffService_1 = class StaffService {
     }
     async getStats() {
         try {
-            const [totalStaff, activeStaff, staffByRole, staffByMerchant, recentLogins, redemptionStats,] = await Promise.all([
-                this.prisma.staff.count(),
-                this.prisma.staff.count({ where: { isActive: true } }),
-                this.prisma.staff.groupBy({
-                    by: ['role'],
-                    _count: { id: true },
-                }),
-                this.prisma.staff.groupBy({
-                    by: ['merchantId'],
-                    _count: { id: true },
-                    where: { merchantId: { not: null } },
-                }),
-                this.prisma.staff.count({
+            const [totalMemberships, activeMemberships, membershipsByRole, membershipsByMerchant] = await Promise.all([
+                this.prisma.merchantMembership.count(),
+                this.prisma.merchantMembership.count({
                     where: {
-                        lastLoginAt: {
-                            gte: new Date(Date.now() - 24 * 60 * 60 * 1000),
+                        user: {
+                            isActive: true,
                         },
                     },
                 }),
-                this.prisma.redemption.groupBy({
-                    by: ['staffId'],
+                this.prisma.merchantMembership.groupBy({
+                    by: ['merchantRole'],
+                    _count: { id: true },
+                }),
+                this.prisma.merchantMembership.groupBy({
+                    by: ['merchantId'],
                     _count: { id: true },
                 }),
             ]);
-            const merchantIds = staffByMerchant.map(s => s.merchantId).filter((id) => id !== null);
+            const merchantIds = membershipsByMerchant.map(m => m.merchantId);
             const merchants = await this.prisma.merchant.findMany({
                 where: { id: { in: merchantIds } },
                 select: { id: true, name: true },
@@ -404,40 +540,73 @@ let StaffService = StaffService_1 = class StaffService {
                 acc[merchant.id] = merchant.name;
                 return acc;
             }, {});
-            const staffIds = redemptionStats.map(r => r.staffId).filter((id) => id !== null);
-            const staffMembers = await this.prisma.staff.findMany({
-                where: { id: { in: staffIds } },
-                select: { id: true, firstName: true, lastName: true },
-            });
-            const staffMap = staffMembers.reduce((acc, staff) => {
-                acc[staff.id] = `${staff.firstName} ${staff.lastName}`;
-                return acc;
-            }, {});
             const roleStats = {
                 MANAGER: 0,
                 CASHIER: 0,
                 SUPERVISOR: 0,
                 ADMIN: 0,
             };
-            staffByRole.forEach(role => {
-                roleStats[role.role] = role._count.id;
+            membershipsByRole.forEach(role => {
+                const staffRole = (0, staff_dto_1.mapMerchantRoleToStaffRole)(role.merchantRole);
+                roleStats[staffRole] = (roleStats[staffRole] || 0) + role._count.id;
+            });
+            const allMemberships = await this.prisma.merchantMembership.findMany({
+                include: { user: true },
+            });
+            const recentLogins = allMemberships.filter(m => {
+                const metadata = m.metadata || {};
+                const lastLogin = metadata.lastLoginAt;
+                if (!lastLogin)
+                    return false;
+                const lastLoginDate = new Date(lastLogin);
+                const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
+                return lastLoginDate >= yesterday;
+            }).length;
+            const redemptionStats = await this.prisma.redemption.groupBy({
+                by: ['redeemedByUserId'],
+                _count: { id: true },
+                where: {
+                    redeemedByUserId: { not: null },
+                },
+            });
+            const userIds = redemptionStats.map(r => r.redeemedByUserId).filter((id) => id !== null);
+            const users = await this.prisma.user.findMany({
+                where: { id: { in: userIds } },
+                select: { id: true, email: true },
+            });
+            const userMap = users.reduce((acc, user) => {
+                acc[user.id] = user.email;
+                return acc;
+            }, {});
+            const membershipIds = userIds.map(userId => {
+                const membership = allMemberships.find(m => m.userId === userId);
+                return membership?.id;
+            }).filter((id) => id !== null);
+            const staffNames = {};
+            allMemberships.forEach(m => {
+                if (userIds.includes(m.userId)) {
+                    const metadata = m.metadata || {};
+                    const firstName = metadata.firstName || '';
+                    const lastName = metadata.lastName || '';
+                    staffNames[m.userId] = `${firstName} ${lastName}`.trim() || userMap[m.userId] || 'Unknown Staff';
+                }
             });
             const totalRedemptions = redemptionStats.reduce((sum, stat) => sum + stat._count.id, 0);
-            const averageRedemptionsPerStaff = activeStaff > 0 ? totalRedemptions / activeStaff : 0;
+            const averageRedemptionsPerStaff = activeMemberships > 0 ? totalRedemptions / activeMemberships : 0;
             const mostActiveStaff = redemptionStats
-                .filter(stat => stat.staffId !== null)
+                .filter(stat => stat.redeemedByUserId !== null)
                 .map(stat => ({
-                staffId: stat.staffId,
-                staffName: staffMap[stat.staffId] || 'Unknown Staff',
+                staffId: stat.redeemedByUserId,
+                staffName: staffNames[stat.redeemedByUserId] || 'Unknown Staff',
                 redemptions: stat._count.id,
             }))
                 .sort((a, b) => b.redemptions - a.redemptions)
                 .slice(0, 5);
             return {
-                totalStaff,
-                activeStaff,
+                totalStaff: totalMemberships,
+                activeStaff: activeMemberships,
                 staffByRole: roleStats,
-                staffByMerchant: staffByMerchant.map(stat => ({
+                staffByMerchant: membershipsByMerchant.map(stat => ({
                     merchantId: stat.merchantId,
                     merchantName: merchantMap[stat.merchantId] || 'Unknown Merchant',
                     staffCount: stat._count.id,
@@ -457,8 +626,15 @@ let StaffService = StaffService_1 = class StaffService {
     }
     async getStaffActivity(staffId, limit = 50) {
         try {
+            const membership = await this.prisma.merchantMembership.findUnique({
+                where: { id: staffId },
+                include: { user: true },
+            });
+            if (!membership) {
+                throw new common_1.NotFoundException('Staff not found');
+            }
             const redemptions = await this.prisma.redemption.findMany({
-                where: { staffId },
+                where: { redeemedByUserId: membership.userId },
                 take: limit,
                 orderBy: { redeemedAt: 'desc' },
                 include: {
@@ -485,7 +661,7 @@ let StaffService = StaffService_1 = class StaffService {
             });
             return redemptions.map(redemption => ({
                 activityType: 'REDEMPTION',
-                description: `Redeemed coupon for ${redemption.coupon.order.deal.title} - Customer: ${redemption.coupon.order.customer.firstName} ${redemption.coupon.order.customer.lastName}`,
+                description: `Redeemed coupon for ${redemption.coupon.order.deal.title} - Customer: ${redemption.coupon.order.customer.firstName || ''} ${redemption.coupon.order.customer.lastName || ''}`.trim(),
                 entityId: redemption.couponId,
                 metadata: {
                     orderNumber: redemption.coupon.order.orderNumber,
@@ -500,22 +676,23 @@ let StaffService = StaffService_1 = class StaffService {
             throw error;
         }
     }
-    mapToResponseDto(staff) {
+    mapToResponseDto(membership, user) {
+        const metadata = membership.metadata || {};
         return {
-            id: staff.id,
-            firstName: staff.firstName,
-            lastName: staff.lastName,
-            email: staff.email,
-            phone: staff.phone,
-            role: staff.role,
-            isActive: staff.isActive,
-            lastLoginAt: staff.lastLoginAt,
-            merchantId: staff.merchantId,
-            merchant: staff.merchant,
-            permissions: staff.permissions,
-            metadata: staff.metadata,
-            createdAt: staff.createdAt,
-            updatedAt: staff.updatedAt,
+            id: membership.id,
+            firstName: metadata.firstName || '',
+            lastName: metadata.lastName || '',
+            email: user.email,
+            phone: metadata.phone,
+            role: (0, staff_dto_1.mapMerchantRoleToStaffRole)(membership.merchantRole),
+            isActive: user.isActive,
+            lastLoginAt: metadata.lastLoginAt ? new Date(metadata.lastLoginAt) : undefined,
+            merchantId: membership.merchantId,
+            merchant: membership.merchant,
+            permissions: membership.permissions,
+            metadata: membership.metadata,
+            createdAt: membership.createdAt,
+            updatedAt: user.updatedAt,
         };
     }
 };

@@ -10,6 +10,8 @@ exports.AuthModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const passport_1 = require("@nestjs/passport");
+const core_1 = require("@nestjs/core");
+const throttler_1 = require("@nestjs/throttler");
 const auth_controller_1 = require("./auth.controller");
 const auth_service_1 = require("./auth.service");
 const prisma_module_1 = require("../../prisma/prisma.module");
@@ -25,6 +27,12 @@ exports.AuthModule = AuthModule = __decorate([
             config_1.ConfigModule,
             passport_1.PassportModule,
             prisma_module_1.PrismaModule,
+            throttler_1.ThrottlerModule.forRoot([
+                {
+                    ttl: 60,
+                    limit: 20,
+                },
+            ]),
         ],
         controllers: [auth_controller_1.AuthController],
         providers: [
@@ -32,12 +40,12 @@ exports.AuthModule = AuthModule = __decorate([
             jwt_strategy_1.JwtStrategy,
             jwt_auth_guard_1.JwtAuthGuard,
             roles_guard_1.RolesGuard,
+            {
+                provide: core_1.APP_GUARD,
+                useClass: throttler_1.ThrottlerGuard,
+            },
         ],
-        exports: [
-            auth_service_1.AuthService,
-            jwt_auth_guard_1.JwtAuthGuard,
-            roles_guard_1.RolesGuard,
-        ],
+        exports: [auth_service_1.AuthService, jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard],
     })
 ], AuthModule);
 //# sourceMappingURL=auth.module.js.map

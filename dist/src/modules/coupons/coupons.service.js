@@ -76,7 +76,7 @@ let CouponsService = CouponsService_1 = class CouponsService {
             this.prisma.coupon.count({ where }),
         ]);
         return {
-            coupons: coupons.map(coupon => this.mapToCouponResponseDto(coupon)),
+            coupons: coupons.map((coupon) => this.mapToCouponResponseDto(coupon)),
             pagination: {
                 page,
                 limit,
@@ -207,12 +207,17 @@ let CouponsService = CouponsService_1 = class CouponsService {
             },
             orderBy: { createdAt: 'asc' },
         });
-        return coupons.map(coupon => this.mapToCouponResponseDto(coupon));
+        return coupons.map((coupon) => this.mapToCouponResponseDto(coupon));
     }
     async findMine(userId, page = 1, limit = 10, status) {
-        const customer = await this.prisma.customer.findFirst({ where: { userId } });
+        const customer = await this.prisma.customer.findFirst({
+            where: { userId },
+        });
         if (!customer) {
-            return { coupons: [], pagination: { page, limit, total: 0, totalPages: 0 } };
+            return {
+                coupons: [],
+                pagination: { page, limit, total: 0, totalPages: 0 },
+            };
         }
         const skip = (page - 1) * limit;
         const where = { order: { customerId: customer.id } };
@@ -229,7 +234,9 @@ let CouponsService = CouponsService_1 = class CouponsService {
                     order: {
                         select: {
                             orderNumber: true,
-                            customer: { select: { firstName: true, lastName: true, email: true } },
+                            customer: {
+                                select: { firstName: true, lastName: true, email: true },
+                            },
                         },
                     },
                     deal: {
@@ -247,16 +254,16 @@ let CouponsService = CouponsService_1 = class CouponsService {
                                     id: true,
                                     name: true,
                                     logo: true,
-                                }
-                            }
-                        }
+                                },
+                            },
+                        },
                     },
                 },
             }),
             this.prisma.coupon.count({ where }),
         ]);
         return {
-            coupons: coupons.map(c => this.mapToCouponResponseDto(c)),
+            coupons: coupons.map((c) => this.mapToCouponResponseDto(c)),
             pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
         };
     }
@@ -293,7 +300,7 @@ let CouponsService = CouponsService_1 = class CouponsService {
             };
         }
     }
-    async redeemCoupon(qrCode, staffId, notes) {
+    async redeemCoupon(qrCode, redeemedByUserId, notes) {
         const validation = await this.validateCoupon(qrCode);
         if (!validation.isValid) {
             throw new common_1.BadRequestException(validation.error);
@@ -342,7 +349,7 @@ let CouponsService = CouponsService_1 = class CouponsService {
         await this.prisma.redemption.create({
             data: {
                 couponId: coupon.id,
-                staffId,
+                redeemedByUserId: redeemedByUserId || null,
                 notes,
             },
         });

@@ -41,15 +41,15 @@ enum CouponStatus {
 enum UserRole {
   CUSTOMER
   MERCHANT
-  STAFF
-  ADMIN
+  SUPER_ADMIN
 }
 
-enum StaffRole {
-  MANAGER
-  CASHIER
-  SUPERVISOR
+enum MerchantRole {
+  OWNER
   ADMIN
+  MANAGER
+  SUPERVISOR
+  CASHIER
 }
 
 // Models
@@ -113,8 +113,7 @@ model Merchant {
 
   // Relations
   deals       Deal[]
-  staff       Staff[]
-  users       MerchantUser[]
+  memberships MerchantMembership[]
 
   @@map("merchants")
 }
@@ -182,7 +181,7 @@ enum RedemptionStatus {
 model Redemption {
   id          String           @id @default(cuid())
   couponId    String
-  staffId     String?
+  redeemedByUserId String?
   notes       String?
   location    String?
   status      RedemptionStatus @default(COMPLETED)
@@ -193,11 +192,11 @@ model Redemption {
 
   // Relations
   coupon      Coupon           @relation(fields: [couponId], references: [id])
-  staff       Staff?           @relation(fields: [staffId], references: [id])
+  redeemedByUser User?         @relation("RedemptionsByUser", fields: [redeemedByUserId], references: [id])
 
   // Indexes for performance optimization
   @@index([couponId])                                         // Filter by coupon
-  @@index([staffId])                                          // Filter by staff
+  @@index([redeemedByUserId])                                 // Filter by redeeming user
   @@index([status])                                           // Filter by status
   @@index([redeemedAt])                                       // Sort by redemption date
   @@map("redemptions")
@@ -226,54 +225,40 @@ model Customer {
 model User {
   id             String    @id @default(cuid())
   email          String    @unique
-  hashedPassword String
+  hashedPassword String?   // Nullable for OAuth users (Google, etc.)
   role           UserRole  @default(CUSTOMER)
   isActive       Boolean   @default(true)
+  // OAuth fields
+  providerId     String?   // Google user ID or other OAuth provider ID
+  provider       String?   // 'google', 'facebook', etc.
+  avatar         String?   // Profile picture URL from OAuth provider
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
   // Profiles / relations
   customer       Customer?
-  merchants      MerchantUser[]
+  merchants      MerchantMembership[]
+  redemptions    Redemption[] @relation("RedemptionsByUser")
 
+  @@index([providerId]) // Index for OAuth provider lookups
   @@map("users")
 }
 
-model MerchantUser {
-  id         String    @id @default(cuid())
-  userId     String
-  merchantId String
-  isOwner    Boolean   @default(false)
-  createdAt  DateTime  @default(now())
+model MerchantMembership {
+  id           String       @id @default(cuid())
+  userId       String
+  merchantId   String
+  merchantRole MerchantRole @default(CASHIER)
+  isOwner      Boolean      @default(false)
+  permissions  Json?
+  metadata     Json?
+  createdAt    DateTime     @default(now())
 
-  user       User      @relation(fields: [userId], references: [id])
-  merchant   Merchant  @relation(fields: [merchantId], references: [id])
+  user         User         @relation(fields: [userId], references: [id])
+  merchant     Merchant     @relation(fields: [merchantId], references: [id])
 
   @@unique([userId, merchantId])
   @@map("merchant_users")
-}
-
-model Staff {
-  id          String      @id @default(cuid())
-  firstName   String
-  lastName    String
-  email       String      @unique
-  phone       String?
-  pin         String      // 4-6 digit PIN for authentication
-  role        StaffRole   @default(CASHIER)
-  isActive    Boolean     @default(true)
-  lastLoginAt DateTime?
-  merchantId  String?     // Optional: staff can be assigned to specific merchant
-  permissions Json?       // Flexible permissions object
-  metadata    Json?       // Additional staff data
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-
-  // Relations
-  merchant    Merchant?   @relation(fields: [merchantId], references: [id])
-  redemptions Redemption[]
-
-  @@map("staff")
 }
 
 model Category {

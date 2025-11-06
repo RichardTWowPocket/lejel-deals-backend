@@ -43,7 +43,7 @@ let OrdersService = class OrdersService {
         if (now < deal.validFrom || now > deal.validUntil) {
             throw new common_1.BadRequestException('Deal is not within valid period');
         }
-        if (deal.maxQuantity && (deal.soldQuantity + quantity) > deal.maxQuantity) {
+        if (deal.maxQuantity && deal.soldQuantity + quantity > deal.maxQuantity) {
             throw new common_1.BadRequestException('Insufficient quantity available');
         }
         const totalAmount = new library_1.Decimal(deal.discountPrice).mul(quantity);
@@ -162,7 +162,7 @@ let OrdersService = class OrdersService {
             this.prisma.order.count({ where }),
         ]);
         return {
-            orders: orders.map(order => this.mapToOrderResponseDto(order)),
+            orders: orders.map((order) => this.mapToOrderResponseDto(order)),
             pagination: {
                 page,
                 limit,
@@ -265,7 +265,9 @@ let OrdersService = class OrdersService {
         return this.findAll(page, limit, undefined, undefined, undefined, merchantId);
     }
     async findMine(userId, page = 1, limit = 10) {
-        const customer = await this.prisma.customer.findFirst({ where: { userId: userId } });
+        const customer = await this.prisma.customer.findFirst({
+            where: { userId: userId },
+        });
         if (!customer) {
             return {
                 orders: [],
@@ -281,7 +283,8 @@ let OrdersService = class OrdersService {
         if (!existingOrder) {
             throw new common_1.NotFoundException('Order not found');
         }
-        if (updateOrderDto.status && !this.isValidStatusTransition(existingOrder.status, updateOrderDto.status)) {
+        if (updateOrderDto.status &&
+            !this.isValidStatusTransition(existingOrder.status, updateOrderDto.status)) {
             throw new common_1.BadRequestException(`Invalid status transition from ${existingOrder.status} to ${updateOrderDto.status}`);
         }
         const order = await this.prisma.order.update({
@@ -397,7 +400,9 @@ let OrdersService = class OrdersService {
             where: { id },
             data: {
                 status: client_1.OrderStatus.CANCELLED,
-                paymentReference: reason ? `${existingOrder.paymentReference || ''} - Cancelled: ${reason}` : existingOrder.paymentReference,
+                paymentReference: reason
+                    ? `${existingOrder.paymentReference || ''} - Cancelled: ${reason}`
+                    : existingOrder.paymentReference,
             },
             include: {
                 customer: {
@@ -458,7 +463,9 @@ let OrdersService = class OrdersService {
             where: { id },
             data: {
                 status: client_1.OrderStatus.REFUNDED,
-                paymentReference: reason ? `${existingOrder.paymentReference || ''} - Refunded: ${reason}` : existingOrder.paymentReference,
+                paymentReference: reason
+                    ? `${existingOrder.paymentReference || ''} - Refunded: ${reason}`
+                    : existingOrder.paymentReference,
             },
             include: {
                 customer: {
@@ -504,7 +511,8 @@ let OrdersService = class OrdersService {
         if (!order) {
             throw new common_1.NotFoundException('Order not found');
         }
-        if (order.status !== client_1.OrderStatus.CANCELLED && order.status !== client_1.OrderStatus.REFUNDED) {
+        if (order.status !== client_1.OrderStatus.CANCELLED &&
+            order.status !== client_1.OrderStatus.REFUNDED) {
             throw new common_1.BadRequestException('Only cancelled or refunded orders can be deleted');
         }
         await this.prisma.order.delete({
@@ -539,8 +547,12 @@ let OrdersService = class OrdersService {
             paidOrders,
             cancelledOrders,
             refundedOrders,
-            totalRevenue: totalRevenue._sum.totalAmount ? Number(totalRevenue._sum.totalAmount) : 0,
-            averageOrderValue: averageOrderValue._avg.totalAmount ? Number(averageOrderValue._avg.totalAmount) : 0,
+            totalRevenue: totalRevenue._sum.totalAmount
+                ? Number(totalRevenue._sum.totalAmount)
+                : 0,
+            averageOrderValue: averageOrderValue._avg.totalAmount
+                ? Number(averageOrderValue._avg.totalAmount)
+                : 0,
             statusDistribution,
         };
     }
@@ -599,7 +611,9 @@ let OrdersService = class OrdersService {
                 status: client_1.OrderStatus.PAID,
             },
         });
-        const completionRate = totalOrdersInPeriod > 0 ? (completedOrdersInPeriod / totalOrdersInPeriod) * 100 : 0;
+        const completionRate = totalOrdersInPeriod > 0
+            ? (completedOrdersInPeriod / totalOrdersInPeriod) * 100
+            : 0;
         const paidOrders = await this.prisma.order.findMany({
             where: {
                 status: client_1.OrderStatus.PAID,
@@ -613,7 +627,7 @@ let OrdersService = class OrdersService {
         const averageTimeToPayment = paidOrders.length > 0
             ? paidOrders.reduce((sum, order) => {
                 const timeDiff = order.updatedAt.getTime() - order.createdAt.getTime();
-                return sum + (timeDiff / (1000 * 60 * 60));
+                return sum + timeDiff / (1000 * 60 * 60);
             }, 0) / paidOrders.length
             : 0;
         return {
@@ -660,17 +674,19 @@ let OrdersService = class OrdersService {
             createdAt: order.createdAt,
             updatedAt: order.updatedAt,
             customer: order.customer,
-            deal: order.deal ? {
-                ...order.deal,
-                discountPrice: Number(order.deal.discountPrice),
-                finalPrice: Number(order.deal.discountPrice),
-            } : undefined,
+            deal: order.deal
+                ? {
+                    ...order.deal,
+                    discountPrice: Number(order.deal.discountPrice),
+                    finalPrice: Number(order.deal.discountPrice),
+                }
+                : undefined,
             coupons: order.coupons,
         };
     }
     formatPeriodData(data, period, type = 'orders') {
         const result = {};
-        data.forEach(item => {
+        data.forEach((item) => {
             const date = new Date(item.createdAt);
             let key;
             switch (period) {
@@ -696,29 +712,32 @@ let OrdersService = class OrdersService {
         return result;
     }
     async enrichTopCustomers(customers) {
-        const customerIds = customers.map(c => c.customerId);
+        const customerIds = customers.map((c) => c.customerId);
         const customerDetails = await this.prisma.customer.findMany({
             where: { id: { in: customerIds } },
             select: { id: true, firstName: true, lastName: true, email: true },
         });
-        return customers.map(customer => {
-            const details = customerDetails.find(d => d.id === customer.customerId);
+        return customers.map((customer) => {
+            const details = customerDetails.find((d) => d.id === customer.customerId);
             return {
                 customerId: customer.customerId,
-                customerName: details ? `${details.firstName || ''} ${details.lastName || ''}`.trim() || details.email : 'Unknown',
+                customerName: details
+                    ? `${details.firstName || ''} ${details.lastName || ''}`.trim() ||
+                        details.email
+                    : 'Unknown',
                 orderCount: customer._count.id,
                 totalSpent: Number(customer._sum.totalAmount || 0),
             };
         });
     }
     async enrichTopDeals(deals) {
-        const dealIds = deals.map(d => d.dealId);
+        const dealIds = deals.map((d) => d.dealId);
         const dealDetails = await this.prisma.deal.findMany({
             where: { id: { in: dealIds } },
             select: { id: true, title: true },
         });
-        return deals.map(deal => {
-            const details = dealDetails.find(d => d.id === deal.dealId);
+        return deals.map((deal) => {
+            const details = dealDetails.find((d) => d.id === deal.dealId);
             return {
                 dealId: deal.dealId,
                 dealTitle: details?.title || 'Unknown Deal',

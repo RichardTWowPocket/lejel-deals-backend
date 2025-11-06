@@ -29,16 +29,15 @@ let CustomersController = class CustomersController {
     create(createCustomerDto, user) {
         return this.customersService.create(createCustomerDto, user.id);
     }
-    createPublic(createCustomerDto) {
-        return this.customersService.create(createCustomerDto, 'public');
-    }
     findAll(page, limit, search, isActive) {
         const isActiveBool = isActive ? isActive === 'true' : undefined;
         return this.customersService.findAll(page, limit, search, isActiveBool);
     }
     search(query, isActive) {
         const isActiveBool = isActive ? isActive === 'true' : undefined;
-        return this.customersService.searchCustomers(query, { isActive: isActiveBool });
+        return this.customersService.searchCustomers(query, {
+            isActive: isActiveBool,
+        });
     }
     getTopCustomers(limit) {
         return this.customersService.getTopCustomers(limit);
@@ -76,14 +75,20 @@ let CustomersController = class CustomersController {
 };
 exports.CustomersController = CustomersController;
 __decorate([
-    (0, auth_decorators_1.Roles)('customer', 'admin'),
+    (0, auth_decorators_1.Roles)('admin'),
     (0, common_1.Post)(),
     (0, swagger_1.ApiOperation)({ summary: 'Create a new customer' }),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiResponse)({ status: 201, description: 'Customer created successfully' }),
-    (0, swagger_1.ApiResponse)({ status: 400, description: 'Invalid input data or email already exists' }),
+    (0, swagger_1.ApiResponse)({
+        status: 400,
+        description: 'Invalid input data or email already exists',
+    }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
-    (0, swagger_1.ApiResponse)({ status: 403, description: 'Forbidden - insufficient permissions' }),
+    (0, swagger_1.ApiResponse)({
+        status: 403,
+        description: 'Forbidden - insufficient permissions',
+    }),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, auth_decorators_1.CurrentUser)()),
     __metadata("design:type", Function),
@@ -92,23 +97,26 @@ __decorate([
 ], CustomersController.prototype, "create", null);
 __decorate([
     (0, auth_decorators_1.Public)(),
-    (0, common_1.Post)('create-from-supabase'),
-    (0, swagger_1.ApiOperation)({ summary: 'Public: Create customer after Supabase signup (email verification flow)' }),
-    (0, swagger_1.ApiResponse)({ status: 201, description: 'Customer created successfully' }),
-    (0, swagger_1.ApiResponse)({ status: 400, description: 'Invalid input data or email already exists' }),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_customer_dto_1.CreateCustomerDto]),
-    __metadata("design:returntype", void 0)
-], CustomersController.prototype, "createPublic", null);
-__decorate([
-    (0, auth_decorators_1.Public)(),
     (0, common_1.Get)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get all customers with pagination and filtering' }),
-    (0, swagger_1.ApiQuery)({ name: 'page', required: false, description: 'Page number', example: 1 }),
-    (0, swagger_1.ApiQuery)({ name: 'limit', required: false, description: 'Items per page', example: 10 }),
+    (0, swagger_1.ApiQuery)({
+        name: 'page',
+        required: false,
+        description: 'Page number',
+        example: 1,
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'limit',
+        required: false,
+        description: 'Items per page',
+        example: 10,
+    }),
     (0, swagger_1.ApiQuery)({ name: 'search', required: false, description: 'Search query' }),
-    (0, swagger_1.ApiQuery)({ name: 'isActive', required: false, description: 'Filter by active status' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'isActive',
+        required: false,
+        description: 'Filter by active status',
+    }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Returns paginated customers list' }),
     __param(0, (0, common_1.Query)('page', new common_1.DefaultValuePipe(1), common_1.ParseIntPipe)),
     __param(1, (0, common_1.Query)('limit', new common_1.DefaultValuePipe(10), common_1.ParseIntPipe)),
@@ -123,7 +131,11 @@ __decorate([
     (0, common_1.Get)('search'),
     (0, swagger_1.ApiOperation)({ summary: 'Search customers' }),
     (0, swagger_1.ApiQuery)({ name: 'q', description: 'Search query', example: 'john' }),
-    (0, swagger_1.ApiQuery)({ name: 'isActive', required: false, description: 'Filter by active status' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'isActive',
+        required: false,
+        description: 'Filter by active status',
+    }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Returns search results' }),
     __param(0, (0, common_1.Query)('q')),
     __param(1, (0, common_1.Query)('isActive')),
@@ -135,8 +147,16 @@ __decorate([
     (0, auth_decorators_1.Public)(),
     (0, common_1.Get)('top'),
     (0, swagger_1.ApiOperation)({ summary: 'Get top customers by spending' }),
-    (0, swagger_1.ApiQuery)({ name: 'limit', required: false, description: 'Number of top customers', example: 10 }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Returns top customers by spending' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'limit',
+        required: false,
+        description: 'Number of top customers',
+        example: 10,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Returns top customers by spending',
+    }),
     __param(0, (0, common_1.Query)('limit', new common_1.DefaultValuePipe(10), common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
@@ -167,15 +187,21 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], CustomersController.prototype, "findByEmail", null);
 __decorate([
-    (0, auth_decorators_1.Roles)('customer', 'admin'),
+    (0, auth_decorators_1.Roles)('admin'),
     (0, common_1.Patch)(':id'),
     (0, swagger_1.ApiOperation)({ summary: 'Update a customer' }),
     (0, swagger_1.ApiParam)({ name: 'id', description: 'Customer ID' }),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Customer updated successfully' }),
-    (0, swagger_1.ApiResponse)({ status: 400, description: 'Invalid input data or email already taken' }),
+    (0, swagger_1.ApiResponse)({
+        status: 400,
+        description: 'Invalid input data or email already taken',
+    }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
-    (0, swagger_1.ApiResponse)({ status: 403, description: 'Forbidden - insufficient permissions' }),
+    (0, swagger_1.ApiResponse)({
+        status: 403,
+        description: 'Forbidden - insufficient permissions',
+    }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Customer not found' }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
@@ -185,15 +211,21 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], CustomersController.prototype, "update", null);
 __decorate([
-    (0, auth_decorators_1.Roles)('customer', 'admin'),
+    (0, auth_decorators_1.Roles)('admin'),
     (0, common_1.Delete)(':id'),
     (0, swagger_1.ApiOperation)({ summary: 'Delete a customer' }),
     (0, swagger_1.ApiParam)({ name: 'id', description: 'Customer ID' }),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Customer deleted successfully' }),
-    (0, swagger_1.ApiResponse)({ status: 400, description: 'Cannot delete customer with active orders' }),
+    (0, swagger_1.ApiResponse)({
+        status: 400,
+        description: 'Cannot delete customer with active orders',
+    }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
-    (0, swagger_1.ApiResponse)({ status: 403, description: 'Forbidden - insufficient permissions' }),
+    (0, swagger_1.ApiResponse)({
+        status: 403,
+        description: 'Forbidden - insufficient permissions',
+    }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Customer not found' }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, auth_decorators_1.CurrentUser)()),
@@ -202,14 +234,17 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], CustomersController.prototype, "remove", null);
 __decorate([
-    (0, auth_decorators_1.Roles)('customer', 'admin'),
+    (0, auth_decorators_1.Roles)('admin'),
     (0, common_1.Get)(':id/stats'),
     (0, swagger_1.ApiOperation)({ summary: 'Get customer statistics' }),
     (0, swagger_1.ApiParam)({ name: 'id', description: 'Customer ID' }),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Returns customer statistics' }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
-    (0, swagger_1.ApiResponse)({ status: 403, description: 'Forbidden - insufficient permissions' }),
+    (0, swagger_1.ApiResponse)({
+        status: 403,
+        description: 'Forbidden - insufficient permissions',
+    }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Customer not found' }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, auth_decorators_1.CurrentUser)()),
@@ -218,14 +253,17 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], CustomersController.prototype, "getStats", null);
 __decorate([
-    (0, auth_decorators_1.Roles)('customer', 'admin'),
+    (0, auth_decorators_1.Roles)('admin'),
     (0, common_1.Get)(':id/insights'),
     (0, swagger_1.ApiOperation)({ summary: 'Get customer insights and analytics' }),
     (0, swagger_1.ApiParam)({ name: 'id', description: 'Customer ID' }),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Returns customer insights' }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
-    (0, swagger_1.ApiResponse)({ status: 403, description: 'Forbidden - insufficient permissions' }),
+    (0, swagger_1.ApiResponse)({
+        status: 403,
+        description: 'Forbidden - insufficient permissions',
+    }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Customer not found' }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, auth_decorators_1.CurrentUser)()),
@@ -234,14 +272,17 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], CustomersController.prototype, "getInsights", null);
 __decorate([
-    (0, auth_decorators_1.Roles)('customer', 'admin'),
+    (0, auth_decorators_1.Roles)('admin'),
     (0, common_1.Patch)(':id/preferences'),
     (0, swagger_1.ApiOperation)({ summary: 'Update customer notification preferences' }),
     (0, swagger_1.ApiParam)({ name: 'id', description: 'Customer ID' }),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Preferences updated successfully' }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
-    (0, swagger_1.ApiResponse)({ status: 403, description: 'Forbidden - insufficient permissions' }),
+    (0, swagger_1.ApiResponse)({
+        status: 403,
+        description: 'Forbidden - insufficient permissions',
+    }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Customer not found' }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
@@ -263,14 +304,20 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], CustomersController.prototype, "getPreferences", null);
 __decorate([
-    (0, auth_decorators_1.Roles)('customer', 'admin'),
+    (0, auth_decorators_1.Roles)('admin'),
     (0, common_1.Patch)(':id/deactivate'),
     (0, swagger_1.ApiOperation)({ summary: 'Deactivate a customer' }),
     (0, swagger_1.ApiParam)({ name: 'id', description: 'Customer ID' }),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Customer deactivated successfully' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Customer deactivated successfully',
+    }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
-    (0, swagger_1.ApiResponse)({ status: 403, description: 'Forbidden - insufficient permissions' }),
+    (0, swagger_1.ApiResponse)({
+        status: 403,
+        description: 'Forbidden - insufficient permissions',
+    }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Customer not found' }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, auth_decorators_1.CurrentUser)()),
@@ -279,14 +326,20 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], CustomersController.prototype, "deactivate", null);
 __decorate([
-    (0, auth_decorators_1.Roles)('customer', 'admin'),
+    (0, auth_decorators_1.Roles)('admin'),
     (0, common_1.Patch)(':id/reactivate'),
     (0, swagger_1.ApiOperation)({ summary: 'Reactivate a customer' }),
     (0, swagger_1.ApiParam)({ name: 'id', description: 'Customer ID' }),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Customer reactivated successfully' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Customer reactivated successfully',
+    }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
-    (0, swagger_1.ApiResponse)({ status: 403, description: 'Forbidden - insufficient permissions' }),
+    (0, swagger_1.ApiResponse)({
+        status: 403,
+        description: 'Forbidden - insufficient permissions',
+    }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Customer not found' }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, auth_decorators_1.CurrentUser)()),

@@ -1,4 +1,12 @@
-import { IsString, IsEmail, IsOptional, IsBoolean, IsDateString, IsObject, IsArray } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  IsOptional,
+  IsBoolean,
+  IsDateString,
+  IsObject,
+  IsArray,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class NotificationPreferencesDto {
@@ -14,7 +22,10 @@ export class NotificationPreferencesDto {
   @IsBoolean()
   push: boolean;
 
-  @ApiProperty({ description: 'WhatsApp notifications enabled', example: false })
+  @ApiProperty({
+    description: 'WhatsApp notifications enabled',
+    example: false,
+  })
   @IsBoolean()
   whatsapp: boolean;
 
@@ -26,17 +37,26 @@ export class NotificationPreferencesDto {
   @IsBoolean()
   orders: boolean;
 
-  @ApiProperty({ description: 'Marketing notifications enabled', example: false })
+  @ApiProperty({
+    description: 'Marketing notifications enabled',
+    example: false,
+  })
   @IsBoolean()
   marketing: boolean;
 }
 
 export class CreateCustomerDto {
-  @ApiProperty({ description: 'Customer email', example: 'customer@example.com' })
+  @ApiProperty({
+    description: 'Customer email',
+    example: 'customer@example.com',
+  })
   @IsEmail()
   email: string;
 
-  @ApiPropertyOptional({ description: 'Customer phone number', example: '+6281234567890' })
+  @ApiPropertyOptional({
+    description: 'Customer phone number',
+    example: '+6281234567890',
+  })
   @IsOptional()
   @IsString()
   phone?: string;
@@ -51,12 +71,18 @@ export class CreateCustomerDto {
   @IsString()
   lastName?: string;
 
-  @ApiPropertyOptional({ description: 'Date of birth', example: '1990-01-01T00:00:00.000Z' })
+  @ApiPropertyOptional({
+    description: 'Date of birth',
+    example: '1990-01-01T00:00:00.000Z',
+  })
   @IsOptional()
   @IsDateString()
   dateOfBirth?: string;
 
-  @ApiPropertyOptional({ description: 'Customer preferences', type: NotificationPreferencesDto })
+  @ApiPropertyOptional({
+    description: 'Customer preferences',
+    type: NotificationPreferencesDto,
+  })
   @IsOptional()
   @IsObject()
   preferences?: NotificationPreferencesDto;
@@ -66,11 +92,11 @@ export class CreateCustomerDto {
   @IsBoolean()
   isActive?: boolean;
 
-  @ApiPropertyOptional({ description: 'Additional metadata', example: { source: 'web', referrer: 'google' } })
+  @ApiPropertyOptional({
+    description: 'Additional metadata',
+    example: { source: 'web', referrer: 'google' },
+  })
   @IsOptional()
   @IsObject()
   metadata?: Record<string, any>;
 }
-
-
-

@@ -1,4 +1,13 @@
-import { IsString, IsNumber, IsEnum, IsOptional, IsDateString, IsInt, Min, Max } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsEnum,
+  IsOptional,
+  IsDateString,
+  IsInt,
+  Min,
+  Max,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { OrderStatus } from '@prisma/client';
 
@@ -11,46 +20,74 @@ export class CreateOrderDto {
   @IsString()
   dealId: string;
 
-  @ApiProperty({ description: 'Quantity of deals to order', example: 2, minimum: 1, maximum: 10 })
+  @ApiProperty({
+    description: 'Quantity of deals to order',
+    example: 2,
+    minimum: 1,
+    maximum: 10,
+  })
   @IsInt()
   @Min(1)
   @Max(10)
   quantity: number;
 
-  @ApiPropertyOptional({ description: 'Payment method', example: 'credit_card' })
+  @ApiPropertyOptional({
+    description: 'Payment method',
+    example: 'credit_card',
+  })
   @IsOptional()
   @IsString()
   paymentMethod?: string;
 
-  @ApiPropertyOptional({ description: 'Payment reference from payment gateway', example: 'midtrans_ref_123' })
+  @ApiPropertyOptional({
+    description: 'Payment reference from payment gateway',
+    example: 'midtrans_ref_123',
+  })
   @IsOptional()
   @IsString()
   paymentReference?: string;
 }
 
 export class UpdateOrderDto {
-  @ApiPropertyOptional({ description: 'Order status', enum: OrderStatus, example: OrderStatus.PAID })
+  @ApiPropertyOptional({
+    description: 'Order status',
+    enum: OrderStatus,
+    example: OrderStatus.PAID,
+  })
   @IsOptional()
   @IsEnum(OrderStatus)
   status?: OrderStatus;
 
-  @ApiPropertyOptional({ description: 'Payment method', example: 'credit_card' })
+  @ApiPropertyOptional({
+    description: 'Payment method',
+    example: 'credit_card',
+  })
   @IsOptional()
   @IsString()
   paymentMethod?: string;
 
-  @ApiPropertyOptional({ description: 'Payment reference from payment gateway', example: 'midtrans_ref_123' })
+  @ApiPropertyOptional({
+    description: 'Payment reference from payment gateway',
+    example: 'midtrans_ref_123',
+  })
   @IsOptional()
   @IsString()
   paymentReference?: string;
 }
 
 export class UpdateOrderStatusDto {
-  @ApiProperty({ description: 'New order status', enum: OrderStatus, example: OrderStatus.PAID })
+  @ApiProperty({
+    description: 'New order status',
+    enum: OrderStatus,
+    example: OrderStatus.PAID,
+  })
   @IsEnum(OrderStatus)
   status: OrderStatus;
 
-  @ApiPropertyOptional({ description: 'Payment reference if status is PAID', example: 'midtrans_ref_123' })
+  @ApiPropertyOptional({
+    description: 'Payment reference if status is PAID',
+    example: 'midtrans_ref_123',
+  })
   @IsOptional()
   @IsString()
   paymentReference?: string;
@@ -75,19 +112,35 @@ export class OrderResponseDto {
   @ApiProperty({ description: 'Total amount in IDR', example: 150000 })
   totalAmount: number;
 
-  @ApiProperty({ description: 'Order status', enum: OrderStatus, example: OrderStatus.PENDING })
+  @ApiProperty({
+    description: 'Order status',
+    enum: OrderStatus,
+    example: OrderStatus.PENDING,
+  })
   status: OrderStatus;
 
-  @ApiPropertyOptional({ description: 'Payment method used', example: 'credit_card' })
+  @ApiPropertyOptional({
+    description: 'Payment method used',
+    example: 'credit_card',
+  })
   paymentMethod?: string;
 
-  @ApiPropertyOptional({ description: 'Payment reference from gateway', example: 'midtrans_ref_123' })
+  @ApiPropertyOptional({
+    description: 'Payment reference from gateway',
+    example: 'midtrans_ref_123',
+  })
   paymentReference?: string;
 
-  @ApiProperty({ description: 'Order creation date', example: '2024-01-01T00:00:00.000Z' })
+  @ApiProperty({
+    description: 'Order creation date',
+    example: '2024-01-01T00:00:00.000Z',
+  })
   createdAt: Date;
 
-  @ApiProperty({ description: 'Order last update date', example: '2024-01-01T00:00:00.000Z' })
+  @ApiProperty({
+    description: 'Order last update date',
+    example: '2024-01-01T00:00:00.000Z',
+  })
   updatedAt: Date;
 
   // Relations
@@ -152,10 +205,16 @@ export class OrderStatsDto {
 }
 
 export class OrderAnalyticsDto {
-  @ApiProperty({ description: 'Orders count by period', example: { '2024-01': 25, '2024-02': 30 } })
+  @ApiProperty({
+    description: 'Orders count by period',
+    example: { '2024-01': 25, '2024-02': 30 },
+  })
   ordersByPeriod: Record<string, number>;
 
-  @ApiProperty({ description: 'Revenue by period', example: { '2024-01': 1000000, '2024-02': 1200000 } })
+  @ApiProperty({
+    description: 'Revenue by period',
+    example: { '2024-01': 1000000, '2024-02': 1200000 },
+  })
   revenueByPeriod: Record<string, number>;
 
   @ApiProperty({ description: 'Top customers by order count' })
@@ -174,12 +233,15 @@ export class OrderAnalyticsDto {
     totalRevenue: number;
   }[];
 
-  @ApiProperty({ description: 'Order completion rate percentage', example: 85.5 })
+  @ApiProperty({
+    description: 'Order completion rate percentage',
+    example: 85.5,
+  })
   completionRate: number;
 
-  @ApiProperty({ description: 'Average time to payment in hours', example: 2.5 })
+  @ApiProperty({
+    description: 'Average time to payment in hours',
+    example: 2.5,
+  })
   averageTimeToPayment: number;
 }
-
-
-

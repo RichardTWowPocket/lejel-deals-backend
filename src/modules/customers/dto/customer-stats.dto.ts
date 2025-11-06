@@ -13,10 +13,16 @@ export class CustomerStatsDto {
   @ApiProperty({ description: 'Average order value', example: 100000 })
   averageOrderValue: number;
 
-  @ApiPropertyOptional({ description: 'Last order date', example: '2024-01-15T00:00:00.000Z' })
+  @ApiPropertyOptional({
+    description: 'Last order date',
+    example: '2024-01-15T00:00:00.000Z',
+  })
   lastOrderDate?: Date;
 
-  @ApiPropertyOptional({ description: 'First order date', example: '2023-06-01T00:00:00.000Z' })
+  @ApiPropertyOptional({
+    description: 'First order date',
+    example: '2023-06-01T00:00:00.000Z',
+  })
   firstOrderDate?: Date;
 
   @ApiProperty({ description: 'Active deals count', example: 3 })
@@ -25,7 +31,10 @@ export class CustomerStatsDto {
   @ApiProperty({ description: 'Used deals count', example: 22 })
   usedDeals: number;
 
-  @ApiProperty({ description: 'Favorite categories', example: ['Food & Beverage', 'Entertainment'] })
+  @ApiProperty({
+    description: 'Favorite categories',
+    example: ['Food & Beverage', 'Entertainment'],
+  })
   favoriteCategories: string[];
 
   @ApiProperty({ description: 'Customer tier', example: 'Gold' })
@@ -34,7 +43,10 @@ export class CustomerStatsDto {
   @ApiProperty({ description: 'Loyalty points', example: 1500 })
   loyaltyPoints: number;
 
-  @ApiProperty({ description: 'Registration date', example: '2023-06-01T00:00:00.000Z' })
+  @ApiProperty({
+    description: 'Registration date',
+    example: '2023-06-01T00:00:00.000Z',
+  })
   registrationDate: Date;
 
   @ApiProperty({ description: 'Days since last order', example: 5 })
@@ -43,6 +55,3 @@ export class CustomerStatsDto {
   @ApiProperty({ description: 'Total savings from deals', example: 500000 })
   totalSavings: number;
 }
-
-
-

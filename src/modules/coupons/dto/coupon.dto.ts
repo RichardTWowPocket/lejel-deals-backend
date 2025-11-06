@@ -15,19 +15,35 @@ export class CouponResponseDto {
   @ApiProperty({ description: 'QR Code string', example: 'qr_code_string' })
   qrCode: string;
 
-  @ApiProperty({ description: 'Coupon status', enum: CouponStatus, example: CouponStatus.ACTIVE })
+  @ApiProperty({
+    description: 'Coupon status',
+    enum: CouponStatus,
+    example: CouponStatus.ACTIVE,
+  })
   status: CouponStatus;
 
-  @ApiPropertyOptional({ description: 'Used date', example: '2024-01-01T12:00:00.000Z' })
+  @ApiPropertyOptional({
+    description: 'Used date',
+    example: '2024-01-01T12:00:00.000Z',
+  })
   usedAt?: Date;
 
-  @ApiProperty({ description: 'Expiration date', example: '2024-02-01T12:00:00.000Z' })
+  @ApiProperty({
+    description: 'Expiration date',
+    example: '2024-02-01T12:00:00.000Z',
+  })
   expiresAt: Date;
 
-  @ApiProperty({ description: 'Creation date', example: '2024-01-01T10:00:00.000Z' })
+  @ApiProperty({
+    description: 'Creation date',
+    example: '2024-01-01T10:00:00.000Z',
+  })
   createdAt: Date;
 
-  @ApiProperty({ description: 'Last update date', example: '2024-01-01T12:00:00.000Z' })
+  @ApiProperty({
+    description: 'Last update date',
+    example: '2024-01-01T12:00:00.000Z',
+  })
   updatedAt: Date;
 
   @ApiPropertyOptional({ description: 'Order details' })
@@ -51,7 +67,10 @@ export class CouponResponseDto {
 }
 
 export class CouponValidationDto {
-  @ApiProperty({ description: 'QR Code to validate', example: 'qr_code_string' })
+  @ApiProperty({
+    description: 'QR Code to validate',
+    example: 'qr_code_string',
+  })
   @IsString()
   qrCode: string;
 }
@@ -63,7 +82,10 @@ export class CouponValidationResponseDto {
   @ApiPropertyOptional({ description: 'Coupon details if valid' })
   coupon?: CouponResponseDto;
 
-  @ApiPropertyOptional({ description: 'Error message if invalid', example: 'Coupon has expired' })
+  @ApiPropertyOptional({
+    description: 'Error message if invalid',
+    example: 'Coupon has expired',
+  })
   error?: string;
 }
 
@@ -72,19 +94,28 @@ export class RedeemCouponDto {
   @IsString()
   qrCode: string;
 
-  @ApiPropertyOptional({ description: 'Staff ID who redeemed the coupon', example: 'staff-123' })
+  @ApiPropertyOptional({
+    description: 'Staff ID who redeemed the coupon',
+    example: 'staff-123',
+  })
   @IsOptional()
   @IsString()
   staffId?: string;
 
-  @ApiPropertyOptional({ description: 'Redemption notes', example: 'Redeemed at counter' })
+  @ApiPropertyOptional({
+    description: 'Redemption notes',
+    example: 'Redeemed at counter',
+  })
   @IsOptional()
   @IsString()
   notes?: string;
 }
 
 export class CancelCouponDto {
-  @ApiPropertyOptional({ description: 'Cancellation reason', example: 'Customer requested cancellation' })
+  @ApiPropertyOptional({
+    description: 'Cancellation reason',
+    example: 'Customer requested cancellation',
+  })
   @IsOptional()
   @IsString()
   reason?: string;
@@ -118,6 +149,3 @@ export class GenerateQRCodeDto {
   @IsString()
   couponId: string;
 }
-
-
-

@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException, NotFoundException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  Logger,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -53,15 +58,20 @@ export class PaymentService {
     private configService: ConfigService,
     private prisma: PrismaService,
   ) {
-    this.midtransServerKey = this.configService.get<string>('MIDTRANS_SERVER_KEY') || '';
-    this.midtransClientKey = this.configService.get<string>('MIDTRANS_CLIENT_KEY') || '';
-    this.midtransIsProduction = this.configService.get<string>('NODE_ENV') === 'production';
-    this.midtransBaseUrl = this.midtransIsProduction 
-      ? 'https://api.midtrans.com' 
+    this.midtransServerKey =
+      this.configService.get<string>('MIDTRANS_SERVER_KEY') || '';
+    this.midtransClientKey =
+      this.configService.get<string>('MIDTRANS_CLIENT_KEY') || '';
+    this.midtransIsProduction =
+      this.configService.get<string>('NODE_ENV') === 'production';
+    this.midtransBaseUrl = this.midtransIsProduction
+      ? 'https://api.midtrans.com'
       : 'https://api.sandbox.midtrans.com';
   }
 
-  async createPayment(paymentRequest: MidtransPaymentRequest): Promise<MidtransPaymentResponse> {
+  async createPayment(
+    paymentRequest: MidtransPaymentRequest,
+  ): Promise<MidtransPaymentResponse> {
     try {
       // Validate order exists and is in PENDING status
       const order = await this.prisma.order.findUnique({
@@ -123,8 +133,8 @@ export class PaymentService {
         {
           headers: {
             'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': `Basic ${Buffer.from(this.midtransServerKey + ':').toString('base64')}`,
+            Accept: 'application/json',
+            Authorization: `Basic ${Buffer.from(this.midtransServerKey + ':').toString('base64')}`,
           },
         },
       );
@@ -140,26 +150,43 @@ export class PaymentService {
       });
 
       // Log payment creation
-      await this.logWebhookEvent('midtrans', 'payment_created', {
-        orderId: paymentRequest.orderId,
-        orderNumber: order.orderNumber,
-        amount: paymentRequest.amount,
-        token: paymentResponse.token,
-      }, 'success');
+      await this.logWebhookEvent(
+        'midtrans',
+        'payment_created',
+        {
+          orderId: paymentRequest.orderId,
+          orderNumber: order.orderNumber,
+          amount: paymentRequest.amount,
+          token: paymentResponse.token,
+        },
+        'success',
+      );
 
-      this.logger.log(`Payment created for order ${order.orderNumber}: ${paymentResponse.token}`);
+      this.logger.log(
+        `Payment created for order ${order.orderNumber}: ${paymentResponse.token}`,
+      );
 
       return paymentResponse;
     } catch (error) {
-      this.logger.error(`Failed to create payment for order ${paymentRequest.orderId}:`, error);
-      
-      // Log error
-      await this.logWebhookEvent('midtrans', 'payment_creation_failed', {
-        orderId: paymentRequest.orderId,
-        error: error.message,
-      }, 'error');
+      this.logger.error(
+        `Failed to create payment for order ${paymentRequest.orderId}:`,
+        error,
+      );
 
-      throw new BadRequestException('Failed to create payment: ' + error.message);
+      // Log error
+      await this.logWebhookEvent(
+        'midtrans',
+        'payment_creation_failed',
+        {
+          orderId: paymentRequest.orderId,
+          error: error.message,
+        },
+        'error',
+      );
+
+      throw new BadRequestException(
+        'Failed to create payment: ' + error.message,
+      );
     }
   }
 
@@ -188,7 +215,7 @@ export class PaymentService {
 
       // Update order status based on transaction status
       let newStatus: OrderStatus;
-      let updateData: any = {
+      const updateData: any = {
         paymentReference: payload.transaction_id,
       };
 
@@ -217,7 +244,9 @@ export class PaymentService {
           newStatus = OrderStatus.REFUNDED;
           break;
         default:
-          this.logger.warn(`Unknown transaction status: ${payload.transaction_status}`);
+          this.logger.warn(
+            `Unknown transaction status: ${payload.transaction_status}`,
+          );
           return;
       }
 
@@ -236,18 +265,29 @@ export class PaymentService {
       }
 
       // Log webhook event
-      await this.logWebhookEvent('midtrans', 'webhook_received', payload, 'success');
+      await this.logWebhookEvent(
+        'midtrans',
+        'webhook_received',
+        payload,
+        'success',
+      );
 
-      this.logger.log(`Order ${order.orderNumber} status updated to ${newStatus} via webhook`);
-
+      this.logger.log(
+        `Order ${order.orderNumber} status updated to ${newStatus} via webhook`,
+      );
     } catch (error) {
       this.logger.error('Webhook processing failed:', error);
-      
+
       // Log error
-      await this.logWebhookEvent('midtrans', 'webhook_processing_failed', {
-        payload,
-        error: error.message,
-      }, 'error');
+      await this.logWebhookEvent(
+        'midtrans',
+        'webhook_processing_failed',
+        {
+          payload,
+          error: error.message,
+        },
+        'error',
+      );
 
       throw error;
     }
@@ -279,15 +319,18 @@ export class PaymentService {
         `${this.midtransBaseUrl}/v2/${order.orderNumber}/status`,
         {
           headers: {
-            'Accept': 'application/json',
-            'Authorization': `Basic ${Buffer.from(this.midtransServerKey + ':').toString('base64')}`,
+            Accept: 'application/json',
+            Authorization: `Basic ${Buffer.from(this.midtransServerKey + ':').toString('base64')}`,
           },
         },
       );
 
       return response.data;
     } catch (error) {
-      this.logger.error(`Failed to get payment status for order ${orderId}:`, error);
+      this.logger.error(
+        `Failed to get payment status for order ${orderId}:`,
+        error,
+      );
       throw new BadRequestException('Failed to get payment status');
     }
   }
@@ -312,8 +355,8 @@ export class PaymentService {
         {},
         {
           headers: {
-            'Accept': 'application/json',
-            'Authorization': `Basic ${Buffer.from(this.midtransServerKey + ':').toString('base64')}`,
+            Accept: 'application/json',
+            Authorization: `Basic ${Buffer.from(this.midtransServerKey + ':').toString('base64')}`,
           },
         },
       );
@@ -328,7 +371,10 @@ export class PaymentService {
 
       this.logger.log(`Payment cancelled for order ${order.orderNumber}`);
     } catch (error) {
-      this.logger.error(`Failed to cancel payment for order ${orderId}:`, error);
+      this.logger.error(
+        `Failed to cancel payment for order ${orderId}:`,
+        error,
+      );
       throw new BadRequestException('Failed to cancel payment');
     }
   }
@@ -350,15 +396,23 @@ export class PaymentService {
     return crypto.createHash('sha512').update(stringToSign).digest('hex');
   }
 
-  private async logWebhookEvent(source: string, event: string, payload: any, status: string): Promise<void> {
+  private async logWebhookEvent(
+    source: string,
+    event: string,
+    payload: any,
+    status: string,
+  ): Promise<void> {
     try {
       await this.prisma.webhookLog.create({
         data: {
           source,
           event,
-          payload: payload as any,
+          payload: payload,
           status,
-          response: status === 'success' ? { processed: true } : { error: payload.error },
+          response:
+            status === 'success'
+              ? { processed: true }
+              : { error: payload.error },
         },
       });
     } catch (error) {
@@ -386,10 +440,12 @@ export class PaymentService {
         qrCode: string;
         expiresAt: Date;
       }> = [];
-      
+
       for (let i = 0; i < order.quantity; i++) {
         const qrCode = await this.generateQRCode(orderId, i + 1);
-        const expiresAt = new Date(order.deal.validUntil.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 days after deal expires
+        const expiresAt = new Date(
+          order.deal.validUntil.getTime() + 30 * 24 * 60 * 60 * 1000,
+        ); // 30 days after deal expires
 
         coupons.push({
           orderId: order.id,
@@ -404,16 +460,24 @@ export class PaymentService {
         data: coupons,
       });
 
-      this.logger.log(`Generated ${coupons.length} coupons for order ${order.orderNumber}`);
+      this.logger.log(
+        `Generated ${coupons.length} coupons for order ${order.orderNumber}`,
+      );
     } catch (error) {
-      this.logger.error(`Failed to generate coupons for order ${orderId}:`, error);
+      this.logger.error(
+        `Failed to generate coupons for order ${orderId}:`,
+        error,
+      );
       throw new BadRequestException('Failed to generate coupons');
     }
   }
 
-  private async generateQRCode(orderId: string, couponNumber: number): Promise<string> {
+  private async generateQRCode(
+    orderId: string,
+    couponNumber: number,
+  ): Promise<string> {
     const QRCode = require('qrcode');
-    
+
     const qrData = {
       orderId,
       couponNumber,

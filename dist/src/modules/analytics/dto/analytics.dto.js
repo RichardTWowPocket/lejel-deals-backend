@@ -74,7 +74,10 @@ __decorate([
     __metadata("design:type", Number)
 ], CustomerAnalyticsDto.prototype, "customerGrowth", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Average spending per customer', example: 250000 }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Average spending per customer',
+        example: 250000,
+    }),
     __metadata("design:type", Number)
 ], CustomerAnalyticsDto.prototype, "averageSpendingPerCustomer", void 0);
 __decorate([
@@ -191,11 +194,17 @@ __decorate([
     __metadata("design:type", Object)
 ], OrderAnalyticsDto.prototype, "orderStatusDistribution", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Average order processing time in hours', example: 2.5 }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Average order processing time in hours',
+        example: 2.5,
+    }),
     __metadata("design:type", Number)
 ], OrderAnalyticsDto.prototype, "averageOrderProcessingTime", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Order completion rate percentage', example: 90.0 }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Order completion rate percentage',
+        example: 90.0,
+    }),
     __metadata("design:type", Number)
 ], OrderAnalyticsDto.prototype, "orderCompletionRate", void 0);
 class DashboardAnalyticsDto {
@@ -217,11 +226,17 @@ __decorate([
     __metadata("design:type", RevenueAnalyticsDto)
 ], DashboardAnalyticsDto.prototype, "revenue", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Customer analytics', type: CustomerAnalyticsDto }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Customer analytics',
+        type: CustomerAnalyticsDto,
+    }),
     __metadata("design:type", CustomerAnalyticsDto)
 ], DashboardAnalyticsDto.prototype, "customers", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Merchant analytics', type: MerchantAnalyticsDto }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Merchant analytics',
+        type: MerchantAnalyticsDto,
+    }),
     __metadata("design:type", MerchantAnalyticsDto)
 ], DashboardAnalyticsDto.prototype, "merchants", void 0);
 __decorate([
@@ -233,7 +248,10 @@ __decorate([
     __metadata("design:type", OrderAnalyticsDto)
 ], DashboardAnalyticsDto.prototype, "orders", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Last updated timestamp', example: '2024-01-01T00:00:00.000Z' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Last updated timestamp',
+        example: '2024-01-01T00:00:00.000Z',
+    }),
     __metadata("design:type", Date)
 ], DashboardAnalyticsDto.prototype, "lastUpdated", void 0);
 class AnalyticsQueryDto {
@@ -245,13 +263,19 @@ class AnalyticsQueryDto {
 }
 exports.AnalyticsQueryDto = AnalyticsQueryDto;
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Start date for analytics', example: '2024-01-01' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Start date for analytics',
+        example: '2024-01-01',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsDateString)(),
     __metadata("design:type", String)
 ], AnalyticsQueryDto.prototype, "startDate", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'End date for analytics', example: '2024-12-31' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'End date for analytics',
+        example: '2024-12-31',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsDateString)(),
     __metadata("design:type", String)

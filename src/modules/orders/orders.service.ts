@@ -1,6 +1,18 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { CreateOrderDto, UpdateOrderDto, UpdateOrderStatusDto, OrderResponseDto, OrderStatsDto, OrderAnalyticsDto } from './dto/create-order.dto';
+import {
+  CreateOrderDto,
+  UpdateOrderDto,
+  UpdateOrderStatusDto,
+  OrderResponseDto,
+  OrderStatsDto,
+  OrderAnalyticsDto,
+} from './dto/create-order.dto';
 import { OrderStatus, DealStatus } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 
@@ -8,8 +20,12 @@ import { Decimal } from '@prisma/client/runtime/library';
 export class OrdersService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createOrderDto: CreateOrderDto, userId?: string): Promise<OrderResponseDto> {
-    const { customerId, dealId, quantity, paymentMethod, paymentReference } = createOrderDto;
+  async create(
+    createOrderDto: CreateOrderDto,
+    userId?: string,
+  ): Promise<OrderResponseDto> {
+    const { customerId, dealId, quantity, paymentMethod, paymentReference } =
+      createOrderDto;
 
     // Validate customer exists and is active
     const customer = await this.prisma.customer.findUnique({
@@ -43,7 +59,7 @@ export class OrdersService {
     }
 
     // Check quantity availability
-    if (deal.maxQuantity && (deal.soldQuantity + quantity) > deal.maxQuantity) {
+    if (deal.maxQuantity && deal.soldQuantity + quantity > deal.maxQuantity) {
       throw new BadRequestException('Insufficient quantity available');
     }
 
@@ -179,7 +195,7 @@ export class OrdersService {
     ]);
 
     return {
-      orders: orders.map(order => this.mapToOrderResponseDto(order)),
+      orders: orders.map((order) => this.mapToOrderResponseDto(order)),
       pagination: {
         page,
         limit,
@@ -281,17 +297,38 @@ export class OrdersService {
     return this.mapToOrderResponseDto(order);
   }
 
-  async findByCustomer(customerId: string, page: number = 1, limit: number = 10): Promise<{ orders: OrderResponseDto[]; pagination: any }> {
+  async findByCustomer(
+    customerId: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ orders: OrderResponseDto[]; pagination: any }> {
     const result = await this.findAll(page, limit, undefined, customerId);
     return result;
   }
 
-  async findByMerchant(merchantId: string, page: number = 1, limit: number = 10): Promise<{ orders: OrderResponseDto[]; pagination: any }> {
-    return this.findAll(page, limit, undefined, undefined, undefined, merchantId);
+  async findByMerchant(
+    merchantId: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ orders: OrderResponseDto[]; pagination: any }> {
+    return this.findAll(
+      page,
+      limit,
+      undefined,
+      undefined,
+      undefined,
+      merchantId,
+    );
   }
 
-  async findMine(userId: string, page: number = 1, limit: number = 10): Promise<{ orders: OrderResponseDto[]; pagination: any }> {
-    const customer = await (this.prisma as any).customer.findFirst({ where: { userId: userId } });
+  async findMine(
+    userId: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ orders: OrderResponseDto[]; pagination: any }> {
+    const customer = await (this.prisma as any).customer.findFirst({
+      where: { userId: userId },
+    });
     if (!customer) {
       return {
         orders: [],
@@ -301,7 +338,10 @@ export class OrdersService {
     return this.findByCustomer(customer.id, page, limit);
   }
 
-  async update(id: string, updateOrderDto: UpdateOrderDto): Promise<OrderResponseDto> {
+  async update(
+    id: string,
+    updateOrderDto: UpdateOrderDto,
+  ): Promise<OrderResponseDto> {
     const existingOrder = await this.prisma.order.findUnique({
       where: { id },
     });
@@ -311,8 +351,13 @@ export class OrdersService {
     }
 
     // Validate status transitions
-    if (updateOrderDto.status && !this.isValidStatusTransition(existingOrder.status, updateOrderDto.status)) {
-      throw new BadRequestException(`Invalid status transition from ${existingOrder.status} to ${updateOrderDto.status}`);
+    if (
+      updateOrderDto.status &&
+      !this.isValidStatusTransition(existingOrder.status, updateOrderDto.status)
+    ) {
+      throw new BadRequestException(
+        `Invalid status transition from ${existingOrder.status} to ${updateOrderDto.status}`,
+      );
     }
 
     const order = await this.prisma.order.update({
@@ -357,7 +402,10 @@ export class OrdersService {
     return this.mapToOrderResponseDto(order);
   }
 
-  async updateStatus(id: string, updateStatusDto: UpdateOrderStatusDto): Promise<OrderResponseDto> {
+  async updateStatus(
+    id: string,
+    updateStatusDto: UpdateOrderStatusDto,
+  ): Promise<OrderResponseDto> {
     const { status, paymentReference } = updateStatusDto;
 
     const existingOrder = await this.prisma.order.findUnique({
@@ -370,12 +418,16 @@ export class OrdersService {
 
     // Validate status transitions
     if (!this.isValidStatusTransition(existingOrder.status, status)) {
-      throw new BadRequestException(`Invalid status transition from ${existingOrder.status} to ${status}`);
+      throw new BadRequestException(
+        `Invalid status transition from ${existingOrder.status} to ${status}`,
+      );
     }
 
     // Additional validation for PAID status
     if (status === OrderStatus.PAID && !paymentReference) {
-      throw new BadRequestException('Payment reference is required when marking order as paid');
+      throw new BadRequestException(
+        'Payment reference is required when marking order as paid',
+      );
     }
 
     const updateData: any = { status };
@@ -443,7 +495,9 @@ export class OrdersService {
       where: { id },
       data: {
         status: OrderStatus.CANCELLED,
-        paymentReference: reason ? `${existingOrder.paymentReference || ''} - Cancelled: ${reason}` : existingOrder.paymentReference,
+        paymentReference: reason
+          ? `${existingOrder.paymentReference || ''} - Cancelled: ${reason}`
+          : existingOrder.paymentReference,
       },
       include: {
         customer: {
@@ -511,7 +565,9 @@ export class OrdersService {
       where: { id },
       data: {
         status: OrderStatus.REFUNDED,
-        paymentReference: reason ? `${existingOrder.paymentReference || ''} - Refunded: ${reason}` : existingOrder.paymentReference,
+        paymentReference: reason
+          ? `${existingOrder.paymentReference || ''} - Refunded: ${reason}`
+          : existingOrder.paymentReference,
       },
       include: {
         customer: {
@@ -562,8 +618,13 @@ export class OrdersService {
     }
 
     // Only allow deletion of cancelled or refunded orders
-    if (order.status !== OrderStatus.CANCELLED && order.status !== OrderStatus.REFUNDED) {
-      throw new BadRequestException('Only cancelled or refunded orders can be deleted');
+    if (
+      order.status !== OrderStatus.CANCELLED &&
+      order.status !== OrderStatus.REFUNDED
+    ) {
+      throw new BadRequestException(
+        'Only cancelled or refunded orders can be deleted',
+      );
     }
 
     await this.prisma.order.delete({
@@ -609,8 +670,12 @@ export class OrdersService {
       paidOrders,
       cancelledOrders,
       refundedOrders,
-      totalRevenue: totalRevenue._sum.totalAmount ? Number(totalRevenue._sum.totalAmount) : 0,
-      averageOrderValue: averageOrderValue._avg.totalAmount ? Number(averageOrderValue._avg.totalAmount) : 0,
+      totalRevenue: totalRevenue._sum.totalAmount
+        ? Number(totalRevenue._sum.totalAmount)
+        : 0,
+      averageOrderValue: averageOrderValue._avg.totalAmount
+        ? Number(averageOrderValue._avg.totalAmount)
+        : 0,
       statusDistribution,
     };
   }
@@ -679,7 +744,10 @@ export class OrdersService {
         status: OrderStatus.PAID,
       },
     });
-    const completionRate = totalOrdersInPeriod > 0 ? (completedOrdersInPeriod / totalOrdersInPeriod) * 100 : 0;
+    const completionRate =
+      totalOrdersInPeriod > 0
+        ? (completedOrdersInPeriod / totalOrdersInPeriod) * 100
+        : 0;
 
     // Calculate average time to payment
     const paidOrders = await this.prisma.order.findMany({
@@ -693,12 +761,14 @@ export class OrdersService {
       },
     });
 
-    const averageTimeToPayment = paidOrders.length > 0
-      ? paidOrders.reduce((sum, order) => {
-          const timeDiff = order.updatedAt.getTime() - order.createdAt.getTime();
-          return sum + (timeDiff / (1000 * 60 * 60)); // Convert to hours
-        }, 0) / paidOrders.length
-      : 0;
+    const averageTimeToPayment =
+      paidOrders.length > 0
+        ? paidOrders.reduce((sum, order) => {
+            const timeDiff =
+              order.updatedAt.getTime() - order.createdAt.getTime();
+            return sum + timeDiff / (1000 * 60 * 60); // Convert to hours
+          }, 0) / paidOrders.length
+        : 0;
 
     return {
       ordersByPeriod: this.formatPeriodData(ordersByPeriod, period),
@@ -713,7 +783,7 @@ export class OrdersService {
   private async generateOrderNumber(): Promise<string> {
     const year = new Date().getFullYear();
     const month = String(new Date().getMonth() + 1).padStart(2, '0');
-    
+
     // Get count of orders this month
     const startOfMonth = new Date(year, new Date().getMonth(), 1);
     const count = await this.prisma.order.count({
@@ -726,7 +796,10 @@ export class OrdersService {
     return orderNumber;
   }
 
-  private isValidStatusTransition(currentStatus: OrderStatus, newStatus: OrderStatus): boolean {
+  private isValidStatusTransition(
+    currentStatus: OrderStatus,
+    newStatus: OrderStatus,
+  ): boolean {
     const validTransitions: Record<OrderStatus, OrderStatus[]> = {
       [OrderStatus.PENDING]: [OrderStatus.PAID, OrderStatus.CANCELLED],
       [OrderStatus.PAID]: [OrderStatus.REFUNDED],
@@ -751,22 +824,28 @@ export class OrdersService {
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
       customer: order.customer,
-      deal: order.deal ? {
-        ...order.deal,
-        discountPrice: Number(order.deal.discountPrice),
-        finalPrice: Number(order.deal.discountPrice), // discountPrice is the coupon face value
-      } : undefined,
+      deal: order.deal
+        ? {
+            ...order.deal,
+            discountPrice: Number(order.deal.discountPrice),
+            finalPrice: Number(order.deal.discountPrice), // discountPrice is the coupon face value
+          }
+        : undefined,
       coupons: order.coupons,
     };
   }
 
-  private formatPeriodData(data: any[], period: string, type: 'orders' | 'revenue' = 'orders'): Record<string, number> {
+  private formatPeriodData(
+    data: any[],
+    period: string,
+    type: 'orders' | 'revenue' = 'orders',
+  ): Record<string, number> {
     const result: Record<string, number> = {};
-    
-    data.forEach(item => {
+
+    data.forEach((item) => {
       const date = new Date(item.createdAt);
       let key: string;
-      
+
       switch (period) {
         case 'week':
           key = date.toISOString().split('T')[0];
@@ -780,29 +859,32 @@ export class OrdersService {
         default:
           key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
       }
-      
+
       if (type === 'revenue') {
         result[key] = (result[key] || 0) + Number(item._sum.totalAmount || 0);
       } else {
         result[key] = (result[key] || 0) + item._count.id;
       }
     });
-    
+
     return result;
   }
 
   private async enrichTopCustomers(customers: any[]): Promise<any[]> {
-    const customerIds = customers.map(c => c.customerId);
+    const customerIds = customers.map((c) => c.customerId);
     const customerDetails = await this.prisma.customer.findMany({
       where: { id: { in: customerIds } },
       select: { id: true, firstName: true, lastName: true, email: true },
     });
 
-    return customers.map(customer => {
-      const details = customerDetails.find(d => d.id === customer.customerId);
+    return customers.map((customer) => {
+      const details = customerDetails.find((d) => d.id === customer.customerId);
       return {
         customerId: customer.customerId,
-        customerName: details ? `${details.firstName || ''} ${details.lastName || ''}`.trim() || details.email : 'Unknown',
+        customerName: details
+          ? `${details.firstName || ''} ${details.lastName || ''}`.trim() ||
+            details.email
+          : 'Unknown',
         orderCount: customer._count.id,
         totalSpent: Number(customer._sum.totalAmount || 0),
       };
@@ -810,14 +892,14 @@ export class OrdersService {
   }
 
   private async enrichTopDeals(deals: any[]): Promise<any[]> {
-    const dealIds = deals.map(d => d.dealId);
+    const dealIds = deals.map((d) => d.dealId);
     const dealDetails = await this.prisma.deal.findMany({
       where: { id: { in: dealIds } },
       select: { id: true, title: true },
     });
 
-    return deals.map(deal => {
-      const details = dealDetails.find(d => d.id === deal.dealId);
+    return deals.map((deal) => {
+      const details = dealDetails.find((d) => d.id === deal.dealId);
       return {
         dealId: deal.dealId,
         dealTitle: details?.title || 'Unknown Deal',

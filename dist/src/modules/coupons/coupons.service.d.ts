@@ -56,7 +56,7 @@ export declare class CouponsService {
         pagination: any;
     }>;
     validateCoupon(qrCode: string): Promise<CouponValidationResult>;
-    redeemCoupon(qrCode: string, staffId?: string, notes?: string): Promise<CouponResponseDto>;
+    redeemCoupon(qrCode: string, redeemedByUserId?: string, notes?: string): Promise<CouponResponseDto>;
     cancelCoupon(id: string, reason?: string): Promise<CouponResponseDto>;
     expireCoupons(): Promise<number>;
     getStats(): Promise<CouponStatsDto>;

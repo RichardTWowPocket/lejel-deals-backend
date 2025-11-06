@@ -39,3 +39,26 @@ export class UserProfileDto {
   lastName?: string;
 }
 
+export class OAuthGoogleDto {
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  providerId: string; // Google user ID
+
+  @IsOptional()
+  @IsString()
+  name?: string; // Full name from Google
+
+  @IsOptional()
+  @IsString()
+  avatar?: string; // Profile picture URL
+
+  @IsOptional()
+  @IsString()
+  firstName?: string;
+
+  @IsOptional()
+  @IsString()
+  lastName?: string;
+}

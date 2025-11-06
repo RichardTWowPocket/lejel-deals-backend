@@ -33,7 +33,10 @@ __decorate([
     __metadata("design:type", String)
 ], CreateCategoryDto.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Category description', example: 'Restaurants, cafes, and food delivery' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Category description',
+        example: 'Restaurants, cafes, and food delivery',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -45,50 +48,74 @@ __decorate([
     __metadata("design:type", String)
 ], CreateCategoryDto.prototype, "icon", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Category image URL', example: 'https://example.com/category-image.jpg' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Category image URL',
+        example: 'https://example.com/category-image.jpg',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateCategoryDto.prototype, "image", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Category color for UI theming', example: '#FF6B6B' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Category color for UI theming',
+        example: '#FF6B6B',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateCategoryDto.prototype, "color", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Parent category ID for hierarchy', example: 'parent-category-123' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Parent category ID for hierarchy',
+        example: 'parent-category-123',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateCategoryDto.prototype, "parentId", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Category level in hierarchy (auto-calculated if not provided)', example: 1 }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Category level in hierarchy (auto-calculated if not provided)',
+        example: 1,
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsInt)(),
     __metadata("design:type", Number)
 ], CreateCategoryDto.prototype, "level", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Category path in hierarchy (auto-generated if not provided)', example: 'food/beverage' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Category path in hierarchy (auto-generated if not provided)',
+        example: 'food/beverage',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateCategoryDto.prototype, "path", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Category sort order within the same level', example: 1 }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Category sort order within the same level',
+        example: 1,
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsInt)(),
     __metadata("design:type", Number)
 ], CreateCategoryDto.prototype, "sortOrder", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Category tags for searchability', example: ['food', 'restaurant', 'delivery'] }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Category tags for searchability',
+        example: ['food', 'restaurant', 'delivery'],
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsString)({ each: true }),
     __metadata("design:type", Array)
 ], CreateCategoryDto.prototype, "tags", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Category metadata for flexible data storage', example: { featured: true, priority: 1 } }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Category metadata for flexible data storage',
+        example: { featured: true, priority: 1 },
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsObject)(),
     __metadata("design:type", Object)
