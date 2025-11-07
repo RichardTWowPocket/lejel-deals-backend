@@ -122,15 +122,14 @@ export class DealsService {
     }
 
     // Filter by price range
-    if (filters.priceMin !== undefined) {
-      where.dealPrice = { ...where.dealPrice, gte: filters.priceMin };
-    }
-
-    if (filters.priceMax !== undefined) {
-      where.dealPrice = {
-        ...where.dealPrice,
-        lte: filters.priceMax,
-      };
+    if (filters.priceMin !== undefined || filters.priceMax !== undefined) {
+      where.dealPrice = {};
+      if (filters.priceMin !== undefined) {
+        where.dealPrice.gte = filters.priceMin;
+      }
+      if (filters.priceMax !== undefined) {
+        where.dealPrice.lte = filters.priceMax;
+      }
     }
 
     // Filter for active deals only when status=active is specified

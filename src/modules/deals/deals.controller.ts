@@ -133,11 +133,17 @@ export class DealsController {
     @Query('search') search?: string,
     @Query('featured') featured?: boolean,
     @Query('city') city?: string,
-    @Query('priceMin') priceMin?: number,
-    @Query('priceMax') priceMax?: number,
+    @Query('priceMin') priceMin?: string,
+    @Query('priceMax') priceMax?: string,
+    @Query('minPrice') minPrice?: string,
+    @Query('maxPrice') maxPrice?: string,
     @Query('sortBy') sortBy?: string,
     @Query('sortOrder') sortOrder?: 'asc' | 'desc',
   ): Promise<DealListResponseDto> {
+    // Support both priceMin/priceMax and minPrice/maxPrice parameter names
+    const finalPriceMin = priceMin || minPrice;
+    const finalPriceMax = priceMax || maxPrice;
+    
     return this.dealsService.findAll({
       page,
       limit,
@@ -147,8 +153,8 @@ export class DealsController {
       search,
       featured,
       city,
-      priceMin,
-      priceMax,
+      priceMin: finalPriceMin ? Number(finalPriceMin) : undefined,
+      priceMax: finalPriceMax ? Number(finalPriceMax) : undefined,
       sortBy,
       sortOrder,
     });
