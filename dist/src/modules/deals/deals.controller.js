@@ -28,7 +28,9 @@ let DealsController = class DealsController {
     constructor(dealsService) {
         this.dealsService = dealsService;
     }
-    async findAll(page, limit, status, merchantId, categoryId, search, featured, city, priceMin, priceMax, sortBy, sortOrder) {
+    async findAll(page, limit, status, merchantId, categoryId, search, featured, city, priceMin, priceMax, minPrice, maxPrice, sortBy, sortOrder) {
+        const finalPriceMin = priceMin || minPrice;
+        const finalPriceMax = priceMax || maxPrice;
         return this.dealsService.findAll({
             page,
             limit,
@@ -38,8 +40,8 @@ let DealsController = class DealsController {
             search,
             featured,
             city,
-            priceMin,
-            priceMax,
+            priceMin: finalPriceMin ? Number(finalPriceMin) : undefined,
+            priceMax: finalPriceMax ? Number(finalPriceMax) : undefined,
             sortBy,
             sortOrder,
         });
@@ -184,10 +186,12 @@ __decorate([
     __param(7, (0, common_1.Query)('city')),
     __param(8, (0, common_1.Query)('priceMin')),
     __param(9, (0, common_1.Query)('priceMax')),
-    __param(10, (0, common_1.Query)('sortBy')),
-    __param(11, (0, common_1.Query)('sortOrder')),
+    __param(10, (0, common_1.Query)('minPrice')),
+    __param(11, (0, common_1.Query)('maxPrice')),
+    __param(12, (0, common_1.Query)('sortBy')),
+    __param(13, (0, common_1.Query)('sortOrder')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Number, String, String, String, String, Boolean, String, Number, Number, String, String]),
+    __metadata("design:paramtypes", [Number, Number, String, String, String, String, Boolean, String, String, String, String, String, String, String]),
     __metadata("design:returntype", Promise)
 ], DealsController.prototype, "findAll", null);
 __decorate([

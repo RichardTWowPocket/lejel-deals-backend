@@ -87,14 +87,14 @@ let DealsService = class DealsService {
                 city: { contains: filters.city, mode: 'insensitive' },
             };
         }
-        if (filters.priceMin !== undefined) {
-            where.dealPrice = { ...where.dealPrice, gte: filters.priceMin };
-        }
-        if (filters.priceMax !== undefined) {
-            where.dealPrice = {
-                ...where.dealPrice,
-                lte: filters.priceMax,
-            };
+        if (filters.priceMin !== undefined || filters.priceMax !== undefined) {
+            where.dealPrice = {};
+            if (filters.priceMin !== undefined) {
+                where.dealPrice.gte = filters.priceMin;
+            }
+            if (filters.priceMax !== undefined) {
+                where.dealPrice.lte = filters.priceMax;
+            }
         }
         if (filters.status === client_1.DealStatus.ACTIVE) {
             where.status = client_1.DealStatus.ACTIVE;
